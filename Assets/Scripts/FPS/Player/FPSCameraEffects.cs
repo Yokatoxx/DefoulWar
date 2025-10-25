@@ -1,0 +1,107 @@
+using UnityEngine;
+
+namespace Proto3GD.FPS
+{
+    /// <summary>
+    /// Gère les effets visuels de la caméra (headbob, FOV dynamique)
+    /// </summary>
+    [RequireComponent(typeof(Camera))]
+    public class FPSCameraEffects : MonoBehaviour
+    {
+        [Header("Headbob Settings")]
+        [SerializeField] private float bobFrequency = 1.8f;
+        [SerializeField] private float bobHorizontalAmplitude = 0.08f;
+        [SerializeField] private float bobVerticalAmplitude = 0.05f;
+        [SerializeField] private float bobSmoothing = 8f;
+
+        [Header("FOV Settings")]
+        [SerializeField] private float defaultFOV = 60f;
+        [SerializeField] private float sprintFOV = 70f;
+        [SerializeField] private float jumpFOV = 45f;
+        [SerializeField] private float fovTransitionSpeed = 8f;
+
+        private Camera cam;
+        private float targetFOV;
+        private float bobTimer;
+        private Vector3 camDefaultLocalPos;
+        private bool isJumping;
+
+        private void Awake()
+        {
+            cam = GetComponent<Camera>();
+            if (cam == null)
+            {
+                cam = gameObject.AddComponent<Camera>();
+            }
+            
+            camDefaultLocalPos = transform.localPosition;
+        }
+        
+        private void Start()
+        {
+            // Initialiser le FOV après que la caméra soit créée
+            if (cam != null)
+            {
+                targetFOV = defaultFOV;
+                cam.fieldOfView = defaultFOV;
+            }
+        }
+
+        private void Update()
+        {
+            UpdateFOV();
+        }
+
+        public void UpdateEffects(bool isGrounded, bool isMoving, float currentSpeed, Vector2 moveInput, bool isSprinting)
+        {
+            // Gérer le FOV selon l'état
+            if (!isGrounded && !isJumping)
+            {
+                targetFOV = jumpFOV;
+                isJumping = true;
+            }
+            else if (isGrounded)
+            {
+                if (isJumping)
+                {
+                    isJumping = false;
+                }
+                
+                // FOV de sprint ou normal
+                if (isSprinting && isMoving)
+                {
+                    targetFOV = sprintFOV;
+                }
+                else
+                {
+                    targetFOV = defaultFOV;
+                }
+            }
+
+            // Headbob
+            if (isMoving && isGrounded)
+            {
+                bobTimer += Time.deltaTime * bobFrequency * currentSpeed;
+                float bobX = Mathf.Sin(bobTimer) * bobHorizontalAmplitude;
+                float bobY = Mathf.Cos(bobTimer * 2f) * bobVerticalAmplitude;
+                Vector3 targetPos = camDefaultLocalPos + new Vector3(bobX, bobY, 0f);
+                transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, Time.deltaTime * bobSmoothing);
+            }
+            else
+            {
+                bobTimer = 0f;
+                transform.localPosition = Vector3.Lerp(transform.localPosition, camDefaultLocalPos, Time.deltaTime * bobSmoothing);
+            }
+        }
+
+        private void UpdateFOV()
+        {
+            if (cam != null)
+            {
+                cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, Time.deltaTime * fovTransitionSpeed);
+            }
+        }
+
+        public Camera Camera => cam;
+    }
+}
