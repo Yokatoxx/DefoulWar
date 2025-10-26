@@ -9267,7 +9267,6 @@ GameObject:
   m_Component:
   - component: {fileID: 943778875}
   - component: {fileID: 943778874}
-  - component: {fileID: 943778883}
   - component: {fileID: 943778882}
   - component: {fileID: 943778881}
   - component: {fileID: 943778880}
@@ -9549,28 +9548,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useNewInputSystem: 0
---- !u!114 &943778883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943778869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da70cac90980495fa13fde6d08f6eae9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bobFrequency: 2
-  bobHorizontalAmplitude: 15
-  bobVerticalAmplitude: 15
-  bobSmoothing: 8
-  headbobTarget: {fileID: 0}
-  speedScale: 1
-  defaultFOV: 60
-  sprintFOV: 70
-  jumpFOV: 50
-  fovTransitionSpeed: 8
 --- !u!114 &943778884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19079,6 +19056,7 @@ GameObject:
   - component: {fileID: 1905549314}
   - component: {fileID: 1905549313}
   - component: {fileID: 1905549316}
+  - component: {fileID: 1905549317}
   m_Layer: 3
   m_Name: Camera
   m_TagString: MainCamera
@@ -19246,6 +19224,26 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   showDebugInfo: 0
+--- !u!114 &1905549317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905549311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da70cac90980495fa13fde6d08f6eae9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bobFrequency: 1.25
+  bobHorizontalAmplitude: 0.25
+  bobVerticalAmplitude: 0.15
+  bobSmoothing: 8
+  defaultFOV: 60
+  sprintFOV: 70
+  jumpFOV: 45
+  fovTransitionSpeed: 8
 --- !u!1 &1913109445
 GameObject:
   m_ObjectHideFlags: 0

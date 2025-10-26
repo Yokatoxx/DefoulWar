@@ -34,7 +34,7 @@ namespace Proto3GD.FPS
                 cam = gameObject.AddComponent<Camera>();
             }
             
-            camDefaultLocalPos = transform.localPosition;
+            camDefaultLocalPos = cam.transform.localPosition;
         }
         
         private void Start()
@@ -85,7 +85,8 @@ namespace Proto3GD.FPS
                 float bobX = Mathf.Sin(bobTimer) * bobHorizontalAmplitude;
                 float bobY = Mathf.Cos(bobTimer * 2f) * bobVerticalAmplitude;
                 Vector3 targetPos = camDefaultLocalPos + new Vector3(bobX, bobY, 0f);
-                transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, Time.deltaTime * bobSmoothing);
+                transform.localPosition = Vector3.Lerp(cam.transform.localPosition, targetPos, Time.deltaTime * bobSmoothing);
+
             }
             else
             {
