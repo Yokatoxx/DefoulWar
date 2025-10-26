@@ -58,7 +58,6 @@ namespace Proto3GD.FPS
         
         private CharacterController characterController;
         
-        // Tracking des ennemis tués par dash pour éviter le spawn de pilier
         private static System.Collections.Generic.HashSet<GameObject> enemiesKilledByDash = new System.Collections.Generic.HashSet<GameObject>();
         
         // Runtime
@@ -125,11 +124,10 @@ namespace Proto3GD.FPS
             }
             else
             {
-                // Dash directionnel: E déclenche un dash dans la direction de la caméra
                 bool hasCharge = currentDashCharge >= 1f;
                 bool cooldownReady = autoRegenerate ? (cooldownTimer >= dashCooldown) : true;
                 
-                if (!isStunned && Input.GetKeyDown(KeyCode.E) && hasCharge && cooldownReady)
+                if (!isStunned && Input.GetKeyDown(KeyCode.F) && hasCharge && cooldownReady)
                 {
                     StartDirectionalDash();
                 }
