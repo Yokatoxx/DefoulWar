@@ -9457,23 +9457,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abae424d8e92498d9b8bf7c95b18e083, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 5
-  detectionRadius: 0.5
-  dashSpeed: 25
-  dashDuration: 0.4
+  dashSpeed: 20
+  dashDuration: 0.3
   dashCooldown: 1.5
-  dashFOV: 90
-  fovTransitionSpeed: 15
-  highlightColor: {r: 0, g: 0.010046005, b: 1, a: 1}
-  outlineWidth: 4
-  playerController: {fileID: 943778879}
-  cameraTransform: {fileID: 1905549312}
-  useDirectionalDash: 1
   dashHitRadius: 1
   dashDamage: 9999
   enemyMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  dashFOV: 90
+  fovTransitionSpeed: 15
+  playerController: {fileID: 943778879}
+  cameraTransform: {fileID: 1905549312}
 --- !u!43 &998631713
 Mesh:
   m_ObjectHideFlags: 0
@@ -22082,7 +22077,7 @@ MonoBehaviour:
   - enemies:
     - prefab: {fileID: 160580225223210161, guid: 0c83bdec55c1a6f4198e60bf8b13d256, type: 3}
       count: 10
-    - prefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
+    - prefab: {fileID: 160580225223210161, guid: 80eab93a04a444447bff257b35df6f3c, type: 3}
       count: 5
   - enemies:
     - prefab: {fileID: 160580225223210161, guid: 0c83bdec55c1a6f4198e60bf8b13d256, type: 3}

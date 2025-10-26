@@ -8,26 +8,20 @@ using Proto3GD.FPS;
 
 namespace Ennemies.Effect
 {
-    /// <summary>
-    /// Ennemi : chasse rapidement les balles détectées, puis revient au suivi simple du joueur.
-    /// À la mort (hors dash), affiche une tache aléatoire en overlay sur l'écran.
-    /// </summary>
+
     [RequireComponent(typeof(EnemyHealth))]
     [RequireComponent(typeof(NavMeshAgent))]
     public class TacheEnnemies : MonoBehaviour
     {
-        [Header("Réaction aux balles")]
-        [SerializeField] private float bulletDetectionRadius = 15f;
-        [SerializeField] private float chaseBulletSpeedMultiplier = 5.5f;
-        [SerializeField] private float maxChaseBulletTime = 1.25f;
-        [SerializeField] private float bulletScanInterval = 0.05f;
-        [SerializeField] private float chaseAccelerationMultiplier = 5f;
-        [SerializeField] private float chaseAngularSpeed = 720f;
+        [Header("Dash sur le joueur")]
+        [SerializeField] private float dashDetectionRange = 10f;
+        [SerializeField] private float dashSpeed = 20f;
+        [SerializeField] private float dashDuration = 0.5f;
+        [SerializeField] private float dashCooldown = 3f;
+        [SerializeField] private float explosionRadius = 3f;
+        [SerializeField] private float explosionDamage = 50f;
 
-        [Header("IA externe à désactiver pendant la chasse (optionnel)")]
-        [SerializeField] private MonoBehaviour[] behavioursToDisableDuringChase;
-
-        [Header("Tache Caméra (à la mort par balle)")]
+        [Header("Tache Caméra")]
         [SerializeField] private Sprite tacheSprite;
         [SerializeField] private float tacheDuration = 5f;
         [SerializeField, Range(0f, 1f)] private float tacheMaxAlpha = 0.7f;
@@ -37,25 +31,17 @@ namespace Ennemies.Effect
         [SerializeField] private float fadeInTime = 0.08f;
         [SerializeField] private float fadeOutTime = 0.5f;
 
-        // Références
         private EnemyHealth health;
         private NavMeshAgent agent;
         private Transform player;
 
-        // Sauvegarde des valeurs agent
-        private float baseSpeed;
-        private float baseAcceleration;
-        private float baseAngularSpeed;
+        private bool isDashing;
+        private float dashTimer;
+        private float cooldownTimer;
+        private Vector3 dashDirection;
 
-        // État chasse
-        private Transform currentBullet;
-        private float chaseTimer;
-        private float bulletScanTimer;
+        private static readonly Collider[] ExplosionBuffer = new Collider[32];
 
-        // Buffers non alloc
-        private static readonly Collider[] BulletScanBuffer = new Collider[64];
-
-        // Overlay taches (persistant)
         private static Canvas _tacheCanvas;
         private static readonly List<Image> ActiveTaches = new List<Image>();
         private static int _overlaySortingOrder = 5000;
@@ -65,175 +51,87 @@ namespace Ennemies.Effect
             health = GetComponent<EnemyHealth>();
             agent = GetComponent<NavMeshAgent>();
 
-            baseSpeed = agent.speed;
-            baseAcceleration = agent.acceleration;
-            baseAngularSpeed = agent.angularSpeed;
-
             var playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null) player = playerObj.transform;
-        }
-
-        private void OnEnable()
-        {
-            if (health != null)
-                health.OnDeath.AddListener(OnEnemyDeath);
-        }
-
-        private void OnDisable()
-        {
-            if (health != null)
-                health.OnDeath.RemoveListener(OnEnemyDeath);
-
-            // Réactivation de sécurité
-            ToggleExternalBehaviours(true);
         }
 
         private void Update()
         {
             if (health != null && health.IsDead) return;
-            if (agent == null) return;
-
-            // 1) Poursuite d'une balle en cours
-            if (currentBullet != null)
+            if (agent == null || player == null) return;
+            
+            if (cooldownTimer > 0f)
             {
-                chaseTimer += Time.deltaTime;
-
-                if (currentBullet == null || currentBullet.gameObject == null)
+                cooldownTimer -= Time.deltaTime;
+            }
+            
+            if (isDashing)
+            {
+                dashTimer += Time.deltaTime;
+                
+                if (dashTimer >= dashDuration)
                 {
-                    StopChasingAndFollowPlayer();
+                    Explode();
+                    return;
                 }
-                else
-                {
-                    // Paramètres "très rapides"
-                    agent.speed = baseSpeed * chaseBulletSpeedMultiplier;
-                    agent.acceleration = baseAcceleration * chaseAccelerationMultiplier;
-                    agent.angularSpeed = chaseAngularSpeed;
-                    agent.autoBraking = false;
-                    agent.isStopped = false;
-                    agent.SetDestination(currentBullet.position);
 
-                    // Timeout / trop loin -> arrêt de la chasse
-                    if (chaseTimer >= maxChaseBulletTime ||
-                        Vector3.Distance(transform.position, currentBullet.position) > bulletDetectionRadius * 1.5f)
-                    {
-                        StopChasingAndFollowPlayer();
-                    }
-                }
+                transform.position += dashDirection * (dashSpeed * Time.deltaTime);
                 return;
             }
+            
+            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-            // 2) Scanner périodiquement les balles
-            bulletScanTimer += Time.deltaTime;
-            if (bulletScanTimer >= bulletScanInterval)
+            if (distanceToPlayer <= dashDetectionRange && cooldownTimer <= 0f)
             {
-                bulletScanTimer = 0f;
-                TryAcquireBulletTarget();
+                StartDash();
             }
-
-            // 3) Suivi simple du joueur (fallback)
-            if (player != null)
+            else
             {
-                SetAgentBaseParams();
-                agent.autoBraking = true;
                 agent.isStopped = false;
                 agent.SetDestination(player.position);
             }
         }
 
-        private void TryAcquireBulletTarget()
+        private void StartDash()
         {
-            int count = Physics.OverlapSphereNonAlloc(transform.position, bulletDetectionRadius, BulletScanBuffer);
-            Transform best = null;
-            float bestDist = float.PositiveInfinity;
+            isDashing = true;
+            dashTimer = 0f;
+            cooldownTimer = dashCooldown;
+            
+            dashDirection = (player.position - transform.position).normalized;
+            agent.enabled = false;
 
+            transform.forward = dashDirection;
+        }
+
+        private void Explode()
+        {
+            int count = Physics.OverlapSphereNonAlloc(transform.position, explosionRadius, ExplosionBuffer);
+            
             for (int i = 0; i < count; i++)
             {
-                var h = BulletScanBuffer[i];
-                if (h == null) continue;
+                var col = ExplosionBuffer[i];
+                if (col == null) continue;
 
-                var bullet = h.GetComponentInParent<Bullet>() ?? h.GetComponent<Bullet>();
-                if (bullet == null) continue;
-
-                Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                if (rb == null) continue;
-
-                // Privilégier les balles qui bougent réellement
-                if (rb.linearVelocity.sqrMagnitude < 0.05f) continue;
-
-                float dist = Vector3.Distance(transform.position, bullet.transform.position);
-                if (dist < bestDist)
+                var healthComp = col.GetComponent<EnemyHealth>();
+                if (healthComp != null)
                 {
-                    bestDist = dist;
-                    best = bullet.transform;
+                    healthComp.TakeDamage(explosionDamage);
+                    continue;
+                }
+
+                var playerHealth = col.GetComponent<PlayerHealth>();
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage(explosionDamage);
                 }
             }
 
-            if (best != null)
-            {
-                StartChasingBullet(best);
-            }
-        }
-
-        private void StartChasingBullet(Transform bullet)
-        {
-            currentBullet = bullet;
-            chaseTimer = 0f;
-
-            // Désactiver l'IA externe optionnelle
-            ToggleExternalBehaviours(false);
-
-            agent.ResetPath();
-            agent.speed = baseSpeed * chaseBulletSpeedMultiplier;
-            agent.acceleration = baseAcceleration * chaseAccelerationMultiplier;
-            agent.angularSpeed = chaseAngularSpeed;
-            agent.autoBraking = false;
-            agent.isStopped = false;
-        }
-
-        private void StopChasingAndFollowPlayer()
-        {
-            currentBullet = null;
-            chaseTimer = 0f;
-
-            // Réactiver l'IA externe optionnelle
-            ToggleExternalBehaviours(true);
-
-            // Revenir au suivi joueur simple
-            agent.ResetPath();
-            SetAgentBaseParams();
-            agent.autoBraking = true;
-            if (player != null)
-            {
-                agent.isStopped = false;
-                agent.SetDestination(player.position);
-            }
-        }
-
-        private void SetAgentBaseParams()
-        {
-            agent.speed = baseSpeed;
-            agent.acceleration = baseAcceleration;
-            agent.angularSpeed = baseAngularSpeed;
-        }
-
-        private void ToggleExternalBehaviours(bool enable)
-        {
-            if (behavioursToDisableDuringChase == null) return;
-            for (int i = 0; i < behavioursToDisableDuringChase.Length; i++)
-            {
-                var b = behavioursToDisableDuringChase[i];
-                if (b == null) continue;
-                b.enabled = enable;
-            }
-        }
-
-        private void OnEnemyDeath()
-        {
-            GameObject root = health != null ? health.transform.root.gameObject : gameObject;
-            bool dashKill = PillarDashSystem.WasKilledByDash(root);
-            if (dashKill) return;
             TrySpawnCameraTache();
+            Destroy(gameObject);
         }
+
+
 
         private static Sprite _fallbackTacheSprite;
         private static Sprite GetFallbackSprite()
@@ -308,30 +206,41 @@ namespace Ennemies.Effect
             rt.localRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
 
             ActiveTaches.Add(img);
-            StartCoroutine(FadeAndRemove(img, tacheDuration, tacheMaxAlpha));
+            
+            var coroutineRunner = _tacheCanvas.GetComponent<TacheCoroutineRunner>();
+            if (coroutineRunner == null)
+            {
+                coroutineRunner = _tacheCanvas.gameObject.AddComponent<TacheCoroutineRunner>();
+            }
+            coroutineRunner.StartCoroutine(FadeAndRemove(img, tacheDuration, tacheMaxAlpha, fadeInTime, fadeOutTime));
         }
 
-        private IEnumerator FadeAndRemove(Image img, float duration, float maxAlpha)
+        private static IEnumerator FadeAndRemove(Image img, float duration, float maxAlpha, float fadeIn, float fadeOut)
         {
             if (img == null) yield break;
 
+            fadeIn = Mathf.Max(0.01f, fadeIn);
+            fadeOut = Mathf.Max(0.01f, fadeOut);
+
             float t = 0f;
-            while (t < fadeInTime)
+            while (t < fadeIn)
             {
+                if (img == null) yield break;
                 t += Time.deltaTime;
-                float a = Mathf.Lerp(0f, maxAlpha, Mathf.Clamp01(t / Mathf.Max(0.0001f, fadeInTime)));
+                float a = Mathf.Lerp(0f, maxAlpha, t / fadeIn);
                 var c = img.color; c.a = a; img.color = c;
                 yield return null;
             }
 
-            float remain = Mathf.Max(0f, duration - fadeInTime - fadeOutTime);
+            float remain = Mathf.Max(0f, duration - fadeIn - fadeOut);
             if (remain > 0f) yield return new WaitForSeconds(remain);
 
             t = 0f;
-            while (t < fadeOutTime)
+            while (t < fadeOut)
             {
+                if (img == null) yield break;
                 t += Time.deltaTime;
-                float a = Mathf.Lerp(maxAlpha, 0f, Mathf.Clamp01(t / Mathf.Max(0.0001f, fadeOutTime)));
+                float a = Mathf.Lerp(maxAlpha, 0f, t / fadeOut);
                 var c = img.color; c.a = a; img.color = c;
                 yield return null;
             }
@@ -367,7 +276,14 @@ namespace Ennemies.Effect
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = new Color(0f, 0.6f, 1f, 0.2f);
-            Gizmos.DrawWireSphere(transform.position, bulletDetectionRadius);
+            Gizmos.DrawWireSphere(transform.position, dashDetectionRange);
+            
+            Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, explosionRadius);
         }
+    }
+
+    public class TacheCoroutineRunner : MonoBehaviour
+    {
     }
 }
