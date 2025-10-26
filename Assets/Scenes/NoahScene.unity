@@ -9406,9 +9406,9 @@ MonoBehaviour:
   sprintSpeed: 8
   jumpHeight: 2
   gravity: -9.81
-  airControlFactor: 0.8
-  preserveJumpMomentum: 1
-  maxAirSpeed: 20
+  airControlFactor: 1
+  preserveJumpMomentum: 0
+  maxAirSpeed: 25
   groundCheck: {fileID: 2040315599}
   groundDistance: 0.4
   groundMask:
@@ -9457,23 +9457,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abae424d8e92498d9b8bf7c95b18e083, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 5
-  detectionRadius: 0.5
   dashSpeed: 25
   dashDuration: 0.4
   dashCooldown: 1.5
-  dashFOV: 90
-  fovTransitionSpeed: 15
-  highlightColor: {r: 0, g: 0.010046005, b: 1, a: 1}
-  outlineWidth: 4
-  playerController: {fileID: 943778879}
-  cameraTransform: {fileID: 1905549312}
-  useDirectionalDash: 1
   dashHitRadius: 1
   dashDamage: 9999
   enemyMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  dashFOV: 90
+  fovTransitionSpeed: 15
+  playerController: {fileID: 943778879}
+  cameraTransform: {fileID: 1905549312}
 --- !u!43 &998631713
 Mesh:
   m_ObjectHideFlags: 0
