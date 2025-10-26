@@ -15,6 +15,7 @@ namespace Proto3GD.FPS
 
         [Header("Lean Settings")]
         [SerializeField] private float leanAngle = 15f;
+        [SerializeField] private float leanInputAngle = 20f;
         [SerializeField] private float leanSpeed = 8f;
 
         private float verticalRotation = 0f;
@@ -56,8 +57,8 @@ namespace Proto3GD.FPS
             {
                 targetLean = Mathf.Clamp(moveInput.x, -1f, 1f) * leanAngle;
             }
-            if (leanLeft) targetLean = -leanAngle;
-            if (leanRight) targetLean = leanAngle;
+            if (leanLeft) targetLean = leanInputAngle;
+            if (leanRight) targetLean = -leanInputAngle;
             
             currentLean = Mathf.Lerp(currentLean, targetLean, Time.deltaTime * leanSpeed);
             
