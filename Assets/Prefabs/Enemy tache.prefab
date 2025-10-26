@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5846532761041005572}
   m_Layer: 0
   m_Name: Enemy tache
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30,8 +30,8 @@ Transform:
   m_GameObject: {fileID: 160580225223210161}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 5, y: 0.45095, z: 5}
+  m_LocalScale: {x: 0.60225, y: 0.60225, z: 0.60225}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1094369121560445654}
@@ -130,13 +130,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 808a5d46d141e3f47a4e82b122040c84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletDetectionRadius: 15
-  chaseBulletSpeedMultiplier: 2.2
-  maxChaseBulletTime: 1.25
-  bulletScanInterval: 0.1
-  chaseAccelerationMultiplier: 4
-  chaseAngularSpeed: 720
-  behavioursToDisableDuringChase: []
+  dashDetectionRange: 5
+  dashSpeed: 20
+  dashDuration: 0.5
+  dashCooldown: 3
+  explosionRadius: 3
+  explosionDamage: 50
   tacheSprite: {fileID: 21300000, guid: 0de596e726de45840be3d1ace5203cab, type: 3}
   tacheDuration: 5
   tacheMaxAlpha: 0.7

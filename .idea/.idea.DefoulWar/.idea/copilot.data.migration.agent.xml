@@ -6,6 +6,7 @@
       <option value="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <option value="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
       <option value="2a979126-8eed-4dfc-9945-ed810f6081dc" />
+      <option value="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
       <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
@@ -33,6 +34,16 @@
           <value>
             <set>
               <option value="923879ba-d16a-4cfa-aa75-e941ce7c146a" />
+              <option value="97f0976e-56fb-48e8-805a-78e3a063d002" />
+            </set>
+          </value>
+        </entry>
+        <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5">
+          <value>
+            <set>
+              <option value="a5f94437-7982-4c1c-baa0-9e17a005424c" />
+              <option value="675d6b8e-27d5-4531-8af3-04a620c1180f" />
+              <option value="57cbbd47-89d4-4616-a312-81b98b6bb722" />
             </set>
           </value>
         </entry>
@@ -63,8 +74,8 @@
         <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31">
           <value>
             <set>
-              <option value="67c05110-576e-4d70-b38b-9d151bb748fc" />
               <option value="3e80dc2e-cfc5-41b3-8b2d-f1289d43b53e" />
+              <option value="67c05110-576e-4d70-b38b-9d151bb748fc" />
             </set>
           </value>
         </entry>
@@ -78,13 +89,14 @@
           <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
         </set>
       </entry>
-      <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
-      <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
-      <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31">
+      <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5">
         <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/TacheEnnemies.cs" />
         </set>
       </entry>
+      <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
+      <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
+      <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
     </pendingWorkingSetItems>
   </component>
 </project>

@@ -3,10 +3,9 @@ using System.Collections.Generic;
 
 namespace Proto3GD.FPS
 {
-    /// <summary>
-    /// Système de dash directionnel.
-    /// Permet au joueur de dasher dans la direction de la caméra et de tuer les ennemis sur son passage.
-    /// </summary>
+
+    // Système de dash directionnel.
+    // Permet au joueur de dasher dans la direction de la caméra et de tuer les ennemis sur son passage.
     public class PillarDashSystem : MonoBehaviour
     {
         [Header("Dash Settings")]
@@ -86,21 +85,9 @@ namespace Proto3GD.FPS
                     defaultFOV = playerCamera.fieldOfView;
                     targetFOV = defaultFOV;
                 }
-                else
-                {
-                    Debug.LogError("[PillarDashSystem] Aucun composant Camera trouvé sur CameraTransform. Veuillez vérifier la hiérarchie.");
-                    return;
-                }
             }
 
             characterController = playerController.Controller;
-            if (characterController == null)
-            {
-                Debug.LogError("[PillarDashSystem] Le champ Controller de FPSPlayerController n'est pas assigné. Veuillez l'assigner dans l'Inspector.");
-                return;
-            }
-            
-            Debug.Log("[PillarDashSystem] Initialisation réussie !");
         }
         
         private void Update()
@@ -139,8 +126,7 @@ namespace Proto3GD.FPS
 
             // Mouvement en ligne droite selon la direction de dash
             Vector3 dashMovement = directionalDashDir * (dashSpeed * Time.fixedDeltaTime);
-
-            // Balayage des ennemis entre lastDashPosition et la nouvelle position
+            
             Vector3 currentPos = transform.position;
             Vector3 nextPos = currentPos + dashMovement;
             Vector3 seg = nextPos - lastDashPosition;
@@ -185,6 +171,9 @@ namespace Proto3GD.FPS
                     {
                         enemiesKilledByDash.Add(enemyRoot);
                         StartCoroutine(CleanupEnemyTracking(enemyRoot));
+                        
+                        // Désactiver immédiatement les collisions pour permettre le dash à travers
+                        DisableEnemyCollisions(enemyRoot);
                     }
 
                     // Appliquer dégâts
@@ -213,9 +202,6 @@ namespace Proto3GD.FPS
             _hitThisDash.Clear();
         }
         
-        /// <summary>
-        /// Gère le mouvement pendant le dash.
-        /// </summary>
         private void HandleDash()
         {
             dashTimer += Time.deltaTime;
@@ -226,9 +212,33 @@ namespace Proto3GD.FPS
             }
         }
         
-        /// <summary>
-        /// Nettoie le tracking des ennemis tués par dash après un délai.
-        /// </summary>
+
+        // Désactive toutes les collisions d'un ennemi pour permettre au dash de passer à travers.
+        private void DisableEnemyCollisions(GameObject enemy)
+        {
+
+            Collider[] colliders = enemy.GetComponentsInChildren<Collider>();
+            foreach (Collider col in colliders)
+            {
+                col.enabled = false;
+            }
+            
+            // Désactiver également le rigidbody pour éviter les interactions physiques
+            Rigidbody rb = enemy.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.detectCollisions = false;
+            }
+            
+            Rigidbody[] childRbs = enemy.GetComponentsInChildren<Rigidbody>();
+            foreach (Rigidbody childRb in childRbs)
+            {
+                childRb.isKinematic = true;
+                childRb.detectCollisions = false;
+            }
+        }
+        
         private System.Collections.IEnumerator CleanupEnemyTracking(GameObject enemy)
         {
             yield return new WaitForSeconds(2f);
@@ -239,17 +249,12 @@ namespace Proto3GD.FPS
             }
         }
         
-        /// <summary>
-        /// Vérifie si un ennemi a été tué par le dash (pour empêcher le spawn de pilier).
-        /// </summary>
+        // Vérifie si un ennemi a été tué par le dash
         public static bool WasKilledByDash(GameObject enemy)
         {
             return enemiesKilledByDash.Contains(enemy);
         }
         
-        /// <summary>
-        /// Termine le dash et réinitialise les paramètres.
-        /// </summary>
         private void EndDash()
         {
             isDashing = false;
@@ -258,9 +263,6 @@ namespace Proto3GD.FPS
             targetFOV = defaultFOV;
         }
         
-        /// <summary>
-        /// Met à jour le FOV de la caméra avec interpolation.
-        /// </summary>
         private void UpdateFOV()
         {
             if (playerCamera != null)
@@ -273,14 +275,8 @@ namespace Proto3GD.FPS
             }
         }
         
-        /// <summary>
-        /// Vérifie si le joueur peut dasher actuellement.
-        /// </summary>
         public bool CanDash => cooldownTimer >= dashCooldown && !isDashing;
         
-        /// <summary>
-        /// Retourne le pourcentage de cooldown du dash (0 = en cooldown, 1 = disponible)
-        /// </summary>
         public float DashCooldownProgress => Mathf.Clamp01(cooldownTimer / dashCooldown);
     }
 }
