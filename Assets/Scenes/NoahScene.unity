@@ -9431,6 +9431,7 @@ MonoBehaviour:
   minVerticalAngle: -80
   maxVerticalAngle: 80
   leanAngle: -2
+  leanInputAngle: 20
   leanSpeed: 8
 --- !u!114 &943778882
 MonoBehaviour:
