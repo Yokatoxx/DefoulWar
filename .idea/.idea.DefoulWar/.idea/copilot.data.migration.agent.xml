@@ -2,11 +2,19 @@
 <project version="4">
   <component name="AgentMigrationStateService">
     <option name="pendingSessionIds">
+      <option value="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <option value="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
     </option>
     <option name="pendingTurns">
       <map>
+        <entry key="20c9c51b-c869-4736-a779-06d9aa46d146">
+          <value>
+            <set>
+              <option value="93a9dd1c-c214-47a5-bd61-4732537cd7fe" />
+            </set>
+          </value>
+        </entry>
         <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68">
           <value>
             <set>
@@ -28,6 +36,11 @@
       </map>
     </option>
     <pendingWorkingSetItems>
+      <entry key="20c9c51b-c869-4736-a779-06d9aa46d146">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs" />
+        </set>
+      </entry>
       <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68">
         <set>
           <option value="file://$PROJECT_DIR$/Assets/Scripts/EnemySpawner.cs" />

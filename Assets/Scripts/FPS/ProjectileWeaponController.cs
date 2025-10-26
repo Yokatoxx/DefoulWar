@@ -36,6 +36,12 @@ namespace FPS
         [SerializeField] private Transform firePoint;
         [SerializeField] private Transform cameraTransform;
         
+        [Header("FX")]
+        [Tooltip("Option 1: référence directe à un ParticleSystem placé sur l'arme")]
+        [SerializeField] private ParticleSystem muzzleFlash;
+        [Tooltip("Option 2: prefab d'effet à instancier au moment du tir (sera parenté au firePoint)")]
+        [SerializeField] private GameObject muzzleFlashPrefab;
+        
         [Header("Input Mode")]
         [SerializeField] private bool useNewInputSystem = false;
         [SerializeField] private bool controlledExternally = false;
@@ -121,6 +127,9 @@ namespace FPS
         {
             currentAmmo--;
             
+            // Déclencher l'effet de bouche (muzzle flash) si présent
+            PlayMuzzleFlash();
+            
             float randomX = Random.Range(-recoilAmount, recoilAmount);
             float randomY = Random.Range(-recoilAmount, recoilAmount);
             currentRecoil += new Vector3(recoilAmount, randomY, randomX);
@@ -174,6 +183,38 @@ namespace FPS
                         rb.linearVelocity = aimDir * bulletSpeed;
                     }
                 }
+            }
+        }
+        
+        private void PlayMuzzleFlash()
+        {
+            if (firePoint == null && muzzleFlash == null && muzzleFlashPrefab == null) return;
+            
+            // Option 1: ParticleSystem déjà présent dans la scène/arme
+            if (muzzleFlash != null)
+            {
+                if (firePoint != null)
+                {
+                    muzzleFlash.transform.SetPositionAndRotation(firePoint.position, firePoint.rotation);
+                }
+                muzzleFlash.Play(true);
+                return;
+            }
+            
+            // Option 2: Instancier un prefab d'effet et le détruire après sa durée
+            if (muzzleFlashPrefab != null)
+            {
+                Transform parent = firePoint != null ? firePoint : transform;
+                GameObject fx = Instantiate(muzzleFlashPrefab, parent.position, parent.rotation, parent);
+                
+                float lifeTime = 2f; // valeur de secours
+                var ps = fx.GetComponentInChildren<ParticleSystem>();
+                if (ps != null)
+                {
+                    var main = ps.main;
+                    lifeTime = main.duration + main.startLifetime.constantMax;
+                }
+                Destroy(fx, lifeTime);
             }
         }
         
