@@ -42,7 +42,7 @@ namespace Proto3GD.FPS
         private float defaultFOV;
         private float targetFOV;
         
-        private bool isDashing = false;
+        public bool isDashing = false;
         private float dashTimer = 0f;
         private float cooldownTimer = 0f;
         

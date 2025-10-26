@@ -9469,6 +9469,7 @@ MonoBehaviour:
   fovTransitionSpeed: 15
   playerController: {fileID: 943778879}
   cameraTransform: {fileID: 1905549312}
+  isDashing: 0
 --- !u!43 &998631713
 Mesh:
   m_ObjectHideFlags: 0
@@ -15348,6 +15349,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 438654094}
+  dashPlayer: {fileID: 943778884}
   followPosition: 1
   followRotation: 1
   positionOffset: {x: 0, y: 0, z: 0}

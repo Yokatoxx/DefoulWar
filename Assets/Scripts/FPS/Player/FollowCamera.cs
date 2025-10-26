@@ -1,9 +1,12 @@
+using Proto3GD.FPS;
 using UnityEngine;
 
 
 public class FollowCamera : MonoBehaviour
 {
     public Transform target;
+
+    public PillarDashSystem dashPlayer;
 
     public bool followPosition = true;
     public bool followRotation = true;
@@ -20,6 +23,18 @@ public class FollowCamera : MonoBehaviour
     void LateUpdate()
     {
         if (target == null) return;
+
+        if(dashPlayer != null)
+        {
+            if(dashPlayer.isDashing)
+            {
+                smoothPosition = false;
+            }
+            else
+            {
+                smoothPosition = true;
+            }
+        }
 
         // Position
         if (followPosition)
