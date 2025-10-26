@@ -19279,12 +19279,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bobFrequency: 1.25
-  bobHorizontalAmplitude: 0.25
+  bobHorizontalAmplitude: 0.2
   bobVerticalAmplitude: 0.15
   bobSmoothing: 8
   defaultFOV: 60
   sprintFOV: 70
-  jumpFOV: 45
+  jumpFOV: 50
   fovTransitionSpeed: 8
 --- !u!1 &1913109445
 GameObject:
