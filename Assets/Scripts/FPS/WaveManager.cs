@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -5,11 +6,28 @@ using UnityEngine.Events;
 
 namespace Proto3GD.FPS
 {
-
-    // Gestionnaire de vagues d'ennemis: renforce plusieurs zones en parallèle.
-    // Progression par vague
+    // Système de vagues simple: chaque vague définit une liste de types d'ennemis et leur quantité.
     public class WaveManager : MonoBehaviour
     {
+        // --------------------
+        // Types de données
+        // --------------------
+        [System.Serializable]
+        public class EnemySpawn
+        {
+            public GameObject prefab;
+            [Min(0)] public int count = 1;
+        }
+
+        [System.Serializable]
+        public class Wave
+        {
+            public List<EnemySpawn> enemies = new List<EnemySpawn>();
+        }
+
+        // --------------------
+        // Singleton basique
+        // --------------------
         private static WaveManager instance;
         public static WaveManager Instance
         {
@@ -22,7 +40,7 @@ namespace Proto3GD.FPS
                 return instance;
             }
         }
-        
+
         private void Awake()
         {
             if (instance != null && instance != this)
@@ -33,51 +51,54 @@ namespace Proto3GD.FPS
             }
             instance = this;
         }
-        
-        [Header("Wave Settings")]
-        [SerializeField] private int startingEnemiesPerWave = 5;
-        [SerializeField] private float enemiesIncreasePerWave = 2f;
-        [SerializeField] private float timeBetweenWaves = 5f;
-        
-        [Header("Enemy Spawning")]
-        [SerializeField] private GameObject enemyPrefab;
+
+        // --------------------
+        // Réglages
+        // --------------------
+        [Header("Waves")]
+        [Tooltip("Liste des vagues. Chaque vague contient des types d'ennemis et une quantité.")]
+        [SerializeField] private List<Wave> waves = new List<Wave>();
+        [SerializeField] private bool autoStart = true;
+        [SerializeField] private bool loopWaves = false;
+
+        [Header("Spawning")]
         [SerializeField] private Transform[] spawnPoints;
-        [SerializeField] private float spawnDelay = 0.5f;
-        
-        [Header("Armor Progression (par vague)")]
-        [Tooltip("Nombre de hits sur une zone pendant UNE vague pour gagner +1 niveau d'armure")]
-        [SerializeField] private int hitsPerWaveForLevelUp = 10;
-        
-        [Header("Current Wave Info")]
-        [SerializeField] private int currentWave;
-        [SerializeField] private int enemiesRemaining;
-        [SerializeField] private int totalEnemiesInWave;
-        
+        [SerializeField] private float spawnDelay = 0.25f;
+        [SerializeField] private float timeBetweenWaves = 5f;
+
         [Header("Events")]
         public UnityEvent<int> onWaveStart = new UnityEvent<int>();
         public UnityEvent<int> onWaveComplete = new UnityEvent<int>();
         public UnityEvent<int> onEnemyCountChanged = new UnityEvent<int>();
-        
-        private Dictionary<string, int> currentWaveHits = new Dictionary<string, int>();
-        
-        // Niveaux d'armure par zone (0..3)
-        private Dictionary<string, int> zoneArmorLevels = new Dictionary<string, int>();
-        
-        private List<GameObject> activeEnemies = new List<GameObject>();
+
+        // --------------------
+        // État courant
+        // --------------------
+        [SerializeField] private int currentWaveIndex = -1; // 0-based interne
+        [SerializeField] private int enemiesRemaining;
+        [SerializeField] private int totalEnemiesInWave;
+
+        private readonly List<GameObject> activeEnemies = new List<GameObject>();
         private bool isWaveActive;
         private bool isSpawning;
-        
-        // Référence au système de spawn de piliers
+
+        // Armure persistante très simple (compatible FPSDebugTools)
+        private readonly Dictionary<string, int> zoneArmorLevels = new Dictionary<string, int>();
+        // Statistiques de hits pour la vague courante
+        private readonly Dictionary<string, int> currentWaveHits = new Dictionary<string, int>();
+
+        // Intégration optionnelle avec le spawner de piliers
         private PillarSpawner pillarSpawner;
-        
+
         private void Start()
         {
-            // Trouver le PillarSpawner dans la scène
             pillarSpawner = FindFirstObjectByType<PillarSpawner>();
-            
-            StartNextWave();
+            if (autoStart)
+            {
+                StartNextWave();
+            }
         }
-        
+
         private void Update()
         {
             if (isWaveActive && !isSpawning && enemiesRemaining <= 0)
@@ -85,160 +106,163 @@ namespace Proto3GD.FPS
                 EndWave();
             }
         }
-        
+
+        // --------------------
+        // Logique de vagues
+        // --------------------
         public void StartNextWave()
         {
-            if (isWaveActive) return;
-            
-            currentWave++;
-            totalEnemiesInWave = Mathf.RoundToInt(startingEnemiesPerWave + (currentWave - 1) * enemiesIncreasePerWave);
-            enemiesRemaining = totalEnemiesInWave;
-            
-            // Appliquer les gains d'armure en fonction des hits de la vague précédente
-            ApplyArmorProgressionFromPreviousWave();
-            
-            // Réappliquer les niveaux persistants aux ennemis déjà présents (debug)
-            ReapplyArmorToActiveEnemies();
-            
-            // Réinitialiser les stats de la nouvelle vague
-            currentWaveHits.Clear();
-            activeEnemies.Clear();
-            
-            isWaveActive = true;
-            onWaveStart?.Invoke(currentWave);
-            onEnemyCountChanged?.Invoke(enemiesRemaining);
-            
-            Debug.Log($"Wave {currentWave} started! Enemies: {totalEnemiesInWave}");
-            StartCoroutine(SpawnEnemiesCoroutine());
-        }
-        
-        private System.Collections.IEnumerator SpawnEnemiesCoroutine()
-        {
-            isSpawning = true;
-            for (int i = 0; i < totalEnemiesInWave; i++)
+            if (waves == null || waves.Count == 0)
             {
-                SpawnEnemy();
-                yield return new WaitForSeconds(spawnDelay);
-            }
-            isSpawning = false;
-        }
-        
-        private void SpawnEnemy()
-        {
-            if (enemyPrefab == null || spawnPoints.Length == 0)
-            {
-                Debug.LogError("Enemy prefab or spawn points not set!");
+                Debug.LogWarning("[WaveManager] Aucune vague configurée.");
                 return;
             }
-            
+
+            int nextIndex = currentWaveIndex + 1;
+            if (!loopWaves && nextIndex >= waves.Count)
+            {
+                Debug.Log("[WaveManager] Toutes les vagues sont terminées.");
+                isWaveActive = false;
+                return;
+            }
+
+            if (loopWaves)
+            {
+                nextIndex = Mathf.Abs(nextIndex) % waves.Count;
+            }
+
+            currentWaveIndex = nextIndex;
+
+            // Préparer la vague
+            Wave wave = waves[currentWaveIndex];
+            totalEnemiesInWave = wave.enemies.Where(es => es != null && es.prefab != null && es.count > 0).Sum(es => es.count);
+            enemiesRemaining = totalEnemiesInWave;
+            activeEnemies.Clear();
+            currentWaveHits.Clear();
+
+            isWaveActive = true;
+            onWaveStart?.Invoke(CurrentWave);
+            onEnemyCountChanged?.Invoke(enemiesRemaining);
+
+            StopAllCoroutines();
+            StartCoroutine(SpawnWaveCoroutine(wave));
+
+            Debug.Log($"[WaveManager] Vague {CurrentWave} démarrée. Ennemis: {totalEnemiesInWave}");
+        }
+
+        private IEnumerator SpawnWaveCoroutine(Wave wave)
+        {
+            isSpawning = true;
+
+            if (spawnPoints == null || spawnPoints.Length == 0)
+            {
+                Debug.LogError("[WaveManager] Aucun point de spawn défini.");
+                isSpawning = false;
+                yield break;
+            }
+
+            foreach (var pack in wave.enemies)
+            {
+                if (pack == null || pack.prefab == null || pack.count <= 0) continue;
+                for (int i = 0; i < pack.count; i++)
+                {
+                    SpawnEnemy(pack.prefab);
+                    if (spawnDelay > 0f)
+                        yield return new WaitForSeconds(spawnDelay);
+                    else
+                        yield return null; // laisser un frame
+                }
+            }
+
+            isSpawning = false;
+        }
+
+        private void SpawnEnemy(GameObject prefab)
+        {
+            if (prefab == null) return;
+            if (spawnPoints == null || spawnPoints.Length == 0) return;
+
             Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-            GameObject enemyRoot = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+            GameObject enemyRoot = Instantiate(prefab, spawnPoint.position, spawnPoint.rotation);
             activeEnemies.Add(enemyRoot);
 
-            // synchroniseur d'armure pour ce nouvel ennemi
-            if (enemyRoot.GetComponentInChildren<EnemyArmorSync>() == null)
-            {
-                enemyRoot.AddComponent<EnemyArmorSync>();
-            }
-            
-            // Enregistrer l'ennemi auprès du PillarSpawner pour le système de spawn de piliers
+            // Enregistrer auprès du PillarSpawner pour les ennemis dynamiques
             EnemyHealth enemyHealth = enemyRoot.GetComponentInChildren<EnemyHealth>();
             if (enemyHealth != null)
             {
-                // Appliquer les armures
+                // Appliquer les armures persistantes si défini
                 if (zoneArmorLevels.Count > 0)
                 {
                     enemyHealth.ApplyArmorLevels(zoneArmorLevels);
-                    #if UNITY_EDITOR
-                    string info = string.Join(", ", zoneArmorLevels.Select(p => $"{p.Key}=L{p.Value}"));
-                    Debug.Log($"[WaveManager] Applied armor to spawned enemy: {info}");
-                    #endif
                 }
-                
-                // Enregistrer auprès du PillarSpawner si disponible
+
                 if (pillarSpawner != null)
                 {
                     pillarSpawner.RegisterEnemy(enemyHealth);
                 }
             }
         }
-        
-
-        public void RecordHit(string zoneName)
-        {
-            string key = NormalizeZoneKey(zoneName);
-            if (!currentWaveHits.ContainsKey(key))
-            {
-                currentWaveHits[key] = 0;
-            }
-            currentWaveHits[key]++;
-        }
-        
 
         public void OnEnemyDeath(EnemyHealth enemy)
         {
-            enemiesRemaining--;
+            enemiesRemaining = Mathf.Max(0, enemiesRemaining - 1);
             onEnemyCountChanged?.Invoke(enemiesRemaining);
-            
+
             if (enemy != null)
             {
                 GameObject root = enemy.transform.root != null ? enemy.transform.root.gameObject : enemy.gameObject;
                 activeEnemies.Remove(root);
             }
         }
-        
+
         private void EndWave()
         {
             isWaveActive = false;
-            onWaveComplete?.Invoke(currentWave);
-            
-            Debug.Log($"Wave {currentWave} complete!");
-            foreach (var kvp in currentWaveHits.OrderByDescending(x => x.Value))
-            {
-                Debug.Log($"  {kvp.Key}: {kvp.Value} hits");
-            }
-            
-            Invoke(nameof(StartNextWave), timeBetweenWaves);
-        }
-        
-        private void ApplyArmorProgressionFromPreviousWave()
-        {
-            if (currentWaveHits == null || currentWaveHits.Count == 0) return;
-            
-            foreach (var kvp in currentWaveHits)
-            {
-                string zone = kvp.Key;
-                int hits = kvp.Value;
-                if (hits >= hitsPerWaveForLevelUp)
-                {
-                    int prev = zoneArmorLevels.ContainsKey(zone) ? zoneArmorLevels[zone] : 0;
-                    int next = Mathf.Clamp(prev + 1, 1, 3);
-                    zoneArmorLevels[zone] = next;
-                }
-            }
-            
-            if (zoneArmorLevels.Count > 0)
-            {
-                string info = string.Join(", ", zoneArmorLevels.Select(p => $"{p.Key}=L{p.Value}"));
-                Debug.Log($"Armor levels (persistent) applied next wave: {info}");
-            }
-        }
-        
+            onWaveComplete?.Invoke(CurrentWave);
+            Debug.Log($"[WaveManager] Vague {CurrentWave} terminée.");
 
-        public int CurrentWave => currentWave;
-        public int EnemiesRemaining => enemiesRemaining;
-        public int TotalEnemiesInWave => totalEnemiesInWave;
-        public bool IsWaveActive => isWaveActive;
+            // Programmer la suivante si possible
+            if ((loopWaves && waves.Count > 0) || currentWaveIndex + 1 < (waves?.Count ?? 0))
+            {
+                Invoke(nameof(StartNextWave), Mathf.Max(0f, timeBetweenWaves));
+            }
+        }
+
+        // --------------------
+        // API minimale de compatibilité
+        // --------------------
+        public void RecordHit(string zoneName)
+        {
+            // Incrémente les statistiques de hits pour la vague en cours
+            string key = NormalizeZoneKey(zoneName);
+            if (string.IsNullOrEmpty(key)) key = "body";
+            if (!currentWaveHits.ContainsKey(key)) currentWaveHits[key] = 0;
+            currentWaveHits[key]++;
+        }
+
+        public void ForceNextWaveNow()
+        {
+            // Arrête les spawns en cours et passe directement à la prochaine vague
+            StopAllCoroutines();
+            isSpawning = false;
+            isWaveActive = false;
+            enemiesRemaining = 0;
+            onEnemyCountChanged?.Invoke(enemiesRemaining);
+            StartNextWave();
+        }
+
+        // --------------------
+        // Armure persistante (simple, pilotée par DebugTools)
+        // --------------------
         public IReadOnlyDictionary<string, int> ArmorLevels => zoneArmorLevels;
-        public Dictionary<string, int> CurrentWaveHits => currentWaveHits;
-        
+        public IReadOnlyDictionary<string, int> CurrentWaveHits => currentWaveHits;
 
         public void SetArmorLevel(string zoneName, int level)
         {
             string key = NormalizeZoneKey(zoneName);
             if (string.IsNullOrEmpty(key)) return;
             level = Mathf.Clamp(level, 0, 3);
-            if (level == 0)
+            if (level <= 0)
             {
                 if (zoneArmorLevels.ContainsKey(key)) zoneArmorLevels.Remove(key);
             }
@@ -247,7 +271,6 @@ namespace Proto3GD.FPS
                 zoneArmorLevels[key] = level;
             }
         }
-        
 
         public void IncreaseArmorLevel(string zoneName, int delta)
         {
@@ -258,7 +281,6 @@ namespace Proto3GD.FPS
             if (next <= 0) zoneArmorLevels.Remove(key);
             else zoneArmorLevels[key] = next;
         }
-        
 
         public void IncreaseArmorLevels(Dictionary<string, int> deltas)
         {
@@ -268,14 +290,12 @@ namespace Proto3GD.FPS
                 IncreaseArmorLevel(kv.Key, kv.Value);
             }
         }
-        
 
         public void ResetAllArmorLevels()
         {
             zoneArmorLevels.Clear();
         }
-        
- 
+
         public void ReapplyArmorToActiveEnemies()
         {
             var enemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
@@ -283,45 +303,23 @@ namespace Proto3GD.FPS
             {
                 e.ApplyArmorLevels(zoneArmorLevels);
             }
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             string info = zoneArmorLevels.Count > 0 ? string.Join(", ", zoneArmorLevels.Select(p => $"{p.Key}=L{p.Value}")) : "(none)";
-            Debug.Log($"[WaveManager] Reapplied armor to {enemies.Length} active enemies: {info}");
-            #endif
+            Debug.Log($"[WaveManager] Reapplied armor to {enemies.Length} enemies: {info}");
+#endif
         }
-        
 
-        // Démarre immédiatement la prochaine vague(debug)
+        // --------------------
+        // Helpers & propriétés
+        // --------------------
+        public int CurrentWave => currentWaveIndex + 1; // 1-based pour l'UI
+        public int EnemiesRemaining => enemiesRemaining;
+        public int TotalEnemiesInWave => totalEnemiesInWave;
+        public bool IsWaveActive => isWaveActive;
 
-        public void ForceNextWaveNow()
-        {
-            if (!isWaveActive)
-            {
-                StartNextWave();
-                return;
-            }
-            
-            isWaveActive = false;
-            StartNextWave();
-        }
-        
         private static string NormalizeZoneKey(string zone)
         {
-            if (string.IsNullOrWhiteSpace(zone)) return string.Empty;
-            string k = zone.Trim().ToLowerInvariant();
-            switch (k)
-            {
-                case "chest":
-                case "torso":
-                case "abdomen":
-                case "stomach":
-                case "trunk":
-                    return "body";
-                case "skull":
-                case "headshot":
-                    return "head";
-                default:
-                    return k;
-            }
+            return string.IsNullOrWhiteSpace(zone) ? string.Empty : zone.Trim().ToLowerInvariant();
         }
     }
 }

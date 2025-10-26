@@ -9231,7 +9231,6 @@ GameObject:
   m_Component:
   - component: {fileID: 943778875}
   - component: {fileID: 943778874}
-  - component: {fileID: 943778883}
   - component: {fileID: 943778882}
   - component: {fileID: 943778881}
   - component: {fileID: 943778880}
@@ -9512,26 +9511,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useNewInputSystem: 0
---- !u!114 &943778883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943778869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da70cac90980495fa13fde6d08f6eae9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bobFrequency: 1.8
-  bobHorizontalAmplitude: 0.08
-  bobVerticalAmplitude: 0.05
-  bobSmoothing: 8
-  defaultFOV: 60
-  sprintFOV: 70
-  jumpFOV: 40
-  fovTransitionSpeed: 8
 --- !u!114 &943778884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19016,6 +18995,7 @@ GameObject:
   - component: {fileID: 1905549314}
   - component: {fileID: 1905549313}
   - component: {fileID: 1905549316}
+  - component: {fileID: 1905549317}
   m_Layer: 3
   m_Name: Camera
   m_TagString: MainCamera
@@ -19183,6 +19163,26 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   showDebugInfo: 0
+--- !u!114 &1905549317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905549311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da70cac90980495fa13fde6d08f6eae9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bobFrequency: 1.8
+  bobHorizontalAmplitude: 0.08
+  bobVerticalAmplitude: 0.05
+  bobSmoothing: 8
+  defaultFOV: 60
+  sprintFOV: 70
+  jumpFOV: 40
+  fovTransitionSpeed: 8
 --- !u!1 &1913109445
 GameObject:
   m_ObjectHideFlags: 0
@@ -21963,7 +21963,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2142988282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21976,20 +21976,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41a3be528e834b8d8afa5fc2a01d054e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingEnemiesPerWave: 5
-  enemiesIncreasePerWave: 2
-  timeBetweenWaves: 5
-  enemyPrefab: {fileID: 160580225223210161, guid: 80eab93a04a444447bff257b35df6f3c, type: 3}
+  waves:
+  - enemies:
+    - prefab: {fileID: 160580225223210161, guid: 0c83bdec55c1a6f4198e60bf8b13d256, type: 3}
+      count: 10
+    - prefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
+      count: 5
+  - enemies:
+    - prefab: {fileID: 160580225223210161, guid: 0c83bdec55c1a6f4198e60bf8b13d256, type: 3}
+      count: 20
+    - prefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
+      count: 10
+    - prefab: {fileID: 160580225223210161, guid: 80eab93a04a444447bff257b35df6f3c, type: 3}
+      count: 10
+  autoStart: 1
+  loopWaves: 0
   spawnPoints:
   - {fileID: 1328047096}
   - {fileID: 1795708353}
   - {fileID: 278262399}
   - {fileID: 1846174485}
   spawnDelay: 0.5
-  hitsPerWaveForLevelUp: 10
-  currentWave: 0
-  enemiesRemaining: 0
-  totalEnemiesInWave: 0
+  timeBetweenWaves: 5
   onWaveStart:
     m_PersistentCalls:
       m_Calls: []
@@ -21999,6 +22007,9 @@ MonoBehaviour:
   onEnemyCountChanged:
     m_PersistentCalls:
       m_Calls: []
+  currentWaveIndex: -1
+  enemiesRemaining: 0
+  totalEnemiesInWave: 0
 --- !u!4 &2142988283
 Transform:
   m_ObjectHideFlags: 0
