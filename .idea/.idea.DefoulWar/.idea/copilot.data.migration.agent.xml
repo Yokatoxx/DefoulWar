@@ -4,6 +4,8 @@
     <option name="pendingSessionIds">
       <option value="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <option value="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
+      <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
+      <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
     </option>
     <option name="pendingTurns">
@@ -18,17 +20,32 @@
         <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68">
           <value>
             <set>
+              <option value="2ed9bd87-3918-4ab6-b290-af3a778647bb" />
               <option value="c03dc95a-0de2-4863-a4c7-ab849beb2d30" />
               <option value="e975bd19-189f-479d-ac9b-be3f8059c34a" />
-              <option value="2ed9bd87-3918-4ab6-b290-af3a778647bb" />
+            </set>
+          </value>
+        </entry>
+        <entry key="a779c500-59ba-4ca7-b785-bdfa8b44028b">
+          <value>
+            <set>
+              <option value="3b941df8-13f2-482f-8418-7411b6cb04fe" />
+            </set>
+          </value>
+        </entry>
+        <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b">
+          <value>
+            <set>
+              <option value="c4442e7f-8fcd-4d6b-9fa7-ec7d128c4aa6" />
+              <option value="52a8421a-bb99-4a13-8cfd-03ec35e0ddf2" />
             </set>
           </value>
         </entry>
         <entry key="c267a988-d614-4b0f-bbf7-f88132b67369">
           <value>
             <set>
-              <option value="a00fc245-ea31-4a72-9360-0f716012752d" />
               <option value="0862b6bb-f711-4e16-9de2-ced3374023e6" />
+              <option value="a00fc245-ea31-4a72-9360-0f716012752d" />
               <option value="c5fe89de-17f0-4103-b80c-e50cfb0f1be5" />
             </set>
           </value>
@@ -36,29 +53,14 @@
       </map>
     </option>
     <pendingWorkingSetItems>
-      <entry key="20c9c51b-c869-4736-a779-06d9aa46d146">
+      <entry key="20c9c51b-c869-4736-a779-06d9aa46d146" />
+      <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
+      <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b">
         <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/WaveManager.cs" />
         </set>
       </entry>
-      <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68">
-        <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/EnemySpawner.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunVisuals.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunAutoFire.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunDebugTrigger.cs" />
-        </set>
-      </entry>
-      <entry key="c267a988-d614-4b0f-bbf7-f88132b67369">
-        <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/ElectricEnnemis.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunAutoFire.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs" />
-        </set>
-      </entry>
+      <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
     </pendingWorkingSetItems>
   </component>
 </project>
