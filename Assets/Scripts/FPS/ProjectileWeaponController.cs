@@ -45,6 +45,14 @@ namespace FPS
         private bool isFiring;
         private Vector3 currentRecoil;
         
+        // Override temporaire de cadence (secondes entre tirs)
+        private float? fireRateOverride;
+        private float EffectiveFireRate => Mathf.Max(0.01f, fireRateOverride ?? fireRate);
+        public void SetFireRateOverride(float? secondsBetweenShots)
+        {
+            fireRateOverride = secondsBetweenShots;
+        }
+        
         private void Awake()
         {
             currentAmmo = maxAmmo;
@@ -106,7 +114,7 @@ namespace FPS
             if (currentAmmo <= 0) return;
             
             Shoot();
-            nextFireTime = Time.time + fireRate;
+            nextFireTime = Time.time + EffectiveFireRate;
         }
         
         private void Shoot()
@@ -253,7 +261,7 @@ namespace FPS
             if (currentAmmo <= 0) return false;
             
             Shoot();
-            nextFireTime = Time.time + fireRate;
+            nextFireTime = Time.time + EffectiveFireRate;
             return true;
         }
     }

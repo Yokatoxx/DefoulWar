@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Proto3GD.FPS
 {
@@ -61,6 +62,17 @@ namespace Proto3GD.FPS
         // Tracking des ennemis tués par dash pour éviter le spawn de pilier
         private static System.Collections.Generic.HashSet<GameObject> enemiesKilledByDash = new System.Collections.Generic.HashSet<GameObject>();
         
+        [Header("Directional Dash (nouveau)")]
+        [SerializeField] private bool useDirectionalDash = true;
+        [SerializeField] private float dashHitRadius = 1.0f;
+        [SerializeField] private float dashDamage = 9999f; // dégâts par défaut létaux
+        [SerializeField] private LayerMask enemyMask = ~0;
+
+        // Runtime
+        private Vector3 directionalDashDir;
+        private Vector3 lastDashPosition;
+        private readonly HashSet<GameObject> _hitThisDash = new HashSet<GameObject>();
+        
         private void Start()
         {
             if (playerController == null)
@@ -114,6 +126,10 @@ namespace Proto3GD.FPS
                 cooldownTimer += Time.deltaTime;
             }
             
+            // Empêcher le dash pendant un stun
+            var stunComp = GetComponent<PlayerStunAutoFire>();
+            bool isStunned = stunComp != null && stunComp.IsStunned;
+            
             // Gestion du dash
             if (isDashing)
             {
@@ -121,39 +137,124 @@ namespace Proto3GD.FPS
             }
             else
             {
-                // Détection de pilier et highlight
-                DetectAndHighlightPillar();
-                
-                // Écouter l'input pour dasher
-                if (Input.GetKeyDown(KeyCode.E) && cooldownTimer >= dashCooldown)
+                if (useDirectionalDash)
                 {
-                    TryStartDash();
+                    // Dash directionnel: E déclenche un dash dans la direction de la caméra
+                    if (!isStunned && Input.GetKeyDown(KeyCode.E) && cooldownTimer >= dashCooldown)
+                    {
+                        StartDirectionalDash();
+                    }
+                }
+                else
+                {
+                    // Ancien mode: détection + dash vers une cible
+                    DetectAndHighlightPillar();
+                    if (!isStunned && Input.GetKeyDown(KeyCode.E) && cooldownTimer >= dashCooldown)
+                    {
+                        TryStartDash();
+                    }
                 }
             }
             
             // Gestion du FOV
             UpdateFOV();
         }
-        
+
         private void FixedUpdate()
         {
-            // Appliquer le mouvement du dash en FixedUpdate pour plus de fiabilité
-            if (isDashing && characterController != null)
+            if (!isDashing || characterController == null) return;
+
+            if (useDirectionalDash)
             {
-                // Recalculer la direction vers le pilier à chaque frame pour suivre le pilier
+                // Mouvement en ligne droite selon la direction de dash
+                Vector3 dashMovement = directionalDashDir * (dashSpeed * Time.fixedDeltaTime);
+
+                // Balayage des ennemis entre lastDashPosition et la nouvelle position
+                Vector3 currentPos = transform.position;
+                Vector3 nextPos = currentPos + dashMovement;
+                Vector3 seg = nextPos - lastDashPosition;
+                float segLen = seg.magnitude;
+                if (segLen > 0.0001f)
+                {
+                    int hits = Physics.SphereCastNonAlloc(
+                        lastDashPosition,
+                        dashHitRadius,
+                        seg.normalized,
+                        _hitBuffer,
+                        segLen,
+                        enemyMask,
+                        QueryTriggerInteraction.Ignore
+                    );
+                    for (int i = 0; i < hits; i++)
+                    {
+                        var h = _hitBuffer[i];
+                        if (h.collider == null) continue;
+                        var enemyHealth = h.collider.GetComponentInParent<EnemyHealth>() ?? h.collider.GetComponent<EnemyHealth>();
+                        if (enemyHealth == null) continue;
+
+                        var enemyRoot = enemyHealth.transform.root.gameObject;
+                        if (_hitThisDash.Contains(enemyRoot)) continue;
+                        _hitThisDash.Add(enemyRoot);
+
+                        // Si c'est un ennemi électrique -> stun le joueur (auto-fire)
+                        var electric = h.collider.GetComponentInParent<Ennemies.Effect.ElectricEnnemis>() ?? h.collider.GetComponent<Ennemies.Effect.ElectricEnnemis>();
+                        if (electric != null)
+                        {
+                            var playerStun = GetComponent<PlayerStunAutoFire>();
+                            if (playerStun == null) playerStun = gameObject.AddComponent<PlayerStunAutoFire>();
+                            if (electric.OverrideAutoFireInterval)
+                                playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
+                            else
+                                playerStun.ApplyStun(electric.StunDuration);
+                        }
+
+                        // Marquer comme kill par dash si le coup sera létal
+                        bool willDie = enemyHealth.CurrentHealth <= dashDamage;
+                        if (willDie)
+                        {
+                            enemiesKilledByDash.Add(enemyRoot);
+                            StartCoroutine(CleanupEnemyTracking(enemyRoot));
+                        }
+
+                        // Appliquer dégâts
+                        enemyHealth.TakeDamage(dashDamage, "Dash");
+                    }
+                }
+
+                lastDashPosition = nextPos;
+                characterController.Move(dashMovement);
+                Debug.DrawRay(transform.position, directionalDashDir * 3f, Color.cyan, 0.05f);
+            }
+            else
+            {
+                // Ancien comportement: suivre la cible actuelle
                 if (currentTargetedPillar != null)
                 {
                     Vector3 pillarPosition = currentTargetedPillar.transform.position;
                     dashDirection = (pillarPosition - transform.position).normalized;
                 }
-                
-                // Mouvement puissant vers le pilier
                 Vector3 dashMovement = dashDirection * (dashSpeed * Time.fixedDeltaTime);
                 characterController.Move(dashMovement);
-                
-                // Debug visuel
                 Debug.DrawRay(transform.position, dashDirection * 3f, Color.red, 0.1f);
             }
+        }
+
+        private static readonly RaycastHit[] _hitBuffer = new RaycastHit[32];
+
+        private void StartDirectionalDash()
+        {
+            // Direction = caméra si dispo sinon forward du joueur
+            Vector3 fwd = cameraTransform != null ? cameraTransform.forward : transform.forward;
+            fwd.y = 0f;
+            if (fwd.sqrMagnitude < 0.0001f) fwd = transform.forward;
+            directionalDashDir = fwd.normalized;
+
+            // Init timers/état
+            isDashing = true;
+            dashTimer = 0f;
+            targetFOV = dashFOV;
+            lastDashPosition = transform.position;
+            _hitThisDash.Clear();
         }
         
         /// <summary>
@@ -335,12 +436,14 @@ namespace Proto3GD.FPS
             
             if (dashTimer < dashDuration)
             {
-                // Vérifier si on a touché le pilier
-                CheckPillarCollision();
+                if (!useDirectionalDash)
+                {
+                    // Ancien: vérifier collision avec la cible
+                    CheckPillarCollision();
+                }
             }
             else
             {
-                // Fin du dash
                 EndDash();
             }
         }
