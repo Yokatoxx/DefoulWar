@@ -15,8 +15,18 @@ namespace Proto3GD.FPS
         [Tooltip("Durée du dash en secondes")]
         [SerializeField] private float dashDuration = 0.4f;
         
-        [Tooltip("Cooldown entre chaque dash en secondes")]
+        [Header("Dash Charge Settings")]
+        [Tooltip("Activer la régénération automatique du dash (désactiver pour forcer le kill d'ennemis)")]
+        [SerializeField] private bool autoRegenerate = false;
+        
+        [Tooltip("Cooldown entre chaque dash en secondes (uniquement si autoRegenerate est activé)")]
         [SerializeField] private float dashCooldown = 1.5f;
+        
+        [Tooltip("Nombre d'ennemis spéciaux à tuer pour remplir complètement la barre de dash")]
+        [SerializeField] private int enemiesRequiredForFullCharge = 3;
+        
+        [Tooltip("Charge de dash actuelle (0 à 1)")]
+        [SerializeField] private float currentDashCharge = 1f;
         
         [Tooltip("Rayon de détection des ennemis pendant le dash")]
         [SerializeField] private float dashHitRadius = 1.0f;
@@ -92,10 +102,16 @@ namespace Proto3GD.FPS
         
         private void Update()
         {
-            // Mise à jour du cooldown
-            if (cooldownTimer < dashCooldown)
+            // Mise à jour du cooldown (uniquement si autoRegenerate est activé)
+            if (autoRegenerate && cooldownTimer < dashCooldown)
             {
                 cooldownTimer += Time.deltaTime;
+                
+                // Régénération automatique de la charge
+                if (cooldownTimer >= dashCooldown && currentDashCharge < 1f)
+                {
+                    currentDashCharge = 1f;
+                }
             }
             
             // Empêcher le dash pendant un stun
@@ -110,7 +126,10 @@ namespace Proto3GD.FPS
             else
             {
                 // Dash directionnel: E déclenche un dash dans la direction de la caméra
-                if (!isStunned && Input.GetKeyDown(KeyCode.E) && cooldownTimer >= dashCooldown)
+                bool hasCharge = currentDashCharge >= 1f;
+                bool cooldownReady = autoRegenerate ? (cooldownTimer >= dashCooldown) : true;
+                
+                if (!isStunned && Input.GetKeyDown(KeyCode.E) && hasCharge && cooldownReady)
                 {
                     StartDirectionalDash();
                 }
@@ -194,6 +213,9 @@ namespace Proto3GD.FPS
             if (fwd.sqrMagnitude < 0.0001f) fwd = transform.forward;
             directionalDashDir = fwd.normalized;
 
+            // Consommer la charge
+            currentDashCharge = 0f;
+
             // Init timers/état
             isDashing = true;
             dashTimer = 0f;
@@ -275,8 +297,24 @@ namespace Proto3GD.FPS
             }
         }
         
-        public bool CanDash => cooldownTimer >= dashCooldown && !isDashing;
+        public bool CanDash => currentDashCharge >= 1f && !isDashing && (autoRegenerate ? cooldownTimer >= dashCooldown : true);
         
         public float DashCooldownProgress => Mathf.Clamp01(cooldownTimer / dashCooldown);
+        
+        public float CurrentDashCharge => currentDashCharge;
+        
+        // Appelé quand un ennemi spécial (DashEnergyEnemy) est tué
+        public void OnDashEnemyKilled(float energyAmount)
+        {
+            float oldCharge = currentDashCharge;
+            
+            // Calculer l'énergie par ennemi (1 / nombre d'ennemis requis)
+            float energyPerEnemy = 1f / Mathf.Max(1, enemiesRequiredForFullCharge);
+            
+            // Ajouter l'énergie (multipliée par le montant configuré sur l'ennemi)
+            currentDashCharge = Mathf.Clamp01(currentDashCharge + (energyPerEnemy * energyAmount));
+            
+            Debug.Log($"[PillarDashSystem] Dash rechargé! {oldCharge:P0} → {currentDashCharge:P0} (+{energyPerEnemy * energyAmount:P0})");
+        }
     }
 }

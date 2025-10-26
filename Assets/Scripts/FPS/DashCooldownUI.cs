@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Proto3GD.FPS
 {
     /// <summary>
-    /// Affiche une jauge visuelle du cooldown du dash sur l'HUD
+    /// Affiche une jauge visuelle de la charge du dash sur l'HUD
     /// </summary>
     public class DashCooldownUI : MonoBehaviour
     {
@@ -19,16 +19,16 @@ namespace Proto3GD.FPS
         private TMPro.TextMeshProUGUI cooldownText;
         
         [Header("Visual Settings")]
-        [SerializeField, Tooltip("Couleur quand le dash est en cooldown")]
+        [SerializeField, Tooltip("Couleur quand le dash est en cours de charge")]
         private Color cooldownColor = new Color(1f, 0.3f, 0.3f, 0.8f);
         
-        [SerializeField, Tooltip("Couleur quand le dash est disponible")]
+        [SerializeField, Tooltip("Couleur quand le dash est complètement chargé")]
         private Color readyColor = new Color(0.3f, 1f, 0.3f, 0.8f);
         
         [SerializeField, Tooltip("Afficher le texte de pourcentage")]
         private bool showPercentageText = true;
         
-        [SerializeField, Tooltip("Cacher la jauge quand elle est pleine")]
+        [SerializeField, Tooltip("Cacher la jauge quand elle est complètement chargée")]
         private bool hideWhenReady = false;
         
         [SerializeField, Tooltip("Durée de l'animation de transition")]
@@ -73,8 +73,8 @@ namespace Proto3GD.FPS
         {
             if (dashSystem == null || fillImage == null) return;
 
-            // Récupérer le progrès du cooldown (0 = en cooldown, 1 = disponible)
-            float progress = dashSystem.DashCooldownProgress;
+            // Récupérer la charge actuelle du dash (0 = vide, 1 = plein)
+            float progress = dashSystem.CurrentDashCharge;
             
             // Lisser l'animation
             currentFillAmount = Mathf.Lerp(currentFillAmount, progress, Time.deltaTime * transitionSpeed);
