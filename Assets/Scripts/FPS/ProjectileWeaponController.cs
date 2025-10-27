@@ -108,7 +108,9 @@ namespace FPS
         
         private void HandleOldInput()
         {
-            isFiring = Input.GetButton("Fire1");
+
+                isFiring = Input.GetMouseButton(0);
+                
             
             if (Input.GetKeyDown(KeyCode.R))
             {
