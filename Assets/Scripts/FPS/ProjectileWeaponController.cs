@@ -8,12 +8,14 @@ namespace FPS
     public class ProjectileWeaponController : MonoBehaviour
     {
         [Header("Weapon Settings")]
+        [SerializeField] private bool useHitscan = false;
         [SerializeField] private float damage = 25f;
         [SerializeField] private float fireRate = 0.1f;
         [SerializeField] private float bulletSpeed = 50f;
         [SerializeField] private int maxAmmo = 30;
         [SerializeField] private int currentAmmo;
         [SerializeField] private float reloadTime = 2f;
+        [SerializeField] private bool autoReloadWhenEmpty = true;
         [SerializeField] private float maxAimDistance = 100f;
         [SerializeField] private LayerMask aimMask = ~0;
         
@@ -51,7 +53,7 @@ namespace FPS
         private bool isFiring;
         private Vector3 currentRecoil;
         
-        // Override temporaire de cadence (secondes entre tirs)
+        // Override temporaire de cadence
         private float? fireRateOverride;
         private float EffectiveFireRate => Mathf.Max(0.01f, fireRateOverride ?? fireRate);
         public void SetFireRateOverride(float? secondsBetweenShots)
@@ -127,15 +129,55 @@ namespace FPS
         {
             currentAmmo--;
             
-            // Déclencher l'effet de bouche (muzzle flash) si présent
             PlayMuzzleFlash();
             
             float randomX = Random.Range(-recoilAmount, recoilAmount);
             float randomY = Random.Range(-recoilAmount, recoilAmount);
             currentRecoil += new Vector3(recoilAmount, randomY, randomX);
             
-            if (bulletPrefab != null)
+            if (useHitscan)
             {
+                // Mode Hitscan - dégâts instantanés
+                Vector3 rayOrigin = cameraTransform != null ? cameraTransform.position : transform.position;
+                Vector3 rayDirection = cameraTransform != null ? cameraTransform.forward : transform.forward;
+                
+                if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, maxAimDistance, aimMask, QueryTriggerInteraction.Ignore))
+                {
+                    // Vérifier si c'est un ennemi
+                    var enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
+                    if (enemyHealth != null)
+                    {
+                        float finalDamage = damage;
+                        
+                        // Appliquer les multiplicateurs de zone
+                        var hitZone = hit.collider.GetComponent<HitZone>();
+                        if (hitZone != null)
+                        {
+                            var multipliers = BuildZoneMultiplierDict();
+                            if (multipliers.TryGetValue(hitZone.ZoneName, out float mult))
+                            {
+                                finalDamage *= mult;
+                            }
+                            hitZone.FlashOnHit();
+                        }
+                        
+                        string zoneName = hitZone != null ? hitZone.ZoneName : "Body";
+                        enemyHealth.TakeDamage(finalDamage, zoneName);
+                    }
+                    else
+                    {
+                        // Vérifier si c'est le joueur
+                        var playerHealth = hit.collider.GetComponent<PlayerHealth>();
+                        if (playerHealth != null)
+                        {
+                            playerHealth.TakeDamage(damage);
+                        }
+                    }
+                }
+            }
+            else if (bulletPrefab != null)
+            {
+                // Mode Projectile - spawn un bullet
                 Vector3 spawnPos = firePoint != null ? firePoint.position : (weaponModel != null ? weaponModel.position : transform.position);
                 Quaternion baseRot = cameraTransform != null ? cameraTransform.rotation : transform.rotation;
                 
@@ -184,13 +226,18 @@ namespace FPS
                     }
                 }
             }
+            
+            // Rechargement automatique si le chargeur est vide
+            if (autoReloadWhenEmpty && currentAmmo <= 0)
+            {
+                StartReload();
+            }
         }
         
         private void PlayMuzzleFlash()
         {
             if (firePoint == null && muzzleFlash == null && muzzleFlashPrefab == null) return;
             
-            // Option 1: ParticleSystem déjà présent dans la scène/arme
             if (muzzleFlash != null)
             {
                 if (firePoint != null)
@@ -201,7 +248,6 @@ namespace FPS
                 return;
             }
             
-            // Option 2: Instancier un prefab d'effet et le détruire après sa durée
             if (muzzleFlashPrefab != null)
             {
                 Transform parent = firePoint != null ? firePoint : transform;
