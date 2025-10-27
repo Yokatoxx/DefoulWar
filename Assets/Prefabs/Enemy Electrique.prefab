@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 912ac019c48ed294398f81737e3b6e7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPrefab: {fileID: 1290454490978211117, guid: 2e0b24711c336464894f8467594d02ea, type: 3}
+  effectPrefab: {fileID: 343933677807719435, guid: 2e0b24711c336464894f8467594d02ea, type: 3}
   effectDuration: 5
 --- !u!1 &463622794186511725
 GameObject:
