@@ -1,3 +1,4 @@
+using Proto3GD.FPS;
 using UnityEngine;
 
 namespace Ennemies.Effect
@@ -15,5 +16,26 @@ namespace Ennemies.Effect
         public float StunDuration => stunDuration;
         public bool OverrideAutoFireInterval => overrideAutoFireInterval;
         public float StunAutoFireInterval => stunAutoFireInterval;
+
+        [SerializeField] private InstantiationEffect instantiationEffect;
+        [SerializeField] private EnemyHealth enemyHealth;
+        
+        private void Start()
+        {
+            instantiationEffect = instantiationEffect.GetComponent<InstantiationEffect>();
+            enemyHealth = enemyHealth.GetComponent<EnemyHealth>();
+        }
+
+       
+
+        private void Update()
+        {
+            
+            if (enemyHealth.IsDead)
+            {
+                instantiationEffect.effectDuration = stunDuration;
+                instantiationEffect.InstanceEffectBase();
+            }
+        }
     }
 }
