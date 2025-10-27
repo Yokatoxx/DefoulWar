@@ -9408,7 +9408,7 @@ MonoBehaviour:
   gravity: -9.81
   airControlFactor: 1
   preserveJumpMomentum: 0
-  maxAirSpeed: 25
+  maxAirSpeed: 100
   groundCheck: {fileID: 2040315599}
   groundDistance: 0.4
   groundMask:
@@ -9460,7 +9460,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dashSpeed: 25
   dashDuration: 0.4
+  autoRegenerate: 0
   dashCooldown: 1.5
+  enemiesRequiredForFullCharge: 3
+  currentDashCharge: 1
   dashHitRadius: 1
   dashDamage: 9999
   enemyMask:
@@ -15356,7 +15359,7 @@ MonoBehaviour:
   positionOffset: {x: 0, y: 0, z: 0}
   rotationOffsetEuler: {x: 0, y: 0, z: 0}
   smoothPosition: 1
-  positionSmoothSpeed: 50
+  positionSmoothSpeed: 80
   smoothRotation: 1
   rotationSmoothSpeed: 20
 --- !u!1 &1505105746
