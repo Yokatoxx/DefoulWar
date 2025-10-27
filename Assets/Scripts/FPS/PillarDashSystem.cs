@@ -40,6 +40,16 @@ namespace Proto3GD.FPS
         [Tooltip("LayerMask pour détecter les ennemis")]
         [SerializeField] private LayerMask enemyMask = ~0;
         
+        [Header("Collision Settings")]
+        [Tooltip("Angle maximum (en degrés) entre la direction du dash et la surface pour continuer le dash. Au-delà, le dash s'arrête.")]
+        [SerializeField] private float maxCollisionAngle = 45f;
+        
+        [Tooltip("LayerMask pour les obstacles qui peuvent arrêter le dash")]
+        [SerializeField] private LayerMask obstacleMask = ~0;
+        
+        [Tooltip("Distance de détection des obstacles devant le joueur")]
+        [SerializeField] private float obstacleCheckDistance = 0.5f;
+        
         [Header("FOV Settings")]
         [Tooltip("FOV pendant le dash")]
         [SerializeField] private float dashFOV = 90f;
@@ -143,6 +153,13 @@ namespace Proto3GD.FPS
         private void FixedUpdate()
         {
             if (!isDashing || characterController == null) return;
+
+            // Vérifier les obstacles devant le joueur
+            if (CheckObstacleCollision())
+            {
+                EndDash();
+                return;
+            }
 
             // Calculer le progrès du dash (0 à 1)
             float dashProgress = Mathf.Clamp01(dashTimer / dashDuration);
@@ -249,6 +266,48 @@ namespace Proto3GD.FPS
             {
                 EndDash();
             }
+        }
+        
+        // Vérifie si le dash doit être arrêté par une collision avec un obstacle à mauvais angle
+        private bool CheckObstacleCollision()
+        {
+            // Raycast dans la direction du dash pour détecter les obstacles
+            RaycastHit hit;
+            float checkDistance = obstacleCheckDistance;
+            
+            // SphereCast pour détecter les obstacles devant le joueur avec un rayon similaire au dashHitRadius
+            if (Physics.SphereCast(
+                transform.position,
+                dashHitRadius * 0.8f, // Légèrement plus petit pour éviter les faux positifs
+                directionalDashDir,
+                out hit,
+                checkDistance,
+                obstacleMask,
+                QueryTriggerInteraction.Ignore))
+            {
+                // Ignorer si c'est un ennemi (ils sont gérés séparément)
+                var enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>() ?? hit.collider.GetComponent<EnemyHealth>();
+                if (enemyHealth != null)
+                {
+                    return false; // Ne pas arrêter le dash pour les ennemis
+                }
+                
+                // Calculer l'angle entre la direction du dash et la normale de la surface
+                float angle = Vector3.Angle(directionalDashDir, -hit.normal);
+                
+                // Debug visuel
+                Debug.DrawRay(hit.point, hit.normal * 2f, Color.red, 0.1f);
+                Debug.DrawRay(hit.point, directionalDashDir * 2f, Color.yellow, 0.1f);
+                
+                // Si l'angle est trop abrupt (surface trop perpendiculaire à la direction du dash)
+                if (angle > maxCollisionAngle)
+                {
+                    Debug.Log($"[PillarDashSystem] Dash arrêté par collision ! Angle: {angle:F1}° (max: {maxCollisionAngle}°)");
+                    return true; // Arrêter le dash
+                }
+            }
+            
+            return false; // Continuer le dash
         }
         
 
