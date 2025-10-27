@@ -15,6 +15,7 @@ namespace Proto3GD.FPS
         [SerializeField] private float sprintSpeed = 8f;
         [SerializeField] private float jumpHeight = 1.5f;
         [SerializeField] private float gravity = -9.81f;
+        [SerializeField] private float gravityMultiplier = 2f;
         [SerializeField] private float increaseSpeedFactor = 25f;
         [SerializeField] private float speedLimit = 20f;
 
@@ -102,7 +103,7 @@ namespace Proto3GD.FPS
                 // Saut
                 if (jump)
                 {
-                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity); //
                     
                     // Capturer le momentum actuel pour le préserver en l'air
                     if (preserveJumpMomentum && desired.sqrMagnitude > 0f)

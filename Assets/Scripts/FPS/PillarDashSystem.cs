@@ -15,6 +15,9 @@ namespace Proto3GD.FPS
         [Tooltip("Durée du dash en secondes")]
         [SerializeField] private float dashDuration = 0.4f;
         
+        [Tooltip("Courbe de vitesse du dash (X = temps normalisé 0-1, Y = multiplicateur de vitesse)")]
+        [SerializeField] private AnimationCurve dashSpeedCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0.3f);
+        
         [Header("Dash Charge Settings")]
         [Tooltip("Activer la régénération automatique du dash (désactiver pour forcer le kill d'ennemis)")]
         [SerializeField] private bool autoRegenerate = false;
@@ -141,8 +144,14 @@ namespace Proto3GD.FPS
         {
             if (!isDashing || characterController == null) return;
 
-            // Mouvement en ligne droite selon la direction de dash
-            Vector3 dashMovement = directionalDashDir * (dashSpeed * Time.fixedDeltaTime);
+            // Calculer le progrès du dash (0 à 1)
+            float dashProgress = Mathf.Clamp01(dashTimer / dashDuration);
+            
+            // Évaluer la courbe pour obtenir le multiplicateur de vitesse
+            float speedMultiplier = dashSpeedCurve.Evaluate(dashProgress);
+            
+            // Mouvement en ligne droite selon la direction de dash avec la courbe appliquée
+            Vector3 dashMovement = directionalDashDir * (dashSpeed * speedMultiplier * Time.fixedDeltaTime);
             
             Vector3 currentPos = transform.position;
             Vector3 nextPos = currentPos + dashMovement;

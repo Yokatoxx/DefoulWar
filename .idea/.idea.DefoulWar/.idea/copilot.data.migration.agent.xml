@@ -8,6 +8,7 @@
       <option value="2a979126-8eed-4dfc-9945-ed810f6081dc" />
       <option value="2bf59f0a-8e1d-421e-b2e4-c5d81fdb4742" />
       <option value="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
+      <option value="47fb342d-157d-4601-916d-863d4c5bb05d" />
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <option value="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
@@ -56,6 +57,13 @@
               <option value="57cbbd47-89d4-4616-a312-81b98b6bb722" />
               <option value="675d6b8e-27d5-4531-8af3-04a620c1180f" />
               <option value="a5f94437-7982-4c1c-baa0-9e17a005424c" />
+            </set>
+          </value>
+        </entry>
+        <entry key="47fb342d-157d-4601-916d-863d4c5bb05d">
+          <value>
+            <set>
+              <option value="91e686aa-6b0e-4255-ac93-925f067dec9f" />
             </set>
           </value>
         </entry>
@@ -128,6 +136,11 @@
       <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
       <entry key="2a979126-8eed-4dfc-9945-ed810f6081dc" />
       <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
+      <entry key="47fb342d-157d-4601-916d-863d4c5bb05d">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
+        </set>
+      </entry>
       <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f">
         <set>
