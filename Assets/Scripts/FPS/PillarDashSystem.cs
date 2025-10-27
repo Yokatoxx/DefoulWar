@@ -214,10 +214,24 @@ namespace Proto3GD.FPS
 
         private void StartDirectionalDash()
         {
-            // Direction = caméra si dispo sinon forward du joueur
-            Vector3 fwd = cameraTransform != null ? cameraTransform.forward : transform.forward;
-            fwd.y = 0f;
-            if (fwd.sqrMagnitude < 0.0001f) fwd = transform.forward;
+            // Direction = centre de l'écran (viseur) - TOUTES DIRECTIONS (haut, bas, diagonales)
+            Vector3 fwd;
+            if (playerCamera != null)
+            {
+                // Raycast depuis le centre de l'écran
+                Ray aimRay = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+                fwd = aimRay.direction;
+            }
+            else if (cameraTransform != null)
+            {
+                fwd = cameraTransform.forward;
+            }
+            else
+            {
+                fwd = transform.forward;
+            }
+            
+            // Utiliser la direction complète (pas de projection horizontale)
             directionalDashDir = fwd.normalized;
 
             // Consommer la charge
