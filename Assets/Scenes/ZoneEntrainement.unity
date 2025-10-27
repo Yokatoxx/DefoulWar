@@ -49528,7 +49528,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8707421386175084620, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: dashSpeed
-      value: 30
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 8707421386175084620, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: fpsMovement
@@ -49540,17 +49540,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8707421386175084620, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: dashDuration
-      value: 0.2
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 8707421386175084620, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: momentumRetention
-      value: 0.2
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: volume
       value: 
       objectReference: {fileID: 1675522526}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8821190030564371954, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
