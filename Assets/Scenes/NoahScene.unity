@@ -9545,8 +9545,10 @@ MonoBehaviour:
   sprintSpeed: 8
   jumpHeight: 2
   gravity: -9.81
+  gravityMultiplier: 2
   increaseSpeedFactor: 3
   speedLimit: 15
+  coyoteTime: 0.15
   speedDisplay: {fileID: 890343426}
   airControlFactor: 1
   preserveJumpMomentum: 0
@@ -9602,6 +9604,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dashSpeed: 35
   dashDuration: 0.2
+  dashSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0.3
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   autoRegenerate: 1
   dashCooldown: 1.5
   enemiesRequiredForFullCharge: 3
@@ -9611,6 +9637,11 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  maxCollisionAngle: 45
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  obstacleCheckDistance: 0.5
   dashFOV: 90
   fovTransitionSpeed: 15
   playerController: {fileID: 943778879}
@@ -14836,7 +14867,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1918107123851469354, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
