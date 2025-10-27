@@ -6,12 +6,16 @@
       <option value="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <option value="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
       <option value="2a979126-8eed-4dfc-9945-ed810f6081dc" />
+      <option value="2bf59f0a-8e1d-421e-b2e4-c5d81fdb4742" />
       <option value="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
+      <option value="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
       <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
+      <option value="cddea399-0ccd-45bc-9587-22a29f83cbb7" />
       <option value="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
+      <option value="fce4fee5-425b-430b-84e9-87a7ae92faa5" />
     </option>
     <option name="pendingTurns">
       <map>
@@ -39,6 +43,13 @@
             </set>
           </value>
         </entry>
+        <entry key="2bf59f0a-8e1d-421e-b2e4-c5d81fdb4742">
+          <value>
+            <set>
+              <option value="c0e5b86d-0a01-4944-b775-3d2c6add8795" />
+            </set>
+          </value>
+        </entry>
         <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5">
           <value>
             <set>
@@ -53,6 +64,14 @@
             <set>
               <option value="4fbc1da6-a9ac-43fd-a2c7-a6f0b4a3b3a9" />
               <option value="7ee69938-9056-4933-9d4c-b1559a5d0898" />
+            </set>
+          </value>
+        </entry>
+        <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f">
+          <value>
+            <set>
+              <option value="2c56a0ac-c49a-4e96-ab16-93cc40510be6" />
+              <option value="d0be0b6e-f56d-43af-8505-05509101a4c9" />
             </set>
           </value>
         </entry>
@@ -80,11 +99,25 @@
             </set>
           </value>
         </entry>
+        <entry key="cddea399-0ccd-45bc-9587-22a29f83cbb7">
+          <value>
+            <set>
+              <option value="2dd56bad-6a60-4912-9428-62eee880f0c4" />
+            </set>
+          </value>
+        </entry>
         <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31">
           <value>
             <set>
               <option value="3e80dc2e-cfc5-41b3-8b2d-f1289d43b53e" />
               <option value="67c05110-576e-4d70-b38b-9d151bb748fc" />
+            </set>
+          </value>
+        </entry>
+        <entry key="fce4fee5-425b-430b-84e9-87a7ae92faa5">
+          <value>
+            <set>
+              <option value="b20cc4ad-63b3-4003-9ffb-f4166e30e5c1" />
             </set>
           </value>
         </entry>
@@ -95,26 +128,15 @@
       <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
       <entry key="2a979126-8eed-4dfc-9945-ed810f6081dc" />
       <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
-      <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11">
+      <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
+      <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f">
         <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashEnergyEnemy.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
-          <option value="file://$PROJECT_DIR$/DASH_ENERGY_GUIDE.md" />
-          <option value="file://$PROJECT_DIR$/DASH_ENERGY_IMPLEMENTATION.md" />
-          <option value="file://$PROJECT_DIR$/DASH_ENEMY_CONFIG_EXAMPLES.md" />
-          <option value="file://$PROJECT_DIR$/DASH_SYSTEM_COMPLETE.md" />
-          <option value="file://$PROJECT_DIR$/DASH_README.md" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashCooldownUI.cs" />
-          <option value="file://$PROJECT_DIR$/DASH_DEBUG_GUIDE.md" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs" />
         </set>
       </entry>
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
-      <entry key="f0942681-0223-4301-8aca-6d3acd664b1c">
-        <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashCooldownUI.cs" />
-        </set>
-      </entry>
+      <entry key="f0942681-0223-4301-8aca-6d3acd664b1c" />
       <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
     </pendingWorkingSetItems>
   </component>

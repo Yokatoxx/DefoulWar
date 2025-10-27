@@ -127,7 +127,7 @@ namespace Proto3GD.FPS
                 bool hasCharge = currentDashCharge >= 1f;
                 bool cooldownReady = autoRegenerate ? (cooldownTimer >= dashCooldown) : true;
                 
-                if (!isStunned && Input.GetKeyDown(KeyCode.F) && hasCharge && cooldownReady)
+                if (!isStunned && Input.GetMouseButtonDown(1) && hasCharge && cooldownReady)
                 {
                     StartDirectionalDash();
                 }
