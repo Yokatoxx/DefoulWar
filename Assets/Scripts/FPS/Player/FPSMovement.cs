@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using TMPro;
 
 namespace Proto3GD.FPS
 {
@@ -15,6 +16,10 @@ namespace Proto3GD.FPS
         [SerializeField] private float jumpHeight = 1.5f;
         [SerializeField] private float gravity = -9.81f;
         [SerializeField] private float increaseSpeedFactor = 25f;
+        [SerializeField] private float speedLimit = 20f;
+
+        private float defaultMoveSpeed;
+        [SerializeField] private TextMeshProUGUI speedDisplay;
 
         [Header("Air Control")]
         [SerializeField, Tooltip("Contrôle en l'air (0 = aucun, 1 = identique au sol)")]
@@ -42,6 +47,8 @@ namespace Proto3GD.FPS
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+
+            defaultMoveSpeed = moveSpeed;
         }
 
         private void Update()
@@ -52,17 +59,22 @@ namespace Proto3GD.FPS
 
         private void IncreaseSpeed()
         {
-            if (CurrentSpeed != 0)
+            if (IsMoving)
             {
-                moveSpeed += increaseSpeedFactor * Time.deltaTime;
-                if (CurrentSpeed > maxAirSpeed)
+                if (moveSpeed < speedLimit)
                 {
-                    CurrentSpeed = maxAirSpeed;
+                    moveSpeed += increaseSpeedFactor * Time.deltaTime;
+                    speedDisplay.text = "Speed: " + Mathf.RoundToInt(moveSpeed).ToString();
+                    if (CurrentSpeed > maxAirSpeed)
+                    {
+                        CurrentSpeed = maxAirSpeed;
+                    }
                 }
             }
             else
             {
-                moveSpeed =
+                speedDisplay.text = "Speed: " + Mathf.RoundToInt(moveSpeed).ToString();
+                moveSpeed = defaultMoveSpeed;
             }
         }
 

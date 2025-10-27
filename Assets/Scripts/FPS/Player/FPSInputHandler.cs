@@ -39,7 +39,6 @@ namespace Proto3GD.FPS
             LookInput = new Vector2(mouseX, mouseY);
             
             // Actions
-            SprintPressed = Input.GetKey(KeyCode.LeftShift);
             LeanLeftPressed = Input.GetKey(KeyCode.Q);
             LeanRightPressed = Input.GetKey(KeyCode.E);
             
@@ -92,14 +91,6 @@ namespace Proto3GD.FPS
             if (useNewInputSystem && context.performed)
             {
                 JumpPressed = true;
-            }
-        }
-
-        public void OnSprint(UnityEngine.InputSystem.InputAction.CallbackContext context)
-        {
-            if (useNewInputSystem)
-            {
-                SprintPressed = context.performed || context.started;
             }
         }
     }
