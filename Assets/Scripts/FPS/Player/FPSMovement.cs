@@ -138,7 +138,7 @@ namespace Proto3GD.FPS
             }
             
             // Appliquer la gravité
-            velocity.y += gravity * Time.deltaTime;
+            velocity.y += gravity * gravityMultiplier * Time.deltaTime;
             controller.Move(new Vector3(0, velocity.y, 0) * Time.deltaTime);
         }
 

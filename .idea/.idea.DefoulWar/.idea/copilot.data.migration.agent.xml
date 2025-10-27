@@ -15,6 +15,7 @@
       <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <option value="cddea399-0ccd-45bc-9587-22a29f83cbb7" />
+      <option value="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
       <option value="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
       <option value="fce4fee5-425b-430b-84e9-87a7ae92faa5" />
     </option>
@@ -66,6 +67,7 @@
               <option value="91e686aa-6b0e-4255-ac93-925f067dec9f" />
               <option value="f8e4fc63-62b4-4442-8830-9cfbcc5302f8" />
               <option value="197efa6e-6715-4d5b-9a19-5d8b544ee40d" />
+              <option value="ca8f1020-f356-4500-8a72-7d08eb32ae7d" />
             </set>
           </value>
         </entry>
@@ -116,6 +118,13 @@
             </set>
           </value>
         </entry>
+        <entry key="ceb67802-ff22-4707-868e-ed5fd02abcf5">
+          <value>
+            <set>
+              <option value="ca8229a4-7887-444a-a97e-e47949531869" />
+            </set>
+          </value>
+        </entry>
         <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31">
           <value>
             <set>
@@ -151,6 +160,11 @@
       </entry>
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
+      <entry key="ceb67802-ff22-4707-868e-ed5fd02abcf5">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" />
+        </set>
+      </entry>
       <entry key="f0942681-0223-4301-8aca-6d3acd664b1c" />
       <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
     </pendingWorkingSetItems>
