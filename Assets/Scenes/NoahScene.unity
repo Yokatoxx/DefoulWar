@@ -9406,6 +9406,7 @@ MonoBehaviour:
   sprintSpeed: 8
   jumpHeight: 2
   gravity: -9.81
+  increaseSpeedFactor: 0.5
   airControlFactor: 1
   preserveJumpMomentum: 0
   maxAirSpeed: 100

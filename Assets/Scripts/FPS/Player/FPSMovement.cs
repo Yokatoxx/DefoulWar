@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Proto3GD.FPS
 {
@@ -13,6 +14,7 @@ namespace Proto3GD.FPS
         [SerializeField] private float sprintSpeed = 8f;
         [SerializeField] private float jumpHeight = 1.5f;
         [SerializeField] private float gravity = -9.81f;
+        [SerializeField] private float increaseSpeedFactor = 25f;
 
         [Header("Air Control")]
         [SerializeField, Tooltip("Contrôle en l'air (0 = aucun, 1 = identique au sol)")]
@@ -44,7 +46,24 @@ namespace Proto3GD.FPS
 
         private void Update()
         {
+            IncreaseSpeed();
             HandleGroundCheck();
+        }
+
+        private void IncreaseSpeed()
+        {
+            if (CurrentSpeed != 0)
+            {
+                moveSpeed += increaseSpeedFactor * Time.deltaTime;
+                if (CurrentSpeed > maxAirSpeed)
+                {
+                    CurrentSpeed = maxAirSpeed;
+                }
+            }
+            else
+            {
+                moveSpeed =
+            }
         }
 
         public void Move(Vector2 input, bool sprint, bool jump)
