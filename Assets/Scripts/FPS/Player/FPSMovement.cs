@@ -49,6 +49,20 @@ namespace Proto3GD.FPS
         public bool IsGrounded => isGrounded;
         public bool IsMoving { get; private set; }
         public float CurrentSpeed { get; private set; }
+        
+        // Méthode pour forcer la vitesse au max (utilisée par le dash)
+        public void SetSpeedToMax()
+        {
+            moveSpeed = speedLimit;
+        }
+        
+        // Méthode pour appliquer un momentum externe (utilisée par le dash)
+        public void ApplyExternalMomentum(Vector3 momentum)
+        {
+            jumpMomentum = momentum;
+            // S'assurer que le joueur garde ce momentum
+            moveSpeed = Mathf.Max(moveSpeed, momentum.magnitude);
+        }
 
         private void Awake()
         {

@@ -57,8 +57,16 @@ namespace Proto3GD.FPS
         [Tooltip("Vitesse de transition du FOV")]
         [SerializeField] private float fovTransitionSpeed = 15f;
         
+        [Header("Momentum Settings")]
+        [Tooltip("Conserver l'énergie cinétique à la sortie du dash")]
+        [SerializeField] private bool conserveMomentum = true;
+        
+        [Tooltip("Pourcentage du momentum du dash à conserver (0 à 1)")]
+        [SerializeField] private float momentumRetention = 0.8f;
+        
         [Header("References")]
         [SerializeField] private FPSPlayerController playerController;
+        [SerializeField] private FPSMovement fpsMovement;
         [SerializeField] private Transform cameraTransform;
         
         private Camera playerCamera;
@@ -88,6 +96,11 @@ namespace Proto3GD.FPS
                 {
                     return;
                 }
+            }
+
+            if (fpsMovement == null)
+            {
+                fpsMovement = GetComponent<FPSMovement>();
             }
 
             if (cameraTransform == null)
@@ -250,6 +263,12 @@ namespace Proto3GD.FPS
             
             currentDashCharge = 0f;
 
+            // Mettre la vitesse de mouvement au maximum
+            if (fpsMovement != null)
+            {
+                fpsMovement.SetSpeedToMax();
+            }
+
             // Init timers/état
             isDashing = true;
             dashTimer = 0f;
@@ -355,6 +374,16 @@ namespace Proto3GD.FPS
         
         private void EndDash()
         {
+            // Appliquer le momentum de sortie si activé
+            if (conserveMomentum && fpsMovement != null)
+            {
+                // Calculer le momentum basé sur la vitesse du dash
+                Vector3 dashMomentum = directionalDashDir * dashSpeed * momentumRetention;
+                fpsMovement.ApplyExternalMomentum(dashMomentum);
+                
+                Debug.Log($"[PillarDashSystem] Momentum conservé: {dashMomentum.magnitude:F1} m/s dans la direction {directionalDashDir}");
+            }
+            
             isDashing = false;
             dashTimer = 0f;
             cooldownTimer = 0f;
