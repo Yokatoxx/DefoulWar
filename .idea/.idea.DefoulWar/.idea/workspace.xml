@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MainScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/MainScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -127,7 +130,7 @@
       <workItem from="1761491995625" duration="1969000" />
       <workItem from="1761496003909" duration="299000" />
       <workItem from="1761500729594" duration="989000" />
-      <workItem from="1761560908329" duration="7859000" />
+      <workItem from="1761560908329" duration="8696000" />
     </task>
     <servers />
   </component>

@@ -18,6 +18,10 @@ namespace Proto3GD.FPS
         [SerializeField] private float gravityMultiplier = 2f;
         [SerializeField] private float increaseSpeedFactor = 25f;
         [SerializeField] private float speedLimit = 20f;
+        
+        [Header("Jump Settings")]
+        [SerializeField, Tooltip("Temps après avoir quitté le sol pendant lequel on peut encore sauter")]
+        private float coyoteTime = 0.15f;
 
         private float defaultMoveSpeed;
         [SerializeField] private TextMeshProUGUI speedDisplay;
@@ -40,6 +44,7 @@ namespace Proto3GD.FPS
         private Vector3 moveDirection = Vector3.zero;
         private Vector3 jumpMomentum = Vector3.zero;
         private bool isGrounded;
+        private float coyoteTimeCounter;
 
         public bool IsGrounded => isGrounded;
         public bool IsMoving { get; private set; }
@@ -110,10 +115,28 @@ namespace Proto3GD.FPS
                     {
                         jumpMomentum = desired * CurrentSpeed;
                     }
+                    
+                    // Consommer le coyote time
+                    coyoteTimeCounter = 0f;
                 }
             }
             else
             {
+                // Permettre le saut pendant le coyote time
+                if (jump && coyoteTimeCounter > 0f)
+                {
+                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                    
+                    // Capturer le momentum actuel pour le préserver en l'air
+                    if (preserveJumpMomentum && desired.sqrMagnitude > 0f)
+                    {
+                        jumpMomentum = desired * CurrentSpeed;
+                    }
+                    
+                    // Consommer le coyote time
+                    coyoteTimeCounter = 0f;
+                }
+                
                 // En l'air
                 if (preserveJumpMomentum && jumpMomentum.sqrMagnitude > 0f)
                 {
@@ -151,6 +174,16 @@ namespace Proto3GD.FPS
             else
             {
                 isGrounded = controller.isGrounded;
+            }
+
+            // Gérer le coyote time
+            if (isGrounded)
+            {
+                coyoteTimeCounter = coyoteTime;
+            }
+            else
+            {
+                coyoteTimeCounter -= Time.deltaTime;
             }
 
             // Réinitialiser la vélocité verticale au sol

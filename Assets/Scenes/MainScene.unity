@@ -22279,13 +22279,9 @@ PrefabInstance:
       propertyPath: weaponModel
       value: 
       objectReference: {fileID: 1433460599}
-    - target: {fileID: 3725817409442096485, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: m_Enabled
-      value: 1
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: jumpHeight
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: speedDisplay
@@ -22294,14 +22290,6 @@ PrefabInstance:
     - target: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_Name
       value: FPS_Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 7771429963434298130, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8291640835560598057, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8703966557384231457, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_LocalPosition.x

@@ -9,10 +9,12 @@
       <option value="2bf59f0a-8e1d-421e-b2e4-c5d81fdb4742" />
       <option value="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
       <option value="47fb342d-157d-4601-916d-863d4c5bb05d" />
+      <option value="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <option value="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
       <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
+      <option value="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <option value="cddea399-0ccd-45bc-9587-22a29f83cbb7" />
       <option value="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
@@ -71,6 +73,13 @@
             </set>
           </value>
         </entry>
+        <entry key="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b">
+          <value>
+            <set>
+              <option value="efec3dac-5e22-49ae-894b-0f9e602b132e" />
+            </set>
+          </value>
+        </entry>
         <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11">
           <value>
             <set>
@@ -102,6 +111,13 @@
             </set>
           </value>
         </entry>
+        <entry key="bb250ac1-5021-49ef-8322-9776164bc8b5">
+          <value>
+            <set>
+              <option value="782bf54b-a1bd-44de-9750-ea55be89845e" />
+            </set>
+          </value>
+        </entry>
         <entry key="c267a988-d614-4b0f-bbf7-f88132b67369">
           <value>
             <set>
@@ -122,6 +138,7 @@
           <value>
             <set>
               <option value="ca8229a4-7887-444a-a97e-e47949531869" />
+              <option value="0c670acd-dc82-41a8-9cd1-cc202c9cb363" />
             </set>
           </value>
         </entry>
@@ -152,6 +169,11 @@
           <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
         </set>
       </entry>
+      <entry key="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" />
+        </set>
+      </entry>
       <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f">
         <set>
@@ -159,6 +181,11 @@
         </set>
       </entry>
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
+      <entry key="bb250ac1-5021-49ef-8322-9776164bc8b5">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" />
+        </set>
+      </entry>
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <entry key="ceb67802-ff22-4707-868e-ed5fd02abcf5">
         <set>
