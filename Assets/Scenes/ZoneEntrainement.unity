@@ -49448,9 +49448,25 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3574266}
     - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: jumpHeight
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: speedDisplay
       value: 
       objectReference: {fileID: 1464062548}
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: gravityMultiplier
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: preserveJumpMomentum
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: jumpMomentumMultiplier
+      value: 0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_Name
       value: FPS_Player
@@ -49494,6 +49510,10 @@ PrefabInstance:
     - target: {fileID: 8703966557384231457, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8707421386175084620, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: momentumRetention
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: volume

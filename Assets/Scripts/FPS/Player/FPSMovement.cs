@@ -31,6 +31,8 @@ namespace Proto3GD.FPS
         private float airControlFactor = 0.4f;
         [SerializeField, Tooltip("Conserver la vitesse horizontale lors du saut")]
         private bool preserveJumpMomentum = false;
+        [SerializeField, Tooltip("Multiplicateur de momentum lors du saut (1 = vitesse normale, >1 = boost)")]
+        private float jumpMomentumMultiplier = 1f;
         [SerializeField, Tooltip("Vitesse maximale en l'air")]
         private float maxAirSpeed = 10f;
 
@@ -127,7 +129,7 @@ namespace Proto3GD.FPS
                     // Capturer le momentum actuel pour le préserver en l'air
                     if (preserveJumpMomentum && desired.sqrMagnitude > 0f)
                     {
-                        jumpMomentum = desired * CurrentSpeed;
+                        jumpMomentum = desired * CurrentSpeed * jumpMomentumMultiplier;
                     }
                     
                     // Consommer le coyote time
@@ -144,7 +146,7 @@ namespace Proto3GD.FPS
                     // Capturer le momentum actuel pour le préserver en l'air
                     if (preserveJumpMomentum && desired.sqrMagnitude > 0f)
                     {
-                        jumpMomentum = desired * CurrentSpeed;
+                        jumpMomentum = desired * CurrentSpeed * jumpMomentumMultiplier;
                     }
                     
                     // Consommer le coyote time
