@@ -9405,6 +9405,7 @@ GameObject:
   - component: {fileID: 943778872}
   - component: {fileID: 943778871}
   - component: {fileID: 943778884}
+  - component: {fileID: 943778885}
   m_Layer: 3
   m_Name: FPS_Player
   m_TagString: Player
@@ -9599,8 +9600,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abae424d8e92498d9b8bf7c95b18e083, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dashSpeed: 25
-  dashDuration: 0.4
+  dashSpeed: 35
+  dashDuration: 0.2
   autoRegenerate: 1
   dashCooldown: 1.5
   enemiesRequiredForFullCharge: 3
@@ -9615,6 +9616,22 @@ MonoBehaviour:
   playerController: {fileID: 943778879}
   cameraTransform: {fileID: 1905549312}
   isDashing: 0
+--- !u!114 &943778885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943778869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b758c9229da4e64d93b22860b781d83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volume: {fileID: 832575518}
+  pillarDashSystem: {fileID: 943778884}
+  dashEffectIntensity: -0.8
+  dashEffectDuration: 0.4
 --- !u!43 &998631713
 Mesh:
   m_ObjectHideFlags: 0
@@ -19286,7 +19303,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
