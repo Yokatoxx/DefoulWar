@@ -9460,7 +9460,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dashSpeed: 25
   dashDuration: 0.4
-  autoRegenerate: 0
+  autoRegenerate: 1
   dashCooldown: 1.5
   enemiesRequiredForFullCharge: 3
   currentDashCharge: 1
