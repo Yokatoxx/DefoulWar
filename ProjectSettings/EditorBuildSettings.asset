@@ -6,8 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Multiscene.unity
+    guid: 3c006375f9c52c943827cbf42ad4028f
+  - enabled: 1
     path: Assets/Scenes/MainScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/DebugScene.unity
+    guid: 316a9ad38410b5a49a1f625c9765c035
+  - enabled: 1
+    path: Assets/Scenes/NoahScene.unity
+    guid: 3b5ca090039b1524cb29992471017911
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
