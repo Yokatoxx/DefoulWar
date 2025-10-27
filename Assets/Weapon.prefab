@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 3693537989123764337}
   - component: {fileID: 684031689176008254}
   - component: {fileID: 8035661892685741967}
-  m_Layer: 0
+  - component: {fileID: 1299489115412818685}
+  m_Layer: 6
   m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,7 +108,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -118,24 +119,60 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1364368352059329568}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aa01fa35b1b406ba5f5ba9baea07030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useHitscan: 0
   damage: 25
-  fireRate: 0.1
+  fireRate: 0.5
   bulletSpeed: 50
-  maxAmmo: 30
+  maxAmmo: 15
   currentAmmo: 0
   reloadTime: 2
+  autoReloadWhenEmpty: 1
+  maxAimDistance: 100
+  aimMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  zoneDamageMultipliers:
+  - zoneName: Body
+    multiplier: 1
+  - zoneName: Head
+    multiplier: 2
   recoilAmount: 0.5
   recoilRecoverySpeed: 5
   bulletPrefab: {fileID: 1026419415010431012, guid: b70a97a7a22199c45835ad4562a1f4e4, type: 3}
   weaponModel: {fileID: 8594616629426685279}
   firePoint: {fileID: 2796565092686009855}
   cameraTransform: {fileID: 0}
+  muzzleFlash: {fileID: 0}
+  muzzleFlashPrefab: {fileID: 0}
   useNewInputSystem: 0
+  controlledExternally: 0
+--- !u!114 &1299489115412818685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364368352059329568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09c1051a125a45a40b3920cd09bde67f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  dashPlayer: {fileID: 0}
+  followPosition: 1
+  followRotation: 1
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffsetEuler: {x: 0, y: 0, z: 0}
+  smoothPosition: 1
+  positionSmoothSpeed: 50
+  smoothRotation: 1
+  rotationSmoothSpeed: 20
 --- !u!1 &7384529639912587102
 GameObject:
   m_ObjectHideFlags: 0
@@ -148,7 +185,7 @@ GameObject:
   - component: {fileID: 3884925414141354296}
   - component: {fileID: 2871269150694286956}
   - component: {fileID: 1161046255236202480}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -253,7 +290,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2796565092686009855}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
