@@ -9,7 +9,6 @@
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Multiscene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Multiscene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ShaderGraphSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ShaderGraphSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,6 +133,7 @@
       <workItem from="1761500729594" duration="989000" />
       <workItem from="1761560908329" duration="9495000" />
       <workItem from="1761599429074" duration="13000" />
+      <workItem from="1761606067180" duration="862000" />
     </task>
     <servers />
   </component>
