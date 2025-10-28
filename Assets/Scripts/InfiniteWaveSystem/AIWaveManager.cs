@@ -2,6 +2,7 @@ using Proto3GD.FPS;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 public class AIWaveManager : MonoBehaviour
 {
@@ -62,6 +63,7 @@ public class AIWaveManager : MonoBehaviour
     [SerializeField] private float moveSpeedScalePerDiff = 0.30f;
     [SerializeField] private float damageScalePerDiff = 0.50f;
     [SerializeField] private float detectionScalePerDiff = 0.20f;
+    [SerializeField] private float healthScalePerDiff = 0.40f;
 
     private SimplePool _poolBasic;
     private SimplePool _poolS1;
@@ -145,15 +147,12 @@ public class AIWaveManager : MonoBehaviour
             if (_nextUpdateIndex >= _enemies.Count) _nextUpdateIndex = 0;
             var e = _enemies[_nextUpdateIndex++];
             if (e == null || !e.gameObject.activeInHierarchy) continue;
-
-            // Si l'ennemi est mort, on laisse EnemyHealth déclencher le despawn.
-            if (e.Health != null && e.Health.IsDead) continue;
+            if (e.IsDead) continue;
 
             Vector3 pos = e.Tr.position;
             float sqrDist = (playerPos - pos).sqrMagnitude;
             float dist = Mathf.Sqrt(sqrDist);
 
-            // State machine légère
             switch (e.State)
             {
                 case ManagedEnemyHook.EnemyState.Idle:
@@ -189,7 +188,6 @@ public class AIWaveManager : MonoBehaviour
                     break;
 
                 case ManagedEnemyHook.EnemyState.Attacking:
-                    // Rotation vers la cible (Y uniquement)
                     Vector3 dir = (playerPos - pos);
                     dir.y = 0f;
                     if (dir.sqrMagnitude > 0.0001f)
@@ -198,7 +196,6 @@ public class AIWaveManager : MonoBehaviour
                         e.Tr.rotation = Quaternion.Slerp(e.Tr.rotation, look, dt * e.Config.rotationSpeed);
                     }
 
-                    // Dégâts avec cooldown
                     if (Time.time >= e.LastAttack + e.Config.attackCooldown)
                     {
                         if (dist <= e.Config.attackRange && _playerHealth != null)
@@ -234,13 +231,11 @@ public class AIWaveManager : MonoBehaviour
         Vector3 pos = GetSpawnPosition();
         GameObject go = pool.Spawn(pos, Quaternion.identity);
 
-        // Hook de gestion IA (attaché une seule fois via pooling)
         var hook = go.GetComponent<ManagedEnemyHook>();
         if (hook == null) hook = go.AddComponent<ManagedEnemyHook>();
         hook.Manager = this;
         hook.Kind = kind;
 
-        // Envoie le contexte de spawn (déclenchera Register via ISpawnableEnemy)
         var spawnable = go.GetComponent<ISpawnableEnemy>();
         if (spawnable != null)
         {
@@ -319,17 +314,15 @@ public class AIWaveManager : MonoBehaviour
     {
         if (hook == null) return;
 
-        // Prépare les refs
         if (hook.Tr == null) hook.Tr = hook.transform;
         if (hook.Agent == null) hook.Agent = hook.GetComponent<NavMeshAgent>();
-        if (hook.Health == null) hook.Health = hook.GetComponent<EnemyHealth>();
 
-        // Applique la config du type + scaling difficulté (sur le spawn uniquement)
         var cfg = GetConfig(hook.Kind);
         float d = Mathf.Max(0f, difficulty - 1f);
         float speedScale = 1f + moveSpeedScalePerDiff * d;
         float damageScale = 1f + damageScalePerDiff * d;
         float detectScale = 1f + detectionScalePerDiff * d;
+        float healthScale = 1f + healthScalePerDiff * d;
 
         cfg.chaseSpeed *= speedScale;
         cfg.patrolSpeed *= speedScale;
@@ -341,20 +334,17 @@ public class AIWaveManager : MonoBehaviour
         hook.LastAttack = 0f;
         hook.LastRepath = 0f;
 
+        // Init santé
+        hook.MaxHealth = Mathf.Max(1f, cfg.maxHealth * healthScale);
+        hook.CurrentHealth = hook.MaxHealth;
+        hook.IsDead = false;
+
         if (hook.Agent != null)
         {
             hook.Agent.isStopped = false;
             hook.Agent.speed = cfg.patrolSpeed;
         }
 
-        // Auto-despawn à la mort
-        if (hook.Health != null)
-        {
-            // Abonne une fois
-            hook.BindDeathOnce();
-        }
-
-        // Ajoute à la liste active
         _enemies.Add(hook);
     }
 
@@ -364,13 +354,11 @@ public class AIWaveManager : MonoBehaviour
         int idx = _enemies.IndexOf(hook);
         if (idx >= 0)
         {
-            // Conserver la continuité du round-robin
             if (idx <= _nextUpdateIndex && _nextUpdateIndex > 0) _nextUpdateIndex--;
             _enemies.RemoveAt(idx);
         }
     }
 
-    // API statique pratique pour despawn depuis les scripts d'ennemis
     public static void Despawn(GameObject go)
     {
         var po = go ? go.GetComponent<PooledObject>() : null;
@@ -381,6 +369,7 @@ public class AIWaveManager : MonoBehaviour
     [System.Serializable]
     public struct EnemyConfig
     {
+        public float maxHealth;
         public float chaseSpeed;
         public float patrolSpeed;
         public float rotationSpeed;
@@ -393,6 +382,7 @@ public class AIWaveManager : MonoBehaviour
         {
             return new EnemyConfig
             {
+                maxHealth = 100f,
                 chaseSpeed = 3.5f,
                 patrolSpeed = 2f,
                 rotationSpeed = 5f,
@@ -405,6 +395,7 @@ public class AIWaveManager : MonoBehaviour
         public static EnemyConfig DefaultSpecial1()
         {
             var c = DefaultBasic();
+            c.maxHealth = 130f;
             c.chaseSpeed = 4.5f;
             c.attackDamage = 15f;
             c.attackCooldown = 1.25f;
@@ -413,6 +404,7 @@ public class AIWaveManager : MonoBehaviour
         public static EnemyConfig DefaultSpecial2()
         {
             var c = DefaultBasic();
+            c.maxHealth = 160f;
             c.detectionRange = 18f;
             c.attackRange = 2.5f;
             c.attackDamage = 20f;
@@ -421,7 +413,7 @@ public class AIWaveManager : MonoBehaviour
         }
     }
 
-    // Composant léger attaché à chaque ennemi pour lier pooling <-> manager et stocker l'état
+    // Composant léger attaché à chaque ennemi pour lier pooling <-> manager et stocker l'état + santé
     public class ManagedEnemyHook : MonoBehaviour, ISpawnableEnemy
     {
         public enum EnemyState { Idle, Chasing, Attacking }
@@ -431,46 +423,61 @@ public class AIWaveManager : MonoBehaviour
 
         [HideInInspector] public Transform Tr;
         [HideInInspector] public NavMeshAgent Agent;
-        [HideInInspector] public EnemyHealth Health;
 
         [HideInInspector] public EnemyConfig Config;
         [HideInInspector] public EnemyState State = EnemyState.Idle;
         [HideInInspector] public float LastAttack;
         [HideInInspector] public float LastRepath;
 
-        private bool _deathBound;
+        // Santé intégrée
+        [HideInInspector] public float MaxHealth;
+        [HideInInspector] public float CurrentHealth;
+        [HideInInspector] public bool IsDead;
+
+        // Événements optionnels (UI/FX)
+        public UnityEvent OnDeath = new UnityEvent();
+        public UnityEvent<float, string> OnDamageTaken = new UnityEvent<float, string>();
 
         public void OnSpawn(SpawnContext context)
         {
-            // Le manager appliquera la config et enregistrera l'ennemi
             Manager?.RegisterEnemy(this, context.Difficulty);
         }
 
         public void OnDespawn()
         {
-            // Nettoyages légers
             if (Agent != null)
             {
                 Agent.isStopped = true;
-                // Évite de garder une destination obsolete dans le pool
                 if (Agent.isOnNavMesh) Agent.ResetPath();
             }
             State = EnemyState.Idle;
-            _deathBound = false;
+            IsDead = false;
+            CurrentHealth = MaxHealth;
             Manager?.UnregisterEnemy(this);
         }
 
-        public void BindDeathOnce()
+        // API de dégâts pour les armes (ex-EnemyHealth.TakeDamage)
+        public void TakeDamage(float damage, string zoneName = "Body")
         {
-            if (_deathBound || Health == null) return;
-            _deathBound = true;
-            // OnDeath: UnityEvent()
-            Health.OnDeath.AddListener(OnDeath);
+            if (IsDead) return;
+
+            CurrentHealth -= Mathf.Max(0f, damage);
+            OnDamageTaken?.Invoke(damage, zoneName);
+
+            if (CurrentHealth <= 0f)
+            {
+                Die();
+            }
         }
 
-        private void OnDeath()
+        private void Die()
         {
-            // Retour pool quand mort
+            if (IsDead) return;
+            IsDead = true;
+
+            OnDeath?.Invoke();
+
+            // Retour au pool
             AIWaveManager.Despawn(gameObject);
         }
     }

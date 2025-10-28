@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2657800489959688396}
   - component: {fileID: 1654310326663819305}
   - component: {fileID: 2188955753850171073}
-  - component: {fileID: 2689582501457834611}
   - component: {fileID: -3158992528684757622}
   - component: {fileID: -8977643811127216630}
   m_Layer: 0
@@ -69,7 +68,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 160580225223210161}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16bb0ed92c0240aa9cddb09695e8ee2d, type: 3}
   m_Name: 
@@ -82,28 +81,6 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2689582501457834611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 160580225223210161}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b35c933fe4a04fd7a4d569ff6a317dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chaseSpeed: 4.5
-  patrolSpeed: 2
-  rotationSpeed: 5
-  detectionRange: 1000000
-  attackRange: 2
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  attackDamage: 10
-  attackCooldown: 1.5
 --- !u!114 &-3158992528684757622
 MonoBehaviour:
   m_ObjectHideFlags: 0
