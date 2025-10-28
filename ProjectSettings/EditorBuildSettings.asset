@@ -17,6 +17,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/NoahScene.unity
     guid: 3b5ca090039b1524cb29992471017911
+  - enabled: 1
+    path: Assets/Scenes/InterieurScene.unity
+    guid: 92b828901aca5a24baba821e2eefda4f
+  - enabled: 1
+    path: Assets/Scenes/SolScene.unity
+    guid: fabf39899cce6404f8f93ab535402170
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

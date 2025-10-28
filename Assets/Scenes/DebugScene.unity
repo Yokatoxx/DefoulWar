@@ -5222,7 +5222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 253523205}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &253633345
@@ -14779,7 +14779,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 418272424}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &429504165
@@ -15413,7 +15413,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 468945723}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!43 &485918392
@@ -16322,7 +16322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
   spawnPoint: {fileID: 510289225}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &536728895
@@ -23713,7 +23713,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 689296345}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!43 &693078354
@@ -26726,7 +26726,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
   spawnPoint: {fileID: 812597798}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &816560213
@@ -30477,7 +30477,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 947489354}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!43 &970779110
@@ -31186,7 +31186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 992432404}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &996819696
@@ -32306,7 +32306,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 1039433318}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1049568217
@@ -32355,7 +32355,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
   spawnPoint: {fileID: 1049568218}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1076318610
@@ -34952,7 +34952,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
   spawnPoint: {fileID: 1237126741}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!43 &1240403760
@@ -35518,7 +35518,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 1281521949}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1291515756
@@ -35567,7 +35567,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 1291515757}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1345804524
@@ -35616,7 +35616,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
   spawnPoint: {fileID: 1345804525}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1373864511
@@ -35992,7 +35992,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 1412304536}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1443256498
@@ -36672,7 +36672,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
   spawnPoint: {fileID: 1579713476}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1613261760
@@ -36721,7 +36721,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
   spawnPoint: {fileID: 1613261761}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1615577101
@@ -38304,7 +38304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 5e0d39b524c651442876cd5ad82b6906, type: 3}
   spawnPoint: {fileID: 1690289087}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1690962490
@@ -39222,7 +39222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
   spawnPoint: {fileID: 1723666560}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1734855934
@@ -44452,7 +44452,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: 22cab77be79969e48a0258fe6f78025d, type: 3}
   spawnPoint: {fileID: 1826065331}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1837805964
@@ -46914,7 +46914,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 160580225223210161, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
   spawnPoint: {fileID: 1948361251}
-  respawnDelay: 1
+  respawnDelay: 2
   spawnOnStart: 1
   parentToSpawner: 0
 --- !u!1 &1974132505
