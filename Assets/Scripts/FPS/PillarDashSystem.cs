@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Proto3GD.FPS
 {
 
-    // Système de dash directionnel.
-    // Permet au joueur de dasher dans la direction de la caméra et de tuer les ennemis sur son passage.
+    // Système de dash directionnel
+    // Permet au joueur de dasher dans la direction de la caméra et de tuer les ennemis sur son passage
     public class PillarDashSystem : MonoBehaviour
     {
         [Header("Dash Settings")]
@@ -127,7 +127,7 @@ namespace Proto3GD.FPS
         
         private void Update()
         {
-            // Mise à jour du cooldown (uniquement si autoRegenerate est activé)
+            // Mise à jour du cooldown
             if (autoRegenerate && cooldownTimer < dashCooldown)
             {
                 cooldownTimer += Time.deltaTime;
@@ -173,8 +173,7 @@ namespace Proto3GD.FPS
                 EndDash();
                 return;
             }
-
-            // Calculer le progrès du dash (0 à 1)
+            
             float dashProgress = Mathf.Clamp01(dashTimer / dashDuration);
             
             // Évaluer la courbe pour obtenir le multiplicateur de vitesse
@@ -219,6 +218,10 @@ namespace Proto3GD.FPS
                             playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
                         else
                             playerStun.ApplyStun(electric.StunDuration);
+                        
+                        // Arrêter le dash immédiatement à cause du stun électrique
+                        EndDash();
+                        return;
                     }
 
                     // Marquer comme kill par dash si le coup sera létal

@@ -8,7 +8,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealth.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealth.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/DebugScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/DebugScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

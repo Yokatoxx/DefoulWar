@@ -3,6 +3,7 @@
   <component name="AgentMigrationStateService">
     <option name="migrationStatus" value="IN_PROGRESS" />
     <option name="pendingSessionIds">
+      <option value="207ca17a-20f1-4239-b252-30db422e9bd2" />
       <option value="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <option value="22a7e080-3b21-4c9b-84e0-15c05590ac35" />
       <option value="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
@@ -30,6 +31,13 @@
     </option>
     <option name="pendingTurns">
       <map>
+        <entry key="207ca17a-20f1-4239-b252-30db422e9bd2">
+          <value>
+            <set>
+              <option value="17cfa6f9-c31c-4fea-8099-bb02bf724ed1" />
+            </set>
+          </value>
+        </entry>
         <entry key="20c9c51b-c869-4736-a779-06d9aa46d146">
           <value>
             <set>
@@ -216,8 +224,17 @@
       </map>
     </option>
     <pendingWorkingSetItems>
+      <entry key="207ca17a-20f1-4239-b252-30db422e9bd2">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
+        </set>
+      </entry>
       <entry key="20c9c51b-c869-4736-a779-06d9aa46d146" />
-      <entry key="22a7e080-3b21-4c9b-84e0-15c05590ac35" />
+      <entry key="22a7e080-3b21-4c9b-84e0-15c05590ac35">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
+        </set>
+      </entry>
       <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
       <entry key="2a979126-8eed-4dfc-9945-ed810f6081dc" />
       <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
