@@ -4,9 +4,7 @@ using TMPro;
 
 namespace Proto3GD.FPS
 {
-    /// <summary>
-    /// Gère le mouvement du joueur (déplacement, saut, contrôle en l'air)
-    /// </summary>
+    /// Gère le mouvement du joueur
     [RequireComponent(typeof(CharacterController))]
     public class FPSMovement : MonoBehaviour
     {
@@ -167,7 +165,6 @@ namespace Proto3GD.FPS
                 }
                 else
                 {
-                    // Contrôle normal en l'air avec Lerp progressif (comme message(8).cs)
                     Vector3 airMove = desired * CurrentSpeed * airControlFactor;
                     moveDirection.x = Mathf.Lerp(moveDirection.x, airMove.x, airControlFactor);
                     moveDirection.z = Mathf.Lerp(moveDirection.z, airMove.z, airControlFactor);

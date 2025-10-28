@@ -15,10 +15,14 @@ namespace Proto3GD.FPS
         [SerializeField] private float bobSmoothing = 8f;
 
         [Header("FOV Settings")]
-        [SerializeField] private float defaultFOV = 60f;
-        [SerializeField] private float sprintFOV = 70f;
+        [SerializeField] private float minFOV = 60f;
+        [SerializeField] private float maxFOV = 90f;
+        [SerializeField] private float minSpeedForFOV = 5f;
+        [SerializeField] private float maxSpeedForFOV = 20f;
         [SerializeField] private float jumpFOV = 45f;
         [SerializeField] private float fovTransitionSpeed = 8f;
+        [SerializeField, Tooltip("Caméra de l'arme à synchroniser avec le FOV principal")]
+        private Camera weaponCamera;
 
         private Camera cam;
         private float targetFOV;
@@ -42,8 +46,14 @@ namespace Proto3GD.FPS
             // Initialiser le FOV après que la caméra soit créée
             if (cam != null)
             {
-                targetFOV = defaultFOV;
-                cam.fieldOfView = defaultFOV;
+                targetFOV = minFOV;
+                cam.fieldOfView = minFOV;
+            }
+            
+            // Initialiser le FOV de la caméra d'arme
+            if (weaponCamera != null)
+            {
+                weaponCamera.fieldOfView = minFOV;
             }
         }
 
@@ -67,15 +77,9 @@ namespace Proto3GD.FPS
                     isJumping = false;
                 }
                 
-                // FOV de sprint ou normal
-                if (isSprinting && isMoving)
-                {
-                    targetFOV = sprintFOV;
-                }
-                else
-                {
-                    targetFOV = defaultFOV;
-                }
+                // FOV basé sur la vitesse
+                float speedRatio = Mathf.InverseLerp(minSpeedForFOV, maxSpeedForFOV, currentSpeed);
+                targetFOV = Mathf.Lerp(minFOV, maxFOV, speedRatio);
             }
 
             // Headbob
@@ -100,6 +104,12 @@ namespace Proto3GD.FPS
             if (cam != null)
             {
                 cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, Time.deltaTime * fovTransitionSpeed);
+                
+                // Synchroniser le FOV de la caméra d'arme
+                if (weaponCamera != null)
+                {
+                    weaponCamera.fieldOfView = cam.fieldOfView;
+                }
             }
         }
 
