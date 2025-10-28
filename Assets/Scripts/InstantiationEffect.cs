@@ -1,6 +1,7 @@
 using System;
 using Proto3GD.FPS;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class InstantiationEffect : MonoBehaviour
 {
@@ -8,9 +9,14 @@ public class InstantiationEffect : MonoBehaviour
     
 
     [SerializeField] private GameObject effectPrefab;
-    
+    public UnityEvent InstantiateEffectEvent;
     public float effectDuration;
 
+
+    private void Awake()
+    {
+        InstantiateEffectEvent.AddListener(InstanceEffectBase);
+    }
 
     public void InstanceEffectPrefab(GameObject effect, float duration)
     {

@@ -35,7 +35,7 @@ namespace Ennemies.Effect
             if (enemyHealth.IsDead&&canBeActive)
             {
                 instantiationEffect.effectDuration = stunDuration;
-                instantiationEffect.InstanceEffectBase();
+                instantiationEffect.InstantiateEffectEvent.Invoke();
                 canBeActive=false;
             }
             else if(!enemyHealth.IsDead)
