@@ -91,7 +91,7 @@ namespace Proto3GD.FPS
                 waveManager.OnEnemyDeath(this);
             }
             
-            Destroy(gameObject, 0.5f);
+            Destroy(gameObject);
         }
         
 
