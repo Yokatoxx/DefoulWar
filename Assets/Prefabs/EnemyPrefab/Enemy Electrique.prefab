@@ -79,6 +79,9 @@ MonoBehaviour:
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2689582501457834611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,8 +171,8 @@ Transform:
   m_GameObject: {fileID: 463622794186511725}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.8, z: 0}
-  m_LocalScale: {x: 0.33501, y: 0.33501, z: 0.33501}
+  m_LocalPosition: {x: 0, y: 1.837, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.47511297, z: 0.47511297}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2657800489959688396}
