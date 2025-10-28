@@ -162,7 +162,7 @@ Transform:
   m_GameObject: {fileID: 525026324071530389}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.893, z: 0}
+  m_LocalPosition: {x: 0, y: 1.8, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -274,8 +274,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8822407487818134662}
   - component: {fileID: 6744729750470337342}
-  - component: {fileID: 1424048076781185940}
-  - component: {fileID: 4807056319870603770}
   - component: {fileID: 2284100924158128847}
   m_Layer: 0
   m_Name: Enemy 1
@@ -324,48 +322,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &1424048076781185940
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1807755940922956229}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16bb0ed92c0240aa9cddb09695e8ee2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 100
-  currentHealth: 0
-  OnDeath:
-    m_PersistentCalls:
-      m_Calls: []
-  OnDamageTaken:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &4807056319870603770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1807755940922956229}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b35c933fe4a04fd7a4d569ff6a317dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chaseSpeed: 3.5
-  patrolSpeed: 2
-  rotationSpeed: 5
-  detectionRange: 1000
-  attackRange: 2
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  attackDamage: 10
-  attackCooldown: 1.5
 --- !u!114 &2284100924158128847
 MonoBehaviour:
   m_ObjectHideFlags: 0
