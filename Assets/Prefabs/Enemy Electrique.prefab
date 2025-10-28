@@ -137,6 +137,7 @@ MonoBehaviour:
   stunAutoFireInterval: 0.2
   instantiationEffect: {fileID: 2489627879979066276}
   enemyHealth: {fileID: 2188955753850171073}
+  kill: 0
 --- !u!114 &2489627879979066276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,11 +150,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 912ac019c48ed294398f81737e3b6e7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPrefab: {fileID: 343933677807719435, guid: 2e0b24711c336464894f8467594d02ea, type: 3}
+  effectPrefab: {fileID: 0}
   InstantiateEffectEvent:
     m_PersistentCalls:
       m_Calls: []
   effectDuration: 5
+  OnDeathEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHitEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDashedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeathGO: {fileID: 343933677807719435, guid: 2e0b24711c336464894f8467594d02ea, type: 3}
+  onHitGO: {fileID: 0}
+  onDashGO: {fileID: 0}
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0

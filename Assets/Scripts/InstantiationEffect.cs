@@ -11,17 +11,23 @@ public class InstantiationEffect : MonoBehaviour
     [SerializeField] private GameObject effectPrefab;
     public UnityEvent InstantiateEffectEvent;
     public float effectDuration;
-
+    public UnityEvent<GameObject> OnDeathEvent,  OnHitEvent,OnDashedEvent;
+    public GameObject onDeathGO, onHitGO, onDashGO;
 
     private void Awake()
     {
         InstantiateEffectEvent.AddListener(InstanceEffectBase);
+        
+        OnDeathEvent.AddListener(InstanceEffectPrefab);
+        OnHitEvent.AddListener(InstanceEffectPrefab);
+        OnDashedEvent.AddListener(InstanceEffectPrefab);
+
     }
 
-    public void InstanceEffectPrefab(GameObject effect, float duration)
+    public void InstanceEffectPrefab(GameObject effect)
     {
         GameObject effectInstance = Instantiate(effect);
-        Destroy(effectInstance, duration);
+        effectInstance.transform.position = transform.position+Vector3.up;
     }
 
     public void InstanceEffectBase()
@@ -29,7 +35,7 @@ public class InstantiationEffect : MonoBehaviour
     
         GameObject effectInstance = Instantiate(effectPrefab);
         effectInstance.transform.position = transform.position+Vector3.up;
-        Destroy(effectInstance, effectDuration);
+       
     }
 
    

@@ -21,6 +21,8 @@ namespace Ennemies.Effect
         [SerializeField] private EnemyHealth enemyHealth;
 
         private bool canBeActive = true;    //evite le spawn de trop de sphere
+        [SerializeField] private bool kill;
+        
         private void Start()
         {
             instantiationEffect = instantiationEffect.GetComponent<InstantiationEffect>();
@@ -31,11 +33,15 @@ namespace Ennemies.Effect
 
         private void Update()
         {
-           
+            if (kill)
+            {
+                enemyHealth.KillImmediate();
+                kill=false;
+            }
             if (enemyHealth.IsDead&&canBeActive)
             {
-                instantiationEffect.effectDuration = stunDuration;
-                instantiationEffect.InstantiateEffectEvent.Invoke();
+               
+                instantiationEffect.OnDeathEvent?.Invoke(instantiationEffect.onDeathGO);
                 canBeActive=false;
             }
             else if(!enemyHealth.IsDead)
