@@ -15,6 +15,7 @@
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <option value="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
       <option value="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
+      <option value="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe" />
       <option value="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
       <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
@@ -120,6 +121,18 @@
           <value>
             <set>
               <option value="63dc3cd7-278e-453a-a833-0ad9cbf8f745" />
+              <option value="215c0577-8d60-4a0c-884f-ae34608bb467" />
+            </set>
+          </value>
+        </entry>
+        <entry key="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe">
+          <value>
+            <set>
+              <option value="79f68f44-fae9-4d54-8f8d-e12c75985044" />
+              <option value="da49d0e5-1e1c-47f6-b735-d4f6723fde7f" />
+              <option value="59f322fd-07d0-45a0-ae9f-6ee9a39968b8" />
+              <option value="b4f3a148-5715-4fe6-8f6b-02aa59cce8d2" />
+              <option value="696543e3-67de-4103-b31a-234d03c2e4e9" />
             </set>
           </value>
         </entry>
@@ -220,6 +233,14 @@
           <option value="file://$PROJECT_DIR$/ELECTRIC_ENEMY_GUIDE.md" />
           <option value="file://$PROJECT_DIR$/DEBUG_ELECTRIC_ENEMY.md" />
           <option value="file://$PROJECT_DIR$/ELECTRIC_FIX_SUMMARY.md" />
+        </set>
+      </entry>
+      <entry key="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/MagicEnemy.cs" />
+          <option value="file://$PROJECT_DIR$/MAGIC_ENEMY_GUIDE.md" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealth.cs" />
+          <option value="file://$PROJECT_DIR$/MAGIC_ENEMY_TEST.md" />
         </set>
       </entry>
       <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f" />

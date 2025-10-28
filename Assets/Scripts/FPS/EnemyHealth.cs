@@ -18,6 +18,7 @@ namespace Proto3GD.FPS
         
         [Header("Events")]
         public UnityEvent OnDeath;
+        public UnityEvent<float, string> OnDamageTaken;
         
         private bool isDead;
         private WaveManager waveManager;
@@ -49,6 +50,9 @@ namespace Proto3GD.FPS
                 zoneHitCount[zoneName] = 0;
             }
             zoneHitCount[zoneName]++;
+            
+            // Déclencher l'événement de dégâts pris
+            OnDamageTaken?.Invoke(damage, zoneName);
             
             EnsureWaveManager();
             if (waveManager != null)

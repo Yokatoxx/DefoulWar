@@ -1,0 +1,229 @@
+using UnityEngine;
+using Proto3GD.FPS;
+
+namespace Ennemies.Effect
+{
+    // Ennemi magique qui renvoie les tirs du joueur et soigne le joueur lorsqu'il est tué par un dash.
+
+    [RequireComponent(typeof(EnemyHealth))]
+    public class MagicEnemy : MonoBehaviour
+    {
+        
+        [Tooltip("Mode de réflexion: true = Hitscan instantané, false = Projectile physique")]
+        [SerializeField] private bool useHitscanReflect = false;
+        
+        [Tooltip("Vitesse du projectile magique renvoyé (ignoré si hitscan)")]
+        [SerializeField] private float reflectedBulletSpeed = 30f;
+        
+        [Tooltip("Dégâts du projectile renvoyé au joueur")]
+        [SerializeField] private float reflectedDamage = 15f;
+        
+        [Tooltip("Temps minimum entre deux réflexions (en secondes)")]
+        [SerializeField] private float reflectCooldown = 0.15f;
+        
+        [Tooltip("Prefab du projectile magique renvoyé (si null, utilise Bullet.CreateBulletPrefab())")]
+        [SerializeField] private GameObject magicBulletPrefab;
+        
+        [Tooltip("Effet visuel lors de la réflexion (optionnel)")]
+        [SerializeField] private GameObject reflectEffectPrefab;
+        
+        [Tooltip("Durée de l'effet visuel de réflexion")]
+        [SerializeField] private float reflectEffectDuration = 0.5f;
+        
+        [Header("Soin lors du dash")]
+        [Tooltip("Points de vie rendus au joueur lorsqu'il tue cet ennemi avec un dash")]
+        [SerializeField] private float healAmount = 30f;
+        
+        [Tooltip("Effet visuel de soin (optionnel)")]
+        [SerializeField] private GameObject healEffectPrefab;
+        
+        [Tooltip("Durée de l'effet visuel de soin")]
+        [SerializeField] private float healEffectDuration = 1f;
+        
+        [Header("Effet visuel de protection")]
+        [Tooltip("Particules ou aura de protection magique (optionnel)")]
+        [SerializeField] private GameObject magicShieldEffect;
+        
+        private EnemyHealth health;
+        private float lastReflectTime = -999f;
+        private GameObject cachedBulletPrefab;
+        
+        private void Awake()
+        {
+            health = GetComponent<EnemyHealth>();
+            if (health != null)
+            {
+                health.OnDeath.AddListener(OnDeath);
+                health.OnDamageTaken.AddListener(OnDamageTaken);
+            }
+        }
+        
+        private void Start()
+        {
+            // Activer l'effet de bouclier magique (si présent)
+            if (magicShieldEffect != null)
+            {
+                magicShieldEffect.SetActive(true);
+            }
+            
+            else
+            {
+                cachedBulletPrefab = magicBulletPrefab;
+            }
+        }
+        
+        private void OnDestroy()
+        {
+            if (health != null)
+            {
+                health.OnDeath.RemoveListener(OnDeath);
+                health.OnDamageTaken.RemoveListener(OnDamageTaken);
+            }
+        }
+        
+        private void OnDeath()
+        {
+            // Vérifier si l'ennemi a été tué par un dash
+            var dashSystem = FindFirstObjectByType<PillarDashSystem>();
+            if (dashSystem != null && PillarDashSystem.WasKilledByDash(transform.root.gameObject))
+            {
+                // Soigner le joueur
+                HealPlayer();
+            }
+            
+            // Désactiver l'effet de bouclier magique
+            if (magicShieldEffect != null)
+            {
+                magicShieldEffect.SetActive(false);
+            }
+        }
+        
+
+        // Intercepte les tirs
+
+        private void OnDamageTaken(float damage, string zoneName)
+        {
+            // Annuler les dégâts cet ennemi ne prend pas de dégâts des balles
+            if (health != null && zoneName != "Dash")
+            {
+                var healthField = typeof(EnemyHealth).GetField("currentHealth", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (healthField != null)
+                {
+                    float currentHealth = (float)healthField.GetValue(health);
+                    healthField.SetValue(health, currentHealth + damage);
+                }
+            }
+            
+            // Vérifier le cooldown
+            if (Time.time - lastReflectTime < reflectCooldown)
+            {
+                return;
+            }
+            
+            
+            // Trouver le joueur pour renvoyer le projectile
+            var player = FindFirstObjectByType<PlayerHealth>();
+            if (player == null) return;
+            
+            lastReflectTime = Time.time;
+            
+            
+            // Choisir le mode de réflexion
+            if (useHitscanReflect)
+            {
+                // Hitscan
+                ReflectHitscan(player);
+            }
+            else
+            {
+                // Projectile
+                CreateMagicBullet(player.transform.position);
+            }
+        }
+        
+        // Renvoie un tir hitscan instantané vers le joueur
+        private void ReflectHitscan(PlayerHealth player)
+        {
+            player.TakeDamage(reflectedDamage);
+            
+            // Effet visuel de ligne/rayon entre l'ennemi et le joueur
+            Debug.DrawLine(transform.position + Vector3.up * 1.5f, player.transform.position, 
+                new Color(0.8f, 0.2f, 1f), 0.1f);
+            
+            Debug.Log("[MagicEnemy] Tir hitscan instantané renvoyé vers le joueur !");
+        }
+        
+        // Crée un projectile magique
+
+        private void CreateMagicBullet(Vector3 targetPosition)
+        {
+            if (cachedBulletPrefab == null)
+            {
+                Debug.LogWarning("[MagicEnemy] Aucun prefab de balle magique disponible !");
+                return;
+            }
+            
+            // Position de spawn
+            Vector3 spawnPosition = transform.position + Vector3.up * 1.5f;
+            
+            // Direction vers le joueur
+            Vector3 directionToPlayer = (targetPosition - spawnPosition).normalized;
+            
+            // Créer le projectile
+            GameObject magicBullet = Instantiate(
+                cachedBulletPrefab,
+                spawnPosition,
+                Quaternion.LookRotation(directionToPlayer)
+            );
+            
+            // Configurer le projectile
+            var bulletScript = magicBullet.GetComponent<Bullet>();
+            if (bulletScript != null)
+            {
+                bulletScript.Initialize(reflectedDamage, reflectedBulletSpeed);
+            }
+            else
+            {
+                // Si pas de script Bullet, utiliser directement le Rigidbody
+                var rb = magicBullet.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.linearVelocity = directionToPlayer * reflectedBulletSpeed;
+                }
+            }
+            
+        }
+        
+        // Soigne le joueur
+        private void HealPlayer()
+        {
+            var player = FindFirstObjectByType<PlayerHealth>();
+            if (player != null)
+            {
+                player.Heal(healAmount);
+                Debug.Log($"[MagicEnemy] Le joueur a récupéré {healAmount} PV !");
+                
+                // Créer l'effet visuel de soin sur le joueur
+                if (healEffectPrefab != null)
+                {
+                    CreateHealEffect(player.transform.position);
+                }
+            }
+        }
+        
+        // Crée un effet visuel de réflexion
+        private void CreateReflectEffect(Vector3 position)
+        {
+            GameObject effect = Instantiate(reflectEffectPrefab, position, Quaternion.identity);
+            Destroy(effect, reflectEffectDuration);
+        }
+        
+        // Crée un effet visuel de soin
+        private void CreateHealEffect(Vector3 position)
+        {
+            GameObject effect = Instantiate(healEffectPrefab, position, Quaternion.identity);
+            Destroy(effect, healEffectDuration);
+        }
+    }
+}
