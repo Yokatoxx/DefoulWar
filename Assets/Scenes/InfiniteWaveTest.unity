@@ -8861,6 +8861,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1492773400}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &259300438 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1403591587188792743, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+  m_PrefabInstance: {fileID: 2142068711}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &266307556
 Mesh:
   m_ObjectHideFlags: 0
@@ -15581,23 +15586,12 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!114 &494411354 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-  m_PrefabInstance: {fileID: 2142068711}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aa01fa35b1b406ba5f5ba9baea07030, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &494411355 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7205156207043545737, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
   m_PrefabInstance: {fileID: 2142068711}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1483003223}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea2fd7c3991641a083d0e0107f502736, type: 3}
@@ -17688,7 +17682,7 @@ MonoBehaviour:
   crosshair: {fileID: 1373864512}
   playerHealth: {fileID: 494411355}
   weaponController: {fileID: 0}
-  projectileWeaponController: {fileID: 494411354}
+  projectileWeaponController: {fileID: 0}
   waveManager: {fileID: 0}
 --- !u!114 &629375222
 MonoBehaviour:
@@ -34605,7 +34599,7 @@ MonoBehaviour:
   prewarmSpecial2: 12
   maxActive: 5000
   maxSpawnsPerFrame: 10
-  targetCountBase: 20
+  targetCountBase: 500
   targetCountGrowthPerMinute: 80
   baseSpawnRate: 0.1
   spawnRateGrowthPerMinute: 100
@@ -34614,6 +34608,41 @@ MonoBehaviour:
   special1WeightPerDifficulty: 0.6
   special2BaseWeight: 0.03
   special2WeightPerDifficulty: 0.5
+  aiUpdatesPerFrame: 200
+  farDistance: 30
+  nearRepathInterval: 0.25
+  farRepathInterval: 1
+  basicConfig:
+    maxHealth: 100
+    chaseSpeed: 3.5
+    patrolSpeed: 2
+    rotationSpeed: 5
+    detectionRange: 10000
+    attackRange: 2
+    attackDamage: 10
+    attackCooldown: 1.5
+  special1Config:
+    maxHealth: 130
+    chaseSpeed: 4.5
+    patrolSpeed: 2
+    rotationSpeed: 5
+    detectionRange: 10000
+    attackRange: 2
+    attackDamage: 15
+    attackCooldown: 1.25
+  special2Config:
+    maxHealth: 160
+    chaseSpeed: 3.5
+    patrolSpeed: 2
+    rotationSpeed: 5
+    detectionRange: 10000
+    attackRange: 2.5
+    attackDamage: 20
+    attackCooldown: 2
+  moveSpeedScalePerDiff: 0.3
+  damageScalePerDiff: 0.5
+  detectionScalePerDiff: 0.2
+  healthScalePerDiff: 0.4
 --- !u!43 &1166694013
 Mesh:
   m_ObjectHideFlags: 0
@@ -36387,6 +36416,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1464062546}
   m_CullTransparentMesh: 1
+--- !u!1 &1483003223 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+  m_PrefabInstance: {fileID: 2142068711}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1492773399
 GameObject:
   m_ObjectHideFlags: 0
@@ -50884,6 +50918,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1177083132}
     - target: {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: weaponModel
       value: 
       objectReference: {fileID: 3574266}
@@ -50963,16 +51001,59 @@ PrefabInstance:
       propertyPath: volume
       value: 
       objectReference: {fileID: 1675522526}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2142068722}
   m_SourcePrefab: {fileID: 100100000, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
 --- !u!4 &2142068712 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8703966557384231457, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
   m_PrefabInstance: {fileID: 2142068711}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2142068722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1483003223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8e8970ca92cafa47a1a58c06793a3b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useHitscan: 1
+  damage: 25
+  fireRate: 0.1
+  bulletSpeed: 50
+  maxAmmo: 30
+  currentAmmo: 0
+  reloadTime: 2
+  autoReloadWhenEmpty: 1
+  maxAimDistance: 100
+  aimMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  zoneDamageMultipliers:
+  - zoneName: Body
+    multiplier: 1
+  - zoneName: Head
+    multiplier: 2
+  recoilAmount: 0.5
+  recoilRecoverySpeed: 5
+  bulletPrefab: {fileID: 1026419415010431012, guid: b70a97a7a22199c45835ad4562a1f4e4, type: 3}
+  weaponModel: {fileID: 3574266}
+  firePoint: {fileID: 1177083132}
+  cameraTransform: {fileID: 259300438}
+  muzzleFlash: {fileID: 0}
+  muzzleFlashPrefab: {fileID: 6980259576133684760, guid: 1f58a1dea6bbd9347843e4935585e6a2, type: 3}
+  useNewInputSystem: 0
+  controlledExternally: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
