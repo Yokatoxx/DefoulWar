@@ -134,6 +134,11 @@ MonoBehaviour:
   stunDuration: 2.5
   overrideAutoFireInterval: 1
   stunAutoFireInterval: 0.2
+  electricDischargeRadius: 3
+  electricDamage: 15
+  electricEffectPrefab: {fileID: 0}
+  effectDuration: 0.5
+  dischargeCooldown: 0.2
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
