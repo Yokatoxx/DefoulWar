@@ -21,6 +21,7 @@ namespace Proto3GD.FPS
         [Header("Wave UI")]
         [SerializeField] private TextMeshProUGUI waveNumberText;
         [SerializeField] private TextMeshProUGUI enemiesRemainingText;
+        [SerializeField] private TextMeshProUGUI waveTimerText;
         [SerializeField] private GameObject waveCompletePanel;
         [SerializeField] private TextMeshProUGUI waveCompleteText;
         
@@ -69,6 +70,7 @@ namespace Proto3GD.FPS
         private void Update()
         {
             UpdateWeaponUI();
+            UpdateWaveTimerUI();
         }
         
         private void UpdateHealthUI(float healthPercentage)
@@ -118,6 +120,35 @@ namespace Proto3GD.FPS
             if (enemiesRemainingText != null)
             {
                 enemiesRemainingText.text = $"Ennemis: {remaining}";
+            }
+        }
+        
+        private void UpdateWaveTimerUI()
+        {
+            if (waveTimerText != null && waveManager != null)
+            {
+                if (waveManager.IsWaveActive)
+                {
+                    float timeRemaining = waveManager.WaveTimeRemaining;
+                    int minutes = Mathf.FloorToInt(timeRemaining / 60f);
+                    int seconds = Mathf.FloorToInt(timeRemaining % 60f);
+                    waveTimerText.text = $"Temps: {minutes:00}:{seconds:00}";
+                    
+                    // Changer la couleur si le temps est presque écoulé
+                    if (timeRemaining <= 10f && waveTimerText != null)
+                    {
+                        waveTimerText.color = Color.Lerp(Color.red, Color.yellow, Mathf.PingPong(Time.time * 2f, 1f));
+                    }
+                    else if (waveTimerText != null)
+                    {
+                        waveTimerText.color = Color.white;
+                    }
+                }
+                else
+                {
+                    waveTimerText.text = "Temps: --:--";
+                    waveTimerText.color = Color.white;
+                }
             }
         }
         

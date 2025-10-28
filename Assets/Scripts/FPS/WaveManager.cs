@@ -23,6 +23,8 @@ namespace Proto3GD.FPS
         public class Wave
         {
             public List<EnemySpawn> enemies = new List<EnemySpawn>();
+            [Tooltip("Durée maximale de la vague en secondes. Si le timer expire, la vague suivante démarre.")]
+            [Min(1f)] public float duration = 30f;
         }
 
         // --------------------
@@ -64,6 +66,7 @@ namespace Proto3GD.FPS
         [Header("Spawning")]
         [SerializeField] private Transform[] spawnPoints;
         [SerializeField] private float spawnDelay = 0.25f;
+        [Tooltip("Temps de repos après qu'une vague soit terminée avant le début de la suivante (si tous les ennemis sont morts avant le timer).")]
         [SerializeField] private float timeBetweenWaves = 5f;
 
         [Header("Events")]
@@ -77,6 +80,8 @@ namespace Proto3GD.FPS
         [SerializeField] private int currentWaveIndex = -1; // 0-based interne
         [SerializeField] private int enemiesRemaining;
         [SerializeField] private int totalEnemiesInWave;
+        [SerializeField] private float waveTimeRemaining;
+        [SerializeField] private float currentWaveDuration;
 
         private readonly List<GameObject> activeEnemies = new List<GameObject>();
         private bool isWaveActive;
@@ -101,9 +106,24 @@ namespace Proto3GD.FPS
 
         private void Update()
         {
-            if (isWaveActive && !isSpawning && enemiesRemaining <= 0)
+            if (isWaveActive)
             {
-                EndWave();
+                // Décompte du timer de la vague
+                waveTimeRemaining -= Time.deltaTime;
+                
+                // Si le timer expire, passer à la vague suivante immédiatement
+                if (waveTimeRemaining <= 0f)
+                {
+                    Debug.Log($"[WaveManager] Timer de la vague {CurrentWave} expiré. Passage à la vague suivante.");
+                    ForceEndCurrentWaveAndStartNext();
+                }
+                // Si tous les ennemis sont morts avant la fin du timer
+                else if (!isSpawning && enemiesRemaining <= 0)
+                {
+                    float restTime = waveTimeRemaining;
+                    Debug.Log($"[WaveManager] Tous les ennemis éliminés avec {restTime:F1}s restantes. Temps de repos.");
+                    EndWave();
+                }
             }
         }
 
@@ -140,6 +160,10 @@ namespace Proto3GD.FPS
             activeEnemies.Clear();
             currentWaveHits.Clear();
 
+            // Initialiser le timer de la vague
+            currentWaveDuration = wave.duration;
+            waveTimeRemaining = currentWaveDuration;
+
             isWaveActive = true;
             onWaveStart?.Invoke(CurrentWave);
             onEnemyCountChanged?.Invoke(enemiesRemaining);
@@ -147,7 +171,7 @@ namespace Proto3GD.FPS
             StopAllCoroutines();
             StartCoroutine(SpawnWaveCoroutine(wave));
 
-            Debug.Log($"[WaveManager] Vague {CurrentWave} démarrée. Ennemis: {totalEnemiesInWave}");
+            Debug.Log($"[WaveManager] Vague {CurrentWave} démarrée. Ennemis: {totalEnemiesInWave}, Durée: {currentWaveDuration}s");
         }
 
         private IEnumerator SpawnWaveCoroutine(Wave wave)
@@ -226,6 +250,20 @@ namespace Proto3GD.FPS
             {
                 Invoke(nameof(StartNextWave), Mathf.Max(0f, timeBetweenWaves));
             }
+        }
+
+        private void ForceEndCurrentWaveAndStartNext()
+        {
+            // Termine immédiatement la vague en cours et démarre la suivante sans délai
+            StopAllCoroutines();
+            isSpawning = false;
+            isWaveActive = false;
+            
+            onWaveComplete?.Invoke(CurrentWave);
+            Debug.Log($"[WaveManager] Vague {CurrentWave} terminée par expiration du timer.");
+            
+            // Démarrer la vague suivante immédiatement (pas de temps de repos)
+            StartNextWave();
         }
 
         // --------------------
@@ -316,6 +354,8 @@ namespace Proto3GD.FPS
         public int EnemiesRemaining => enemiesRemaining;
         public int TotalEnemiesInWave => totalEnemiesInWave;
         public bool IsWaveActive => isWaveActive;
+        public float WaveTimeRemaining => waveTimeRemaining;
+        public float CurrentWaveDuration => currentWaveDuration;
 
         private static string NormalizeZoneKey(string zone)
         {

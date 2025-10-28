@@ -78,6 +78,9 @@ MonoBehaviour:
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2689582501457834611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,7 +96,7 @@ MonoBehaviour:
   chaseSpeed: 3.5
   patrolSpeed: 2
   rotationSpeed: 5
-  detectionRange: 100
+  detectionRange: 1000
   attackRange: 2
   playerMask:
     serializedVersion: 2
