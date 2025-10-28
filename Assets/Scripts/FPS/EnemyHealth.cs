@@ -56,6 +56,17 @@ namespace Proto3GD.FPS
                 waveManager.RecordHit(zoneName);
             }
             
+            // Déclencher l'effet électrique si c'est un ennemi électrique mais seulement si les dégâts ne viennent pas déjà d'une décharge électrique
+            
+            if (zoneName != "Electric")
+            {
+                var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
+                if (electricEnemy != null)
+                {
+                    electricEnemy.TriggerElectricDischarge();
+                }
+            }
+            
             if (currentHealth <= 0)
             {
                 Die();
