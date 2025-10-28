@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace Proto3GD.FPS
 {
-    /// <summary>
-    /// Contrôleur principal du joueur FPS - Orchestre tous les sous-systèmes
-    /// </summary>
+    /// Contrôleur principal du joueur FPS 
     [RequireComponent(typeof(FPSInputHandler))]
     [RequireComponent(typeof(FPSMovement))]
     [RequireComponent(typeof(FPSMouseLook))]
@@ -17,12 +15,10 @@ namespace Proto3GD.FPS
 
         private void Awake()
         {
-            // Récupérer les composants
             inputHandler = GetComponent<FPSInputHandler>();
             movement = GetComponent<FPSMovement>();
             mouseLook = GetComponent<FPSMouseLook>();
             
-            // Le CameraEffects est sur la caméra, pas sur le joueur
             if (mouseLook.CameraTransform != null)
             {
                 cameraEffects = mouseLook.CameraTransform.GetComponent<FPSCameraEffects>();
@@ -31,18 +27,7 @@ namespace Proto3GD.FPS
                     cameraEffects = mouseLook.CameraTransform.gameObject.AddComponent<FPSCameraEffects>();
                 }
             }
-
-            // S'assurer que le composant de stun est présent
-            if (GetComponent<PlayerStunAutoFire>() == null)
-            {
-                gameObject.AddComponent<PlayerStunAutoFire>();
-            }
-
-            // S'assurer que l'effet visuel de stun est présent
-            if (GetComponent<PlayerStunVisuals>() == null)
-            {
-                gameObject.AddComponent<PlayerStunVisuals>();
-            }
+            
         }
 
         private void Update()
@@ -60,7 +45,6 @@ namespace Proto3GD.FPS
             if (stun != null && stun.IsStunned)
             {
                 moveInput = Vector2.zero;
-                // lookInput est conservé
                 jump = false;
                 sprint = false;
                 leanLeft = false;
@@ -75,11 +59,9 @@ namespace Proto3GD.FPS
             {
                 inputHandler.ConsumeJump();
             }
-
-            // Appliquer la caméra (look autorisé même pendant le stun)
+            
             mouseLook.Look(lookInput, moveInput, leanLeft, leanRight);
-
-            // Mettre à jour les effets de caméra (avec vérification null)
+            
             if (cameraEffects != null)
             {
                 cameraEffects.UpdateEffects(

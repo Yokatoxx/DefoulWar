@@ -80,6 +80,8 @@ GameObject:
   - component: {fileID: 2801732676686258852}
   - component: {fileID: 8707421386175084620}
   - component: {fileID: 8826018477589334518}
+  - component: {fileID: 6005410421240447297}
+  - component: {fileID: 9097555686013398260}
   m_Layer: 3
   m_Name: FPS_Player
   m_TagString: Player
@@ -175,7 +177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   sprintSpeed: 8
-  jumpHeight: 2
+  jumpHeight: 4
   gravity: -9.81
   gravityMultiplier: 2
   increaseSpeedFactor: 3
@@ -183,7 +185,8 @@ MonoBehaviour:
   coyoteTime: 0.15
   speedDisplay: {fileID: 0}
   airControlFactor: 1
-  preserveJumpMomentum: 0
+  preserveJumpMomentum: 1
+  jumpMomentumMultiplier: 0.01
   maxAirSpeed: 100
   groundCheck: {fileID: 7268629367177999115}
   groundDistance: 0.4
@@ -239,9 +242,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHitscan: 1
   damage: 25
-  fireRate: 0.5
+  fireRate: 0.15
   bulletSpeed: 50
-  maxAmmo: 10
+  maxAmmo: 30
   currentAmmo: 0
   reloadTime: 2
   autoReloadWhenEmpty: 1
@@ -327,7 +330,10 @@ MonoBehaviour:
   obstacleCheckDistance: 0.5
   dashFOV: 90
   fovTransitionSpeed: 15
+  conserveMomentum: 1
+  momentumRetention: 0.6
   playerController: {fileID: 2084425902901004486}
+  fpsMovement: {fileID: 4379777072623147912}
   cameraTransform: {fileID: 1403591587188792743}
   isDashing: 0
 --- !u!114 &8826018477589334518
@@ -352,6 +358,45 @@ MonoBehaviour:
   dashGaussianEnd: 0.5
   dashParticleSystem: {fileID: 5996498839720484243}
   deactivateParticleGOOnStop: 1
+--- !u!114 &6005410421240447297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab0ba05c5794466d97da13b8d2e1554a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultStunDuration: 2.5
+  autoFireInterval: 0.12
+  reloadIfEmptyDuringStun: 1
+--- !u!114 &9097555686013398260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e07aadd2c2344acb74b3621d678fa3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightningSprites: []
+  lightningColor: {r: 0.6, g: 0.85, b: 1, a: 0.8}
+  concurrentBolts: 4
+  flickerInterval: 0.08
+  flickerJitter: 0.05
+  boltLifetime: 0.12
+  boltScaleRange: {x: 0.6, y: 1.2}
+  screenMargin: 20
+  useCameraShake: 1
+  shakeDuration: 0.08
+  shakePositionMagnitude: 0.02
+  shakeRotationMagnitude: 0.5
 --- !u!1 &4673607940017463061
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,9 +596,9 @@ MonoBehaviour:
   bobHorizontalAmplitude: 0.08
   bobVerticalAmplitude: 0.07
   bobSmoothing: 8
-  defaultFOV: 60
-  sprintFOV: 70
-  jumpFOV: 50
+  defaultFOV: 90
+  sprintFOV: 100
+  jumpFOV: 80
   fovTransitionSpeed: 8
 --- !u!1 &4948290940259812216
 GameObject:
@@ -623,7 +668,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 90
   orthographic: 0
   orthographic size: 5
   m_Depth: 0

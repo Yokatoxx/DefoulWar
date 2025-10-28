@@ -3,6 +3,7 @@
   <component name="AgentMigrationStateService">
     <option name="migrationStatus" value="IN_PROGRESS" />
     <option name="pendingSessionIds">
+      <option value="207ca17a-20f1-4239-b252-30db422e9bd2" />
       <option value="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <option value="22a7e080-3b21-4c9b-84e0-15c05590ac35" />
       <option value="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
@@ -14,6 +15,8 @@
       <option value="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <option value="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
+      <option value="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
+      <option value="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe" />
       <option value="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
       <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
@@ -22,11 +25,21 @@
       <option value="cddea399-0ccd-45bc-9587-22a29f83cbb7" />
       <option value="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
       <option value="e71e8876-e6c3-4478-8ea2-71e6d768e1dd" />
+      <option value="ed42f51a-7d74-4a5a-bd8a-4f714bb60130" />
+      <option value="f0ca7a07-7d4d-40c3-8058-d574206231b6" />
       <option value="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
       <option value="fce4fee5-425b-430b-84e9-87a7ae92faa5" />
     </option>
     <option name="pendingTurns">
       <map>
+        <entry key="207ca17a-20f1-4239-b252-30db422e9bd2">
+          <value>
+            <set>
+              <option value="17cfa6f9-c31c-4fea-8099-bb02bf724ed1" />
+              <option value="d3cc45ee-b738-4c86-9439-95c0c2e7e5bb" />
+            </set>
+          </value>
+        </entry>
         <entry key="20c9c51b-c869-4736-a779-06d9aa46d146">
           <value>
             <set>
@@ -114,6 +127,25 @@
             </set>
           </value>
         </entry>
+        <entry key="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169">
+          <value>
+            <set>
+              <option value="215c0577-8d60-4a0c-884f-ae34608bb467" />
+              <option value="63dc3cd7-278e-453a-a833-0ad9cbf8f745" />
+            </set>
+          </value>
+        </entry>
+        <entry key="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe">
+          <value>
+            <set>
+              <option value="59f322fd-07d0-45a0-ae9f-6ee9a39968b8" />
+              <option value="696543e3-67de-4103-b31a-234d03c2e4e9" />
+              <option value="79f68f44-fae9-4d54-8f8d-e12c75985044" />
+              <option value="b4f3a148-5715-4fe6-8f6b-02aa59cce8d2" />
+              <option value="da49d0e5-1e1c-47f6-b735-d4f6723fde7f" />
+            </set>
+          </value>
+        </entry>
         <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f">
           <value>
             <set>
@@ -176,6 +208,15 @@
             </set>
           </value>
         </entry>
+        <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130">
+          <value>
+            <set>
+              <option value="955d2192-5ffe-447c-bbba-697019039c77" />
+              <option value="3e51a508-7145-4e9b-b11a-bcba1b991bea" />
+              <option value="368e0c97-6b16-45e5-aa1c-9267fe840cd8" />
+            </set>
+          </value>
+        </entry>
         <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31">
           <value>
             <set>
@@ -194,6 +235,7 @@
       </map>
     </option>
     <pendingWorkingSetItems>
+      <entry key="207ca17a-20f1-4239-b252-30db422e9bd2" />
       <entry key="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <entry key="22a7e080-3b21-4c9b-84e0-15c05590ac35" />
       <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
@@ -203,18 +245,22 @@
       <entry key="4be5e487-2ecd-4468-bbe0-731bc52fc849" />
       <entry key="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
-      <entry key="7cedbc0b-a2e2-4763-b45d-84524a48d7af">
-        <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" />
-        </set>
-      </entry>
+      <entry key="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
+      <entry key="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
+      <entry key="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe" />
       <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <entry key="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <entry key="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
       <entry key="e71e8876-e6c3-4478-8ea2-71e6d768e1dd" />
+      <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" />
+        </set>
+      </entry>
       <entry key="f0942681-0223-4301-8aca-6d3acd664b1c" />
+      <entry key="f0ca7a07-7d4d-40c3-8058-d574206231b6" />
       <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
     </pendingWorkingSetItems>
   </component>

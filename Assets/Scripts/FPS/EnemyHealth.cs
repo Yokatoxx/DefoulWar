@@ -18,6 +18,7 @@ namespace Proto3GD.FPS
         
         [Header("Events")]
         public UnityEvent OnDeath;
+        public UnityEvent<float, string> OnDamageTaken;
         
         private bool isDead;
         private WaveManager waveManager;
@@ -50,10 +51,24 @@ namespace Proto3GD.FPS
             }
             zoneHitCount[zoneName]++;
             
+            // Déclencher l'événement de dégâts pris
+            OnDamageTaken?.Invoke(damage, zoneName);
+            
             EnsureWaveManager();
             if (waveManager != null)
             {
                 waveManager.RecordHit(zoneName);
+            }
+            
+            // Déclencher l'effet électrique si c'est un ennemi électrique mais seulement si les dégâts ne viennent pas déjà d'une décharge électrique
+            
+            if (zoneName != "Electric")
+            {
+                var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
+                if (electricEnemy != null)
+                {
+                    electricEnemy.TriggerElectricDischarge();
+                }
             }
             
             if (currentHealth <= 0)
@@ -76,7 +91,7 @@ namespace Proto3GD.FPS
                 waveManager.OnEnemyDeath(this);
             }
             
-            Destroy(gameObject, 0.5f);
+            Destroy(gameObject);
         }
         
 
