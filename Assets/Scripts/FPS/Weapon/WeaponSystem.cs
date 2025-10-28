@@ -3,108 +3,118 @@ using UnityEngine;
 
 public class WeaponSystem : MonoBehaviour
 {
-    [SerializeField] private float shotDelay = 0.2f;
+    [SerializeField] private WeaponSettings weaponSettings;
+
     private float lastShootTime;
-    [SerializeField] private float magazineSize = 30;
-    [SerializeField] private float reloadTime = 1.5f;
-    [SerializeField] private float shootingDistance = 100f;
-    [SerializeField] private float projectileRandomness = 0.1f;
-    [SerializeField] private int bulletsPerShot = 1;
-
     private float currentAmmo;
-    [SerializeField] private float bulletDammage = 10f;
 
-    [SerializeField] private bool addBulletSpread = true;
-    [SerializeField] private bool isAutomatic = true;
+    public Transform bulletSpawnPoint;
+    public GameObject weapon;
 
-    [SerializeField] private Vector3 bulletSpreadVaraiance = new Vector3(0.1f, 0.1f, 0.1f);
-
-    [SerializeField] private GameObject weaponModel;
-    [SerializeField] private ParticleSystem shootingSystem;
-    [SerializeField] private Transform bulletSpawnPoint;
-    [SerializeField] private ParticleSystem ImpactParticleSystem;
-    [SerializeField] private TrailRenderer bulletTrail;
+    [Header("Aiming")]
+    [SerializeField] private Camera aimCamera; // si null => Camera.main
+    [SerializeField] private LayerMask hitMask = ~0;
 
     private Animator animator;
 
     private void Awake()
     {
-        animator = weaponModel.GetComponent<Animator>();
+        animator = weapon != null ? weapon.GetComponent<Animator>() : GetComponentInChildren<Animator>();
+        if (weaponSettings != null && weaponSettings.bulletTrail != null)
+            weaponSettings.bulletTrail.widthMultiplier = weaponSettings.shootTrailWidth;
     }
 
     private void Update()
     {
-        if (isAutomatic)
+        if (weaponSettings.isAutomatic)
         {
-            if (Input.GetMouseButton(0))
-            {
-                Shoot();
-            }
+            if (Input.GetMouseButton(0)) Shoot();
         }
         else
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                Shoot();
-            }
+            if (Input.GetMouseButtonDown(0)) Shoot();
         }
     }
 
     public void Shoot()
     {
-        if(lastShootTime + shotDelay < Time.time)
+        if (lastShootTime + weaponSettings.shotDelay >= Time.time) return;
+
+        if (animator != null) animator.SetBool("isShooting", true);
+
+        for (int i = 0; i < weaponSettings.bulletsPerShot; i++)
         {
-            animator.SetBool("isShooting", true);
-            for (int i = 0; i < bulletsPerShot; i++)
+            if (weaponSettings.muzzleFlash != null && bulletSpawnPoint != null)
+                Instantiate(weaponSettings.muzzleFlash, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+
+            // 1) Ray depuis le centre de la caméra
+            Ray camRay = GetCenterRay();
+            Vector3 camDir = ApplySpread(camRay.direction);
+
+            bool camHit = Physics.Raycast(camRay.origin, camDir, out RaycastHit camHitInfo, weaponSettings.shootingDistance, hitMask, QueryTriggerInteraction.Ignore);
+            Vector3 desiredPoint = camHit ? camHitInfo.point : camRay.origin + camDir * weaponSettings.shootingDistance;
+
+            // 2) Direction depuis le canon vers le point visé (évite la parallaxe)
+            Vector3 muzzleDir = (desiredPoint - bulletSpawnPoint.position).normalized;
+
+            // 3) Occlusion proche: si un obstacle est entre le canon et desiredPoint, on tape l’obstacle
+            float distToDesired = Vector3.Distance(bulletSpawnPoint.position, desiredPoint);
+            bool muzzleHit = Physics.Raycast(bulletSpawnPoint.position, muzzleDir, out RaycastHit muzzleHitInfo, distToDesired, hitMask, QueryTriggerInteraction.Ignore);
+
+            Vector3 endPoint = muzzleHit ? muzzleHitInfo.point : desiredPoint;
+            Vector3 endNormal = muzzleHit ? muzzleHitInfo.normal : (camHit ? camHitInfo.normal : -camDir);
+
+            if (weaponSettings.bulletTrail != null)
             {
-                shootingSystem.Play();
-                Vector3 direction = GetDirection();
-
-                if (Physics.Raycast(bulletSpawnPoint.position, direction, out RaycastHit hit, float.MaxValue))
-                {
-                    TrailRenderer trail = Instantiate(bulletTrail, bulletSpawnPoint.position, Quaternion.identity);
-
-                    StartCoroutine(SpawnTrail(trail, hit));
-
-                    lastShootTime = Time.time;
-                }
+                TrailRenderer trail = Instantiate(weaponSettings.bulletTrail, bulletSpawnPoint.position, Quaternion.identity);
+                StartCoroutine(SpawnTrail(trail, endPoint, endNormal, muzzleHit || camHit));
             }
         }
+
+        lastShootTime = Time.time;
     }
 
-    private Vector3 GetDirection()
+    private Ray GetCenterRay()
     {
-        Vector3 direction = bulletSpawnPoint.forward;
-        if (addBulletSpread)
-        {
-            direction += new Vector3(
-                Random.Range(-bulletSpreadVaraiance.x, bulletSpreadVaraiance.x),
-                Random.Range(-bulletSpreadVaraiance.y, bulletSpreadVaraiance.y),
-                Random.Range(-bulletSpreadVaraiance.z, bulletSpreadVaraiance.z)
-            );
-
-            direction.Normalize();
-        }
-        return direction;
+        Camera cam = aimCamera != null ? aimCamera : Camera.main;
+        if (cam != null)
+            return cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        // Fallback si pas de caméra
+        return new Ray(bulletSpawnPoint.position, bulletSpawnPoint.forward);
     }
 
-    private IEnumerator SpawnTrail(TrailRenderer trail, RaycastHit hit)
+    private Vector3 ApplySpread(Vector3 baseDir)
     {
-        float time = 0;
-        Vector3 startPosition = trail.transform.position;
+        if (!weaponSettings.addBulletSpread) return baseDir.normalized;
 
-        while (time < 1)
+        Vector3 v = weaponSettings.bulletSpreadVaraiance;
+        Vector3 dir = baseDir + new Vector3(
+            Random.Range(-v.x, v.x),
+            Random.Range(-v.y, v.y),
+            Random.Range(-v.z, v.z)
+        );
+        return dir.normalized;
+    }
+
+    private IEnumerator SpawnTrail(TrailRenderer trail, Vector3 hitPoint, Vector3 hitNormal, bool spawnImpact)
+    {
+        float t = 0f;
+        Vector3 start = trail.transform.position;
+        float travelTime = Mathf.Max(0.01f, trail.time);
+
+        while (t < 1f)
         {
-            trail.transform.position = Vector3.Lerp(startPosition, hit.point, time);
-            time += Time.deltaTime / trail.time;
-
+            trail.transform.position = Vector3.Lerp(start, hitPoint, t);
+            t += Time.deltaTime / travelTime;
             yield return null;
         }
-        animator.SetBool("IsShooting", false);
-        trail.transform.position = hit.point;
-        Instantiate(ImpactParticleSystem, hit.point, Quaternion.LookRotation(hit.normal));
 
+        trail.transform.position = hitPoint;
+
+        if (spawnImpact && weaponSettings.ImpactParticleSystem != null)
+            Instantiate(weaponSettings.ImpactParticleSystem, hitPoint, Quaternion.LookRotation(hitNormal));
+
+        if (animator != null) animator.SetBool("isShooting", false);
         Destroy(trail.gameObject, trail.time);
     }
-
 }
