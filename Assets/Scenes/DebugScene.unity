@@ -539,7 +539,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8035661892685741967, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -15174,6 +15175,39 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &494411354 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+  m_PrefabInstance: {fileID: 2142068711}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aa01fa35b1b406ba5f5ba9baea07030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &494411355 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7205156207043545737, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+  m_PrefabInstance: {fileID: 2142068711}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea2fd7c3991641a083d0e0107f502736, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &494411357 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+  m_PrefabInstance: {fileID: 2142068711}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d46500d1c547c5a27b9a6374a97aec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &497541421
 GameObject:
   m_ObjectHideFlags: 0
@@ -17208,9 +17242,9 @@ MonoBehaviour:
   waveCompletePanel: {fileID: 1185791013}
   waveCompleteText: {fileID: 2041945910}
   crosshair: {fileID: 1373864512}
-  playerHealth: {fileID: 0}
+  playerHealth: {fileID: 494411355}
   weaponController: {fileID: 0}
-  projectileWeaponController: {fileID: 0}
+  projectileWeaponController: {fileID: 494411354}
   waveManager: {fileID: 0}
 --- !u!114 &629375222
 MonoBehaviour:
@@ -49511,6 +49545,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8707421386175084620, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: fpsMovement
+      value: 
+      objectReference: {fileID: 494411357}
     - target: {fileID: 8707421386175084620, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: momentumRetention
       value: 0.6
