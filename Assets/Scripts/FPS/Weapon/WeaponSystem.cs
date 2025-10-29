@@ -8,6 +8,8 @@ public class WeaponSystem : MonoBehaviour
     [SerializeField] private WeaponSettings weaponSettings;
     [SerializeField] private WeaponShake weaponShake;
 
+    [SerializeField] private string enemyTag = "Enemy";
+
     private float lastShootTime;
     private float currentAmmo;
 
@@ -124,7 +126,7 @@ public class WeaponSystem : MonoBehaviour
         trail.transform.position = hitPoint;
 
         // Impact FX si on a touché un collider
-        if (hitCollider != null && weaponSettings.ImpactParticleSystem != null)
+        if (hitCollider != null && weaponSettings.ImpactParticleSystem != null && !hitCollider.CompareTag(enemyTag))
             Instantiate(weaponSettings.ImpactParticleSystem, hitPoint, Quaternion.LookRotation(hitNormal));
 
         // Appliquer les dégâts à la fin du trail (si un collider a été touché)
