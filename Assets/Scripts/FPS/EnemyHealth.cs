@@ -22,7 +22,7 @@ namespace Proto3GD.FPS
         public UnityEvent<float, string> OnDamageTaken;
         
         [Header("Dash Tracking")]
-        [SerializeField] private bool killedByDash = false;
+        [SerializeField] private bool killedByDash;
         
         private bool isDead;
         private WaveManager waveManager;
@@ -58,6 +58,41 @@ namespace Proto3GD.FPS
             // Détecter si les dégâts viennent d'un dash
             bool isDashDamage = zoneName == "Dash";
             
+            // Vérifier si c'est un ennemi électrique
+            var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
+            
+            // Si c'est un ennemi électrique ET que c'est un dash, résister et stun le joueur
+            if (isDashDamage && electricEnemy != null)
+            {
+                // NE PAS appliquer de dégâts aux ennemis électriques lors du dash
+                // Mais appliquer le stun au joueur
+                EnsureDashSystem();
+                if (dashSystem != null)
+                {
+                    var player = dashSystem.gameObject;
+                    var playerStun = player.GetComponent<PlayerStunAutoFire>();
+                    if (playerStun == null)
+                    {
+                        playerStun = player.AddComponent<PlayerStunAutoFire>();
+                    }
+                    
+                    if (electricEnemy.OverrideAutoFireInterval)
+                    {
+                        playerStun.ApplyStun(electricEnemy.StunDuration, electricEnemy.StunAutoFireInterval);
+                    }
+                    else
+                    {
+                        playerStun.ApplyStun(electricEnemy.StunDuration);
+                    }
+                    
+                    Debug.Log($"[EnemyHealth] Ennemi électrique touché par dash - Résiste et stun le joueur !");
+                }
+                
+                // Ne pas continuer le traitement des dégâts
+                return;
+            }
+            
+            // Appliquer les dégâts normalement pour les autres cas
             currentHealth -= damage;
             
             // Enregistrer le hit dans la zone
@@ -76,36 +111,10 @@ namespace Proto3GD.FPS
                 waveManager.RecordHit(zoneName);
             }
             
-            // Si c'est un dash et l'ennemi va mourir, gérer l'effet électrique et les collisions
+            // Si c'est un dash et l'ennemi va mourir (non électrique)
             if (isDashDamage && currentHealth <= 0)
             {
                 killedByDash = true;
-                
-                // Vérifier si c'est un ennemi électrique avant de mourir
-                var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
-                if (electricEnemy != null)
-                {
-                    // Appliquer le stun au joueur via le dash system
-                    EnsureDashSystem();
-                    if (dashSystem != null)
-                    {
-                        var player = dashSystem.gameObject;
-                        var playerStun = player.GetComponent<PlayerStunAutoFire>();
-                        if (playerStun == null)
-                        {
-                            playerStun = player.AddComponent<PlayerStunAutoFire>();
-                        }
-                        
-                        if (electricEnemy.OverrideAutoFireInterval)
-                        {
-                            playerStun.ApplyStun(electricEnemy.StunDuration, electricEnemy.StunAutoFireInterval);
-                        }
-                        else
-                        {
-                            playerStun.ApplyStun(electricEnemy.StunDuration);
-                        }
-                    }
-                }
                 
                 // Désactiver les collisions immédiatement pour permettre le dash à travers
                 DisableCollisions();
@@ -114,7 +123,6 @@ namespace Proto3GD.FPS
             // Déclencher l'effet électrique si c'est un ennemi électrique mais seulement si les dégâts ne viennent pas déjà d'une décharge électrique
             if (zoneName != "Electric" && zoneName != "Dash")
             {
-                var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
                 if (electricEnemy != null)
                 {
                     electricEnemy.TriggerElectricDischarge();

@@ -98,6 +98,8 @@
               <option value="eb05a15c-ed69-4c11-8c2b-3298620f301f" />
               <option value="181d6d05-10f7-4afb-8a5f-8db100e15eab" />
               <option value="05b50851-7433-4c27-b642-15b55bccea98" />
+              <option value="b4779a65-83eb-4c33-acf2-3a14a151ce96" />
+              <option value="771f00bf-be55-4d27-986b-fe0a1cb6655b" />
             </set>
           </value>
         </entry>
@@ -271,6 +273,7 @@
           <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" />
           <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/MagicEnemy.cs" />
           <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarSpawner.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/ElectricEnnemis.cs" />
         </set>
       </entry>
       <entry key="47fb342d-157d-4601-916d-863d4c5bb05d" />
