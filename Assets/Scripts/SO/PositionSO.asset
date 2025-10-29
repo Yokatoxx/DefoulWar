@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e11756cfe754d099b98c8a2687ef0e4, type: 3}
   m_Name: PositionSO
   m_EditorClassIdentifier: 
-  positionRef: {x: 0, y: 0, z: 0}
-  positionOffset: {x: -3, y: 1, z: 0}
+  positionRef: {x: 7.6499496, y: 1.3599478, z: 25.578045}
+  positionOffset: {x: 0, y: 0, z: 0}

@@ -49,11 +49,14 @@ namespace Ennemies.Effect
                 kill=false;
             }
 
-            if (enemyHealth.testdmg)
+            if (enemyHealth.isHitGun)
             {
+                positionSO.positionRef=enemyHealth.hitPosition;
                 instantiationEffect.OnHitEvent?.Invoke();
-                positionSO.positionRef=transform.position;
-                enemyHealth.testdmg=false;
+                
+                
+    
+                enemyHealth.isHitGun=false;
             }
             if (enemyHealth.IsDead&&canBeActive)
             {

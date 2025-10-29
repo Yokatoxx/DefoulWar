@@ -151,6 +151,8 @@ namespace FPS
                     {
                         float finalDamage = damage;
                         
+                        enemyHealth.hitPosition=hit.point;
+                        
                         // Appliquer les multiplicateurs de zone
                         var hitZone = hit.collider.GetComponent<HitZone>();
                         if (hitZone != null)

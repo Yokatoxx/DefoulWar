@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   duration: 2
-  grow: 1
+  grow: 0
   growCoef: 1
   positionS0: {fileID: 11400000, guid: 01d5f9e551a7d1846a2ad7d032c36d98, type: 2}
   Offset: 0
@@ -78,7 +78,7 @@ Transform:
   m_GameObject: {fileID: 7684773774775482843}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []

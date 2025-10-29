@@ -23,7 +23,8 @@ namespace Proto3GD.FPS
         private bool isDead;
         private WaveManager waveManager;
 
-        public bool testdmg;
+        public bool isHitGun;
+        public Vector3 hitPosition;
             
         private void Awake()
         {
@@ -44,7 +45,7 @@ namespace Proto3GD.FPS
         {
             
             if (isDead) return;
-           testdmg=true;
+           isHitGun=true;
             currentHealth -= damage;
             
             // Enregistrer le hit dans la zone
