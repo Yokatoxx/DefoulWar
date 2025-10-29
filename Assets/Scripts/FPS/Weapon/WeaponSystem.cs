@@ -14,6 +14,7 @@ public class WeaponSystem : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI textAmmo;
     private bool isReloading = false;
+    private bool looseAmmo = false;
     public bool IsReloading => isReloading;
 
     private float lastShootTime;
@@ -241,7 +242,7 @@ public class WeaponSystem : MonoBehaviour
         int toLoad = Mathf.Min(spaceInMag, currentReserve);
 
         currentMagazine += toLoad;
-        currentReserve -= toLoad;
+        if(looseAmmo) currentReserve -= toLoad;
 
         isReloading = false;
         if (animator != null) animator.SetBool("isReloading", false);
