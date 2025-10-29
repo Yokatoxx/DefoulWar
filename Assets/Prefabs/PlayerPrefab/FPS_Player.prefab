@@ -187,7 +187,7 @@ MonoBehaviour:
   airControlFactor: 1
   preserveJumpMomentum: 1
   jumpMomentumMultiplier: 0.01
-  maxAirSpeed: 100
+  maxAirSpeed: 1
   groundCheck: {fileID: 7268629367177999115}
   groundDistance: 0.4
   groundMask:
@@ -323,15 +323,15 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  maxCollisionAngle: 45
+  maxCollisionAngle: 15
   obstacleMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  obstacleCheckDistance: 0.5
+  obstacleCheckDistance: 1.5
   dashFOV: 90
   fovTransitionSpeed: 15
   conserveMomentum: 1
-  momentumRetention: 0.6
+  momentumRetention: 0.5
   playerController: {fileID: 2084425902901004486}
   fpsMovement: {fileID: 4379777072623147912}
   cameraTransform: {fileID: 1403591587188792743}
@@ -596,10 +596,13 @@ MonoBehaviour:
   bobHorizontalAmplitude: 0.08
   bobVerticalAmplitude: 0.07
   bobSmoothing: 8
-  defaultFOV: 90
-  sprintFOV: 100
+  minFOV: 60
+  maxFOV: 90
+  minSpeedForFOV: 5
+  maxSpeedForFOV: 20
   jumpFOV: 80
   fovTransitionSpeed: 8
+  weaponCamera: {fileID: 0}
 --- !u!1 &4948290940259812216
 GameObject:
   m_ObjectHideFlags: 0
