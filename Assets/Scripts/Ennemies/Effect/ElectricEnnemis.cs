@@ -41,7 +41,7 @@ namespace Ennemies.Effect
             if (enemyHealth.IsDead&&canBeActive)
             {
                
-                instantiationEffect.OnDeathEvent?.Invoke(instantiationEffect.onDeathGO);
+                instantiationEffect.OnDeathEvent?.Invoke(transform.position);
                 canBeActive=false;
             }
             else if(!enemyHealth.IsDead)

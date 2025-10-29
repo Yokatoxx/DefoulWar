@@ -16,6 +16,7 @@ public class EffectStats : MonoBehaviour
     {
         Destroy(gameObject, duration);
         baseScale = transform.localScale;
+        
     }
 
     private void Update()
@@ -25,5 +26,12 @@ public class EffectStats : MonoBehaviour
         {
             transform.localScale = baseScale * tps * growCoef;
         }
+    }
+
+    public void InstantiateThis()
+    {
+        Instantiate(gameObject);
+        
+        
     }
 }

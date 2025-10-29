@@ -150,23 +150,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 912ac019c48ed294398f81737e3b6e7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPrefab: {fileID: 0}
-  InstantiateEffectEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  effectDuration: 5
   OnDeathEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: -6051763980923036685, guid: 2e0b24711c336464894f8467594d02ea, type: 3}
+        m_TargetAssemblyTypeName: EffectStats, Assembly-CSharp
+        m_MethodName: InstantiateThis
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnHitEvent:
     m_PersistentCalls:
       m_Calls: []
   OnDashedEvent:
     m_PersistentCalls:
       m_Calls: []
-  onDeathGO: {fileID: 343933677807719435, guid: 2e0b24711c336464894f8467594d02ea, type: 3}
-  onHitGO: {fileID: 0}
-  onDashGO: {fileID: 0}
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
