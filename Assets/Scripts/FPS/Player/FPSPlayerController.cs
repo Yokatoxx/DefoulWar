@@ -65,11 +65,10 @@ namespace Proto3GD.FPS
             if (cameraEffects != null)
             {
                 cameraEffects.UpdateEffects(
-                    movement.IsGrounded,
-                    movement.IsMoving,
                     movement.CurrentSpeed,
-                    moveInput,
-                    sprint
+                    movement.IsGrounded,
+                    sprint,
+                    movement.IsMoving
                 );
             }
         }

@@ -10,7 +10,7 @@ namespace Ennemies.Effect
     {
         
         [Tooltip("Mode de réflexion: true = Hitscan instantané, false = Projectile physique")]
-        [SerializeField] private bool useHitscanReflect = false;
+        [SerializeField] private bool useHitscanReflect;
         
         [Tooltip("Vitesse du projectile magique renvoyé (ignoré si hitscan)")]
         [SerializeField] private float reflectedBulletSpeed = 30f;
@@ -84,8 +84,7 @@ namespace Ennemies.Effect
         private void OnDeath()
         {
             // Vérifier si l'ennemi a été tué par un dash
-            var dashSystem = FindFirstObjectByType<PillarDashSystem>();
-            if (dashSystem != null && PillarDashSystem.WasKilledByDash(transform.root.gameObject))
+            if (health != null && health.KilledByDash)
             {
                 // Soigner le joueur
                 HealPlayer();
@@ -128,6 +127,11 @@ namespace Ennemies.Effect
             
             lastReflectTime = Time.time;
             
+            // Effet visuel de réflexion
+            if (reflectEffectPrefab != null)
+            {
+                CreateReflectEffect(transform.position + Vector3.up * 1.5f);
+            }
             
             // Choisir le mode de réflexion
             if (useHitscanReflect)
