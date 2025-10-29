@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Proto3GD.FPS
 {
 
-    // Système de dash directionnel.
-    // Permet au joueur de dasher dans la direction de la caméra et de tuer les ennemis sur son passage.
+    // Système de dash directionnel
+    // Permet au joueur de dasher dans la direction de la caméra et de tuer les ennemis sur son passage
     public class PillarDashSystem : MonoBehaviour
     {
         [Header("Dash Settings")]
@@ -14,6 +14,9 @@ namespace Proto3GD.FPS
         
         [Tooltip("Durée du dash en secondes")]
         [SerializeField] private float dashDuration = 0.4f;
+        
+        [Tooltip("Courbe de vitesse du dash (X = temps normalisé 0-1, Y = multiplicateur de vitesse)")]
+        [SerializeField] private AnimationCurve dashSpeedCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0.3f);
         
         [Header("Dash Charge Settings")]
         [Tooltip("Activer la régénération automatique du dash (désactiver pour forcer le kill d'ennemis)")]
@@ -37,6 +40,16 @@ namespace Proto3GD.FPS
         [Tooltip("LayerMask pour détecter les ennemis")]
         [SerializeField] private LayerMask enemyMask = ~0;
         
+        [Header("Collision Settings")]
+        [Tooltip("Angle maximum (en degrés) entre la direction du dash et la surface pour continuer le dash. Au-delà, le dash s'arrête.")]
+        [SerializeField] private float maxCollisionAngle = 45f;
+        
+        [Tooltip("LayerMask pour les obstacles qui peuvent arrêter le dash")]
+        [SerializeField] private LayerMask obstacleMask = ~0;
+        
+        [Tooltip("Distance de détection des obstacles devant le joueur")]
+        [SerializeField] private float obstacleCheckDistance = 0.5f;
+        
         [Header("FOV Settings")]
         [Tooltip("FOV pendant le dash")]
         [SerializeField] private float dashFOV = 90f;
@@ -44,8 +57,16 @@ namespace Proto3GD.FPS
         [Tooltip("Vitesse de transition du FOV")]
         [SerializeField] private float fovTransitionSpeed = 15f;
         
+        [Header("Momentum Settings")]
+        [Tooltip("Conserver l'énergie cinétique à la sortie du dash")]
+        [SerializeField] private bool conserveMomentum = true;
+        
+        [Tooltip("Pourcentage du momentum du dash à conserver (0 à 1)")]
+        [SerializeField] private float momentumRetention = 0.8f;
+        
         [Header("References")]
         [SerializeField] private FPSPlayerController playerController;
+        [SerializeField] private FPSMovement fpsMovement;
         [SerializeField] private Transform cameraTransform;
         
         private Camera playerCamera;
@@ -77,6 +98,11 @@ namespace Proto3GD.FPS
                 }
             }
 
+            if (fpsMovement == null)
+            {
+                fpsMovement = GetComponent<FPSMovement>();
+            }
+
             if (cameraTransform == null)
             {
                 cameraTransform = playerController.CameraTransform;
@@ -101,7 +127,7 @@ namespace Proto3GD.FPS
         
         private void Update()
         {
-            // Mise à jour du cooldown (uniquement si autoRegenerate est activé)
+            // Mise à jour du cooldown
             if (autoRegenerate && cooldownTimer < dashCooldown)
             {
                 cooldownTimer += Time.deltaTime;
@@ -141,8 +167,20 @@ namespace Proto3GD.FPS
         {
             if (!isDashing || characterController == null) return;
 
-            // Mouvement en ligne droite selon la direction de dash
-            Vector3 dashMovement = directionalDashDir * (dashSpeed * Time.fixedDeltaTime);
+            // Vérifier les obstacles devant le joueur
+            if (CheckObstacleCollision())
+            {
+                EndDash();
+                return;
+            }
+            
+            float dashProgress = Mathf.Clamp01(dashTimer / dashDuration);
+            
+            // Évaluer la courbe pour obtenir le multiplicateur de vitesse
+            float speedMultiplier = dashSpeedCurve.Evaluate(dashProgress);
+            
+            // Mouvement en ligne droite selon la direction de dash avec la courbe appliquée
+            Vector3 dashMovement = directionalDashDir * (dashSpeed * speedMultiplier * Time.fixedDeltaTime);
             
             Vector3 currentPos = transform.position;
             Vector3 nextPos = currentPos + dashMovement;
@@ -180,6 +218,10 @@ namespace Proto3GD.FPS
                             playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
                         else
                             playerStun.ApplyStun(electric.StunDuration);
+                        
+                        // Arrêter le dash immédiatement à cause du stun électrique
+                        EndDash();
+                        return;
                     }
 
                     // Marquer comme kill par dash si le coup sera létal
@@ -205,14 +247,30 @@ namespace Proto3GD.FPS
 
         private void StartDirectionalDash()
         {
-            // Direction = caméra si dispo sinon forward du joueur
-            Vector3 fwd = cameraTransform != null ? cameraTransform.forward : transform.forward;
-            fwd.y = 0f;
-            if (fwd.sqrMagnitude < 0.0001f) fwd = transform.forward;
+            Vector3 fwd;
+            if (playerCamera != null)
+            {
+                Ray aimRay = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+                fwd = aimRay.direction;
+            }
+            else if (cameraTransform != null)
+            {
+                fwd = cameraTransform.forward;
+            }
+            else
+            {
+                fwd = transform.forward;
+            }
+            
             directionalDashDir = fwd.normalized;
-
-            // Consommer la charge
+            
             currentDashCharge = 0f;
+
+            // Mettre la vitesse de mouvement au maximum
+            if (fpsMovement != null)
+            {
+                fpsMovement.SetSpeedToMax();
+            }
 
             // Init timers/état
             isDashing = true;
@@ -230,6 +288,48 @@ namespace Proto3GD.FPS
             {
                 EndDash();
             }
+        }
+        
+        // Vérifie si le dash doit être arrêté par une collision avec un obstacle à mauvais angle
+        private bool CheckObstacleCollision()
+        {
+            // Raycast dans la direction du dash pour détecter les obstacles
+            RaycastHit hit;
+            float checkDistance = obstacleCheckDistance;
+            
+            // SphereCast pour détecter les obstacles devant le joueur avec un rayon similaire au dashHitRadius
+            if (Physics.SphereCast(
+                transform.position,
+                dashHitRadius * 0.8f, // Légèrement plus petit pour éviter les faux positifs
+                directionalDashDir,
+                out hit,
+                checkDistance,
+                obstacleMask,
+                QueryTriggerInteraction.Ignore))
+            {
+                // Ignorer si c'est un ennemi (ils sont gérés séparément)
+                var enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>() ?? hit.collider.GetComponent<EnemyHealth>();
+                if (enemyHealth != null)
+                {
+                    return false; // Ne pas arrêter le dash pour les ennemis
+                }
+                
+                // Calculer l'angle entre la direction du dash et la normale de la surface
+                float angle = Vector3.Angle(directionalDashDir, -hit.normal);
+                
+                // Debug visuel
+                Debug.DrawRay(hit.point, hit.normal * 2f, Color.red, 0.1f);
+                Debug.DrawRay(hit.point, directionalDashDir * 2f, Color.yellow, 0.1f);
+                
+                // Si l'angle est trop abrupt (surface trop perpendiculaire à la direction du dash)
+                if (angle > maxCollisionAngle)
+                {
+                    Debug.Log($"[PillarDashSystem] Dash arrêté par collision ! Angle: {angle:F1}° (max: {maxCollisionAngle}°)");
+                    return true; // Arrêter le dash
+                }
+            }
+            
+            return false; // Continuer le dash
         }
         
 
@@ -277,6 +377,16 @@ namespace Proto3GD.FPS
         
         private void EndDash()
         {
+            // Appliquer le momentum de sortie si activé
+            if (conserveMomentum && fpsMovement != null)
+            {
+                // Calculer le momentum basé sur la vitesse du dash
+                Vector3 dashMomentum = directionalDashDir * dashSpeed * momentumRetention;
+                fpsMovement.ApplyExternalMomentum(dashMomentum);
+                
+                Debug.Log($"[PillarDashSystem] Momentum conservé: {dashMomentum.magnitude:F1} m/s dans la direction {directionalDashDir}");
+            }
+            
             isDashing = false;
             dashTimer = 0f;
             cooldownTimer = 0f;
