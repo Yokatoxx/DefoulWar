@@ -12,6 +12,7 @@ namespace Ennemies.Effect
         [Tooltip("Si activé, remplace l'intervalle d'auto-fire du joueur pendant ce stun.")]
         [SerializeField] private bool overrideAutoFireInterval = false;
         [SerializeField, Min(0.01f)] private float stunAutoFireInterval = 0.12f;
+        
 
         public float StunDuration => stunDuration;
         public bool OverrideAutoFireInterval => overrideAutoFireInterval;
@@ -22,6 +23,7 @@ namespace Ennemies.Effect
 
         private bool canBeActive = true;    //evite le spawn de trop de sphere
         [SerializeField] private bool kill;
+        [SerializeField] private PositionSO positionSO;
         
         private void Start()
         {
@@ -42,6 +44,7 @@ namespace Ennemies.Effect
             {
                
                 instantiationEffect.OnDeathEvent?.Invoke(transform.position);
+                positionSO.positionRef=transform.position;
                 canBeActive=false;
             }
             else if(!enemyHealth.IsDead)

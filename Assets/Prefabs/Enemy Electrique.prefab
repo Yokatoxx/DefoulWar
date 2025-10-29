@@ -138,6 +138,7 @@ MonoBehaviour:
   instantiationEffect: {fileID: 2489627879979066276}
   enemyHealth: {fileID: 2188955753850171073}
   kill: 0
+  positionSO: {fileID: 11400000, guid: 01d5f9e551a7d1846a2ad7d032c36d98, type: 2}
 --- !u!114 &2489627879979066276
 MonoBehaviour:
   m_ObjectHideFlags: 0

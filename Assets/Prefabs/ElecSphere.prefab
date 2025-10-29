@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7016029420010144706}
   - component: {fileID: -6051763980923036685}
-  - component: {fileID: 3007266735255816775}
   m_Layer: 0
   m_Name: ElecSphere
   m_TagString: Untagged
@@ -46,45 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f2afbb74258a05438c8bc86597113d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnDeathEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  OnHitEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  OnDashedEvent:
-    m_PersistentCalls:
-      m_Calls: []
   duration: 2
   grow: 1
   growCoef: 1
---- !u!54 &3007266735255816775
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 343933677807719435}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 14
-  m_CollisionDetection: 0
+  positionS0: {fileID: 11400000, guid: 01d5f9e551a7d1846a2ad7d032c36d98, type: 2}
+  Offset: 0
 --- !u!1 &7684773774775482843
 GameObject:
   m_ObjectHideFlags: 0
