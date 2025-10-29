@@ -10,6 +10,8 @@ public class WeaponSettings : ScriptableObject
     public float shootTrailWidth = 0.2f;
     public int bulletsPerShot = 1;
     public float bulletDammage = 10f;
+    public float shakeAmount = 0.1f;
+    public float recoilAmount = 0.1f;
 
     public bool addBulletSpread = true;
     public bool isAutomatic = true;

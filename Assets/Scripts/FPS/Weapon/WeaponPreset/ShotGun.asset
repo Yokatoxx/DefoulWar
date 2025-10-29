@@ -18,7 +18,9 @@ MonoBehaviour:
   shootingDistance: 50
   shootTrailWidth: 1
   bulletsPerShot: 8
-  bulletDammage: 50
+  bulletDammage: 5
+  shakeAmount: 0.1
+  recoilAmount: 0.1
   addBulletSpread: 1
   isAutomatic: 0
   bulletSpreadVaraiance: {x: 0.2, y: 0.2, z: 0.2}

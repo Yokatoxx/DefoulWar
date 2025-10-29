@@ -26977,13 +26977,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad10986b331ce024f8de44517166fc57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponSettings: {fileID: 11400000, guid: 663a4f61b7e970b40ad2dc44fd1d1efa, type: 2}
+  weaponSettings: {fileID: 11400000, guid: c3876e400c078074d8c4b7800835f143, type: 2}
+  weaponShake: {fileID: 0}
   bulletSpawnPoint: {fileID: 1177083132}
   weapon: {fileID: 158521421}
   aimCamera: {fileID: 153320531}
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  zoneDamageMultipliers:
+  - zoneName: Body
+    multiplier: 1
+  - zoneName: Head
+    multiplier: 2
 --- !u!1 &839985739
 GameObject:
   m_ObjectHideFlags: 0
