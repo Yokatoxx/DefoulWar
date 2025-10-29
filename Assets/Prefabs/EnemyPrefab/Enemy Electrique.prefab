@@ -80,6 +80,10 @@ MonoBehaviour:
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  testDMG: 0
 --- !u!114 &2689582501457834611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,6 +139,11 @@ MonoBehaviour:
   stunDuration: 2.5
   overrideAutoFireInterval: 1
   stunAutoFireInterval: 0.2
+  electricDischargeRadius: 5
+  electricDamage: 15
+  electricEffectPrefab: {fileID: 0}
+  effectDuration: 0.5
+  dischargeCooldown: 0.2
   instantiationEffect: {fileID: 2489627879979066276}
   enemyHealth: {fileID: 2188955753850171073}
   kill: 0
@@ -153,6 +162,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   OnDeathEvent:
     m_PersistentCalls:
+      m_Calls: []
+  OnHitEvent:
+    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: -6051763980923036685, guid: 2e0b24711c336464894f8467594d02ea, type: 3}
         m_TargetAssemblyTypeName: EffectStats, Assembly-CSharp
@@ -165,10 +177,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
-  OnHitEvent:
-    m_PersistentCalls:
-      m_Calls: []
+        m_CallState: 1
   OnDashedEvent:
     m_PersistentCalls:
       m_Calls: []

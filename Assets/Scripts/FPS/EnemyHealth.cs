@@ -22,7 +22,9 @@ namespace Proto3GD.FPS
         
         private bool isDead;
         private WaveManager waveManager;
-        
+
+        public bool testdmg;
+            
         private void Awake()
         {
             currentHealth = maxHealth;
@@ -40,8 +42,9 @@ namespace Proto3GD.FPS
         // Inflige des dégâts à l'ennemi et enregistre la zone touchée.
         public void TakeDamage(float damage, string zoneName)
         {
-            if (isDead) return;
             
+            if (isDead) return;
+           testdmg=true;
             currentHealth -= damage;
             
             // Enregistrer le hit dans la zone
@@ -75,6 +78,7 @@ namespace Proto3GD.FPS
             {
                 Die();
             }
+            
         }
         
         private void Die()
