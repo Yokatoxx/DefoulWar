@@ -1,7 +1,9 @@
 using Proto3GD.FPS;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class WeaponSystem : MonoBehaviour
 {
@@ -10,8 +12,15 @@ public class WeaponSystem : MonoBehaviour
 
     [SerializeField] private string enemyTag = "Enemy";
 
+    [SerializeField] private TextMeshProUGUI textAmmo;
+    private bool isReloading = false;
+    public bool IsReloading => isReloading;
+
     private float lastShootTime;
-    private float currentAmmo;
+
+    // Nouveau: gestion chargeur + réserve
+    private int currentMagazine;
+    private int currentReserve;
 
     public Transform bulletSpawnPoint;
     public GameObject weapon;
@@ -35,28 +44,58 @@ public class WeaponSystem : MonoBehaviour
         animator = weapon != null ? weapon.GetComponent<Animator>() : GetComponentInChildren<Animator>();
         if (weaponSettings != null && weaponSettings.bulletTrail != null)
             weaponSettings.bulletTrail.widthMultiplier = weaponSettings.shootTrailWidth;
+
+        // Init munitions
+        currentMagazine = weaponSettings.magazineSize;
+        currentReserve = weaponSettings.maxAmmo;
+        UpdateAmmoUI();
     }
 
     private void Update()
     {
-        if (weaponSettings.isAutomatic)
+        if (!isReloading)
         {
-            if (Input.GetMouseButton(0)) Shoot();
+            if (weaponSettings.isAutomatic)
+            {
+                if (Input.GetMouseButton(0)) Shoot();
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(0)) Shoot();
+            }
         }
-        else
+
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            if (Input.GetMouseButtonDown(0)) Shoot();
+            StartReload();
+        }
+
+        // Auto-reload si chargeur vide et reserve disponible
+        if (currentMagazine <= 0 && currentReserve > 0 && !isReloading)
+        {
+            StartReload();
         }
     }
 
     public void Shoot()
     {
+        if (isReloading) return;
         if (lastShootTime + weaponSettings.shotDelay >= Time.time) return;
+
+        if (currentMagazine <= 0)
+        {
+            // Chargeur vide: tenter reload
+            StartReload();
+            return;
+        }
 
         if (animator != null) animator.SetBool("isShooting", true);
         if (weaponShake != null) weaponShake.Shake();
 
-        for (int i = 0; i < weaponSettings.bulletsPerShot; i++)
+        // Ne pas tirer plus de balles que le chargeur restant
+        int shotsToFire = Mathf.Min(weaponSettings.bulletsPerShot, currentMagazine);
+
+        for (int i = 0; i < shotsToFire; i++)
         {
             if (weaponSettings.muzzleFlash != null && bulletSpawnPoint != null)
                 Instantiate(weaponSettings.muzzleFlash, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
@@ -84,9 +123,14 @@ public class WeaponSystem : MonoBehaviour
                 TrailRenderer trail = Instantiate(weaponSettings.bulletTrail, bulletSpawnPoint.position, Quaternion.identity);
                 StartCoroutine(SpawnTrail(trail, endPoint, endNormal, hitCollider));
             }
+
+            // Consommer 1 munition par projectile émis
+            currentMagazine--;
+            if (currentMagazine == 0) break;
         }
 
         lastShootTime = Time.time;
+        UpdateAmmoUI();
     }
 
     private Ray GetCenterRay()
@@ -125,20 +169,20 @@ public class WeaponSystem : MonoBehaviour
 
         trail.transform.position = hitPoint;
 
-        // Impact FX si on a touché un collider
+        // Impact FX si on a touché un collider non-ennemi
         if (hitCollider != null && weaponSettings.ImpactParticleSystem != null && !hitCollider.CompareTag(enemyTag))
             Instantiate(weaponSettings.ImpactParticleSystem, hitPoint, Quaternion.LookRotation(hitNormal));
 
         // Appliquer les dégâts à la fin du trail (si un collider a été touché)
         if (hitCollider != null)
-            ApplyDamage(hitCollider, hitPoint);
+            ApplyDamage(hitCollider);
 
         if (animator != null) animator.SetBool("isShooting", false);
         Destroy(trail.gameObject, trail.time);
     }
 
-    // Nouvelle application de dégâts à partir d’un collider + point d’impact (utilisée par le trail)
-    private void ApplyDamage(Collider hitCollider, Vector3 hitPoint)
+    // Application des dégâts via le collider touché
+    private void ApplyDamage(Collider hitCollider)
     {
         if (hitCollider == null) return;
 
@@ -156,12 +200,10 @@ public class WeaponSystem : MonoBehaviour
                 finalDamage *= mult;
             }
             hitZone.FlashOnHit();
-            Debug.Log("Aie Aie Aie Aie Aie Aie Aie");
-            enemyHealth.TakeDamage(weaponSettings.bulletDammage);
-
         }
 
         string zoneName = hitZone != null ? hitZone.ZoneName : "Body";
+        enemyHealth.TakeDamage(finalDamage, zoneName);
     }
 
     private Dictionary<string, float> BuildZoneMultiplierDict()
@@ -176,5 +218,42 @@ public class WeaponSystem : MonoBehaviour
         }
         if (!dict.ContainsKey("Body")) dict["Body"] = 1f;
         return dict;
+    }
+
+    // Rechargement
+
+    public void StartReload()
+    {
+        // Conditions: déjà en reload, chargeur plein, ou aucune réserve
+        if (isReloading) return;
+        if (currentMagazine >= weaponSettings.magazineSize) return;
+        if (currentReserve <= 0) return;
+
+        isReloading = true;
+        if (animator != null) animator.SetBool("isReloading", true);
+
+        Invoke(nameof(FinishReload), weaponSettings.reloadTime);
+    }
+
+    private void FinishReload()
+    {
+        int spaceInMag = weaponSettings.magazineSize - currentMagazine;
+        int toLoad = Mathf.Min(spaceInMag, currentReserve);
+
+        currentMagazine += toLoad;
+        currentReserve -= toLoad;
+
+        isReloading = false;
+        if (animator != null) animator.SetBool("isReloading", false);
+
+        UpdateAmmoUI();
+    }
+
+    private void UpdateAmmoUI()
+    {
+        if (textAmmo != null)
+        {
+            textAmmo.text = $"{currentMagazine} / {currentReserve}";
+        }
     }
 }
