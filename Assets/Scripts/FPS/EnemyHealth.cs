@@ -48,7 +48,7 @@ namespace Proto3GD.FPS
                 KillImmediate();
                 kill=false;
             }
-
+            //methode killedbydashevent juste en dessous, L77
             
             if(!isDead)
             {
@@ -62,12 +62,7 @@ namespace Proto3GD.FPS
                 
                 canBeActive=false;
             }
-            if (killedByDash)
-            {
-                
-                instantiationEffect.OnDashedEvent?.Invoke(transform.position);
-                killedByDash=false;
-            }
+           
             
             if (isHitGun)
             {
@@ -77,6 +72,11 @@ namespace Proto3GD.FPS
 
             
             
+        }
+
+        private void KilledByDashEvent()
+        {
+            instantiationEffect.OnDashedEvent?.Invoke(transform.position);
         }
         
         private void EnsureWaveManager()
@@ -124,7 +124,9 @@ namespace Proto3GD.FPS
             // Si c'est un dash et l'ennemi va mourir, gérer l'effet électrique et les collisions
             if (isDashDamage && currentHealth <= 0)
             {
+ 
                 killedByDash = true;
+                KilledByDashEvent();
                 
                 // Vérifier si c'est un ennemi électrique avant de mourir
                 var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
