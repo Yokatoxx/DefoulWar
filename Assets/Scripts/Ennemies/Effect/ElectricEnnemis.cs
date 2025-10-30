@@ -30,47 +30,15 @@ namespace Ennemies.Effect
         private static readonly Collider[] DischargeBuffer = new Collider[32];
         private float lastDischargeTime = -999f;
 
-        [SerializeField] private InstantiationEffect instantiationEffect;
-        [SerializeField] private EnemyHealth enemyHealth;
-        private bool canBeActive = true;    //evite le spawn de trop de sphere
-        [SerializeField] private bool kill;
-        [SerializeField] private PositionSO positionSO;
+     
+        
         
 
 
 
        
 
-        private void Update()
-        {
-            if (kill)
-            {
-                enemyHealth.KillImmediate();
-                kill=false;
-            }
-
-            if (enemyHealth.isHitGun)
-            {
-                positionSO.positionRef=enemyHealth.hitPosition;
-                instantiationEffect.OnHitEvent?.Invoke();
-                
-                
-    
-                enemyHealth.isHitGun=false;
-            }
-            if (enemyHealth.IsDead&&canBeActive)
-            {
-               
-                instantiationEffect.OnDeathEvent?.Invoke();
-                positionSO.positionRef=transform.position;
-                canBeActive=false;
-            }
-            else if(!enemyHealth.IsDead)
-            {
-                canBeActive=true;
-            }
-            
-        }
+       
         private void Awake()
         {
             health = GetComponent<EnemyHealth>();
@@ -78,8 +46,8 @@ namespace Ennemies.Effect
             {
                 health.OnDeath.AddListener(OnDeath);
             }
-            instantiationEffect = instantiationEffect.GetComponent<InstantiationEffect>();
-            enemyHealth = enemyHealth.GetComponent<EnemyHealth>();
+            
+
         }
 
         private void OnDestroy()

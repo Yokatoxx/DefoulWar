@@ -32,18 +32,18 @@ public class EffectStats : MonoBehaviour
         }
     }
 
-    public void InstantiateThis()
+    public void InstantiateThis(Vector3 position)
     {
         GameObject _instance= Instantiate(gameObject);
         
 
         if (Offset)
         {
-            _instance.transform.position=positionS0.positionRef+ positionS0.positionOffset;
+            _instance.transform.position=position+ positionS0.positionOffset;
         }
         else
         {
-            _instance.transform.position = positionS0.positionRef;
+            _instance.transform.position = position;
         }
             
         

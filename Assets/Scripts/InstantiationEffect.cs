@@ -9,7 +9,7 @@ public class InstantiationEffect : MonoBehaviour
     
 
 
-    public UnityEvent OnDeathEvent,  OnHitEvent,OnDashedEvent;
+    public UnityEvent<Vector3> OnDeathEvent,  OnHitEvent,OnDashedEvent;
 
 
     // private void Awake()

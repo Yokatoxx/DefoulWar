@@ -28,10 +28,55 @@ namespace Proto3GD.FPS
         private WaveManager waveManager;
         private PillarDashSystem dashSystem;
         
+        [SerializeField] private InstantiationEffect instantiationEffect;
+        
+        private bool canBeActive = true;    //evite le spawn de trop de sphere
+        [SerializeField] private bool kill;
+        private bool isHitGun;
+        public Vector3 hitPosition;
+        
         private void Awake()
         {
             currentHealth = maxHealth;
             waveManager = FindFirstObjectByType<WaveManager>();
+            instantiationEffect = instantiationEffect.GetComponent<InstantiationEffect>();
+        }
+        private void Update()
+        {
+            if (kill)
+            {
+                KillImmediate();
+                kill=false;
+            }
+
+            
+            if(!isDead)
+            {
+                canBeActive=true;
+                
+            }
+            else if (isDead&&canBeActive)
+            {
+               
+                instantiationEffect.OnDeathEvent?.Invoke(transform.position);
+                
+                canBeActive=false;
+            }
+            if (killedByDash)
+            {
+                
+                instantiationEffect.OnDashedEvent?.Invoke(transform.position);
+                killedByDash=false;
+            }
+            
+            if (isHitGun)
+            {
+                instantiationEffect.OnHitEvent?.Invoke(hitPosition); //faire avec un transform
+                isHitGun=false;
+            }
+
+            
+            
         }
         
         private void EnsureWaveManager()
@@ -54,7 +99,7 @@ namespace Proto3GD.FPS
         public void TakeDamage(float damage, string zoneName)
         {
             if (isDead) return;
-            
+            isHitGun=true;
             // Détecter si les dégâts viennent d'un dash
             bool isDashDamage = zoneName == "Dash";
             

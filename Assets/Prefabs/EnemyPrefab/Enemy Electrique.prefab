@@ -83,7 +83,9 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
-  testdmg: 0
+  killedByDash: 0
+  instantiationEffect: {fileID: 2489627879979066276}
+  kill: 0
   hitPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &2689582501457834611
 MonoBehaviour:
@@ -145,10 +147,6 @@ MonoBehaviour:
   electricEffectPrefab: {fileID: 0}
   effectDuration: 0.5
   dischargeCooldown: 0.2
-  instantiationEffect: {fileID: 2489627879979066276}
-  enemyHealth: {fileID: 2188955753850171073}
-  kill: 0
-  positionSO: {fileID: 11400000, guid: 01d5f9e551a7d1846a2ad7d032c36d98, type: 2}
 --- !u!114 &2489627879979066276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,14 +161,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   OnDeathEvent:
     m_PersistentCalls:
-      m_Calls: []
-  OnHitEvent:
-    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: -6051763980923036685, guid: 2e0b24711c336464894f8467594d02ea, type: 3}
         m_TargetAssemblyTypeName: EffectStats, Assembly-CSharp
         m_MethodName: InstantiateThis
-        m_Mode: 1
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -178,7 +173,10 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 1
+        m_CallState: 2
+  OnHitEvent:
+    m_PersistentCalls:
+      m_Calls: []
   OnDashedEvent:
     m_PersistentCalls:
       m_Calls: []
