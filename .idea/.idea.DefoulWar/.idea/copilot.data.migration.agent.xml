@@ -25,6 +25,7 @@
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <option value="cddea399-0ccd-45bc-9587-22a29f83cbb7" />
       <option value="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
+      <option value="cedbed48-39b3-48c4-81c7-0c3611446c9b" />
       <option value="e71e8876-e6c3-4478-8ea2-71e6d768e1dd" />
       <option value="ed42f51a-7d74-4a5a-bd8a-4f714bb60130" />
       <option value="f0ca7a07-7d4d-40c3-8058-d574206231b6" />
@@ -213,6 +214,13 @@
             </set>
           </value>
         </entry>
+        <entry key="cedbed48-39b3-48c4-81c7-0c3611446c9b">
+          <value>
+            <set>
+              <option value="58a8ecba-1281-44ba-a4cf-63ed3f8ba7c9" />
+            </set>
+          </value>
+        </entry>
         <entry key="e71e8876-e6c3-4478-8ea2-71e6d768e1dd">
           <value>
             <set>
@@ -289,6 +297,11 @@
       <entry key="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <entry key="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
+      <entry key="cedbed48-39b3-48c4-81c7-0c3611446c9b">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunAutoFire.cs" />
+        </set>
+      </entry>
       <entry key="e71e8876-e6c3-4478-8ea2-71e6d768e1dd" />
       <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130" />
       <entry key="f0942681-0223-4301-8aca-6d3acd664b1c" />

@@ -1,11 +1,10 @@
 using System.Collections;
 using UnityEngine;
+using FPS.Weapon;
 
 namespace Proto3GD.FPS
 {
-    /// <summary>
-    /// Étourdit le joueur et déclenche des tirs automatiques via WeaponSystem pendant une durée.
-    /// </summary>
+    // Étourdit le joueur et déclenche des tirs automatiques
     [DisallowMultipleComponent]
     public class PlayerStunAutoFire : MonoBehaviour
     {
@@ -21,8 +20,7 @@ namespace Proto3GD.FPS
         private float stunEndTime;
         private Coroutine routine;
         private float? overrideInterval;
-
-        // Nouvelle référence unique au système d'arme
+        
         [SerializeField] private WeaponSystem weaponSystem;
 
         private void Awake()
