@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Proto3GD.FPS
 {
@@ -68,6 +69,7 @@ namespace Proto3GD.FPS
         [SerializeField] private FPSPlayerController playerController;
         [SerializeField] private FPSMovement fpsMovement;
         [SerializeField] private Transform cameraTransform;
+        [SerializeField] private SoundPlayer sound;
         
         private Camera playerCamera;
         private float defaultFOV;
@@ -261,7 +263,12 @@ namespace Proto3GD.FPS
             {
                 fwd = transform.forward;
             }
-            
+
+            if(sound != null)
+            {
+                sound.PlayOneShot("Dash");
+            }
+
             directionalDashDir = fwd.normalized;
             
             currentDashCharge = 0f;

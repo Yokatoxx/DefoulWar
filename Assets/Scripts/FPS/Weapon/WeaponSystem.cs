@@ -9,6 +9,7 @@ public class WeaponSystem : MonoBehaviour
 {
     [SerializeField] private WeaponSettings weaponSettings;
     [SerializeField] private WeaponShake weaponShake;
+    [SerializeField] private SoundPlayer soundPlayer;
 
     [SerializeField] private string enemyTag = "Enemy";
 
@@ -101,6 +102,9 @@ public class WeaponSystem : MonoBehaviour
         {
             if (weaponSettings.muzzleFlash != null && bulletSpawnPoint != null)
                 Instantiate(weaponSettings.muzzleFlash, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
+
+            if (soundPlayer != null && weaponSettings.shootSound != null)
+                soundPlayer.PlayOneShot(weaponSettings.shootSound, 0.5f, Random.Range(0.8f, 1));
 
             // 1) Ray depuis le centre de la caméra
             Ray camRay = GetCenterRay();
@@ -205,6 +209,17 @@ public class WeaponSystem : MonoBehaviour
         }
 
         string zoneName = hitZone != null ? hitZone.ZoneName : "Body";
+
+        if(hitZone.ZoneName == "Head")
+        {
+            if (soundPlayer != null)
+                soundPlayer.PlayOneShot("HeadShot", 0.7f, Random.Range(0.9f, 1.1f));
+        }
+        else if(hitZone.ZoneName == "Body")
+        {
+            if (soundPlayer != null)
+                soundPlayer.PlayOneShot("Hitmarker", 0.5f, Random.Range(0.9f, 1.1f));
+        }
         enemyHealth.TakeDamage(finalDamage, zoneName);
     }
 

@@ -23,6 +23,8 @@ namespace Proto3GD.FPS
         private WeaponController weaponController;
         private global::FPS.ProjectileWeaponController projectileController;
 
+        [SerializeField] private SoundPlayer sound;
+
         private void Awake()
         {
             weaponController = GetComponentInChildren<WeaponController>();
@@ -59,6 +61,11 @@ namespace Proto3GD.FPS
             isStunned = true;
             stunEndTime = Time.time + d;
             overrideInterval = customAutoFireInterval;
+
+            if (sound != null)
+            {
+                sound.PlayOneShot("Taser");
+            }
 
             // Configurer l'override du fireRate sur l'arme si fourni
             var pc = weaponController != null ? weaponController.GetComponent<global::FPS.ProjectileWeaponController>() : projectileController;

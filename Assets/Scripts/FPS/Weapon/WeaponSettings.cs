@@ -23,4 +23,5 @@ public class WeaponSettings : ScriptableObject
     public ParticleSystem muzzleFlash;
     public ParticleSystem ImpactParticleSystem;
     public TrailRenderer bulletTrail;
+    public AudioClip shootSound;
 }
