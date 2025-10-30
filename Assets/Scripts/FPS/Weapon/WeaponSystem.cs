@@ -63,7 +63,10 @@ namespace FPS.Weapon
 
         private void Update()
         {
-            if (!isReloading)
+            // Empêcher le tir manuel pendant le stun
+            bool isPlayerStunned = stunController != null && stunController.IsStunned;
+
+            if (!isReloading && !isPlayerStunned)
             {
                 if (weaponSettings.isAutomatic)
                 {
@@ -81,7 +84,6 @@ namespace FPS.Weapon
             }
 
             // Auto-reload when magazine empty and reserve available (but not during stun)
-            bool isPlayerStunned = stunController != null && stunController.IsStunned;
             if (currentMagazine <= 0 && currentReserve > 0 && !isReloading && !isPlayerStunned)
             {
                 StartReload();

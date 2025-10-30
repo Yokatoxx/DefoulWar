@@ -26,6 +26,7 @@
       <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <option value="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
+      <option value="c385f004-16f2-4ca7-92db-56f732837536" />
       <option value="cddea399-0ccd-45bc-9587-22a29f83cbb7" />
       <option value="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
       <option value="cedbed48-39b3-48c4-81c7-0c3611446c9b" />
@@ -226,6 +227,13 @@
             </set>
           </value>
         </entry>
+        <entry key="c385f004-16f2-4ca7-92db-56f732837536">
+          <value>
+            <set>
+              <option value="2a0925ff-ecd3-408c-9f20-deb131bebddf" />
+            </set>
+          </value>
+        </entry>
         <entry key="cddea399-0ccd-45bc-9587-22a29f83cbb7">
           <value>
             <set>
@@ -348,6 +356,13 @@
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <entry key="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
+      <entry key="c385f004-16f2-4ca7-92db-56f732837536">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/WeaponSystem.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/WeaponController.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs" />
+        </set>
+      </entry>
       <entry key="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
       <entry key="cedbed48-39b3-48c4-81c7-0c3611446c9b">
         <set>
