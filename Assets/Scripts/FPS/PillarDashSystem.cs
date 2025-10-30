@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using FPS; // EnemyHealth
+using PD = Proto3GD.FPS; // DamageInfo/DamageType alias
 
 namespace Proto3GD.FPS
 {
@@ -238,7 +240,8 @@ namespace Proto3GD.FPS
                     }
 
                     // Appliquer dégâts
-                    enemyHealth.TakeDamage(dashDamage, "Dash");
+                    // enemyHealth.TakeDamage(dashDamage, "Dash");
+                    enemyHealth.TakeDamage(new PD.DamageInfo(dashDamage, "Dash", PD.DamageType.Dash));
                 }
             }
 

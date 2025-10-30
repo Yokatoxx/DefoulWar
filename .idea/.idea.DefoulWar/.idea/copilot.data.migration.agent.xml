@@ -11,6 +11,7 @@
       <option value="2bf59f0a-8e1d-421e-b2e4-c5d81fdb4742" />
       <option value="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
       <option value="47fb342d-157d-4601-916d-863d4c5bb05d" />
+      <option value="48d5d22b-a2aa-454e-99f3-185c5e54b18d" />
       <option value="4be5e487-2ecd-4468-bbe0-731bc52fc849" />
       <option value="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
@@ -94,6 +95,18 @@
               <option value="91e686aa-6b0e-4255-ac93-925f067dec9f" />
               <option value="ca8f1020-f356-4500-8a72-7d08eb32ae7d" />
               <option value="f8e4fc63-62b4-4442-8830-9cfbcc5302f8" />
+            </set>
+          </value>
+        </entry>
+        <entry key="48d5d22b-a2aa-454e-99f3-185c5e54b18d">
+          <value>
+            <set>
+              <option value="c0eab294-6c61-4f8d-9e9b-bfa62a321821" />
+              <option value="1248471a-2900-441a-9fb8-2c88f8cd7752" />
+              <option value="5bd79748-b27d-4aa2-9272-f4eadc259260" />
+              <option value="fc624ec8-6920-422d-bbad-9c4066ec29ae" />
+              <option value="c7215363-1c6c-47a3-bcd3-9b15e1dba37a" />
+              <option value="5ea2a0f7-026b-402c-8f8f-a4581c4dd547" />
             </set>
           </value>
         </entry>
@@ -211,9 +224,9 @@
         <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130">
           <value>
             <set>
-              <option value="955d2192-5ffe-447c-bbba-697019039c77" />
-              <option value="3e51a508-7145-4e9b-b11a-bcba1b991bea" />
               <option value="368e0c97-6b16-45e5-aa1c-9267fe840cd8" />
+              <option value="3e51a508-7145-4e9b-b11a-bcba1b991bea" />
+              <option value="955d2192-5ffe-447c-bbba-697019039c77" />
             </set>
           </value>
         </entry>
@@ -237,11 +250,34 @@
     <pendingWorkingSetItems>
       <entry key="207ca17a-20f1-4239-b252-30db422e9bd2" />
       <entry key="20c9c51b-c869-4736-a779-06d9aa46d146" />
+      <entry key="21da08ed-59f2-4ce1-9592-74c1ed70a669">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/MagicEnemy.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealth.cs" />
+          <option value="file://$PROJECT_DIR$/MAGIC_ENEMY_UPDATE.md" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/EnemyBullet.cs" />
+          <option value="file://$PROJECT_DIR$/MAGIC_ENEMY_DEBUG_GUIDE.md" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/EnemyBullet.cs.meta" />
+        </set>
+      </entry>
       <entry key="22a7e080-3b21-4c9b-84e0-15c05590ac35" />
       <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
       <entry key="2a979126-8eed-4dfc-9945-ed810f6081dc" />
       <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
       <entry key="47fb342d-157d-4601-916d-863d4c5bb05d" />
+      <entry key="48d5d22b-a2aa-454e-99f3-185c5e54b18d">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DamageInfo.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/IDamageInterceptor.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealth.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/MagicEnemy.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/WeaponSystem.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/ElectricEnnemis.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Bullet.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealthBar.cs" />
+        </set>
+      </entry>
       <entry key="4be5e487-2ecd-4468-bbe0-731bc52fc849" />
       <entry key="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
@@ -254,11 +290,7 @@
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <entry key="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
       <entry key="e71e8876-e6c3-4478-8ea2-71e6d768e1dd" />
-      <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130">
-        <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" />
-        </set>
-      </entry>
+      <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130" />
       <entry key="f0942681-0223-4301-8aca-6d3acd664b1c" />
       <entry key="f0ca7a07-7d4d-40c3-8058-d574206231b6" />
       <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />

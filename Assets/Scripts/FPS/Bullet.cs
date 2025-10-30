@@ -1,9 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Proto3GD.FPS; // EnemyHealth, HitZone
 
-namespace Proto3GD.FPS
+namespace FPS
 {
-
     [RequireComponent(typeof(Rigidbody))]
     public class Bullet : MonoBehaviour
     {
@@ -16,12 +16,12 @@ namespace Proto3GD.FPS
         [Header("Optional Trail")]
         [SerializeField] private TrailRenderer trailRenderer;
         
-        // Multiplicateurs de dégâts par zone
-        private bool useWeaponZoneMultipliers = false;
-        private Dictionary<string, float> zoneMultiplierMap = null;
+        // Multiplicateurs de degats par zone
+        private bool useWeaponZoneMultipliers;
+        private Dictionary<string, float> zoneMultiplierMap;
         
         private Rigidbody rb;
-        private bool hasHit = false;
+        private bool hasHit;
         
         private void Awake()
         {
@@ -71,7 +71,7 @@ namespace Proto3GD.FPS
                     hitZone.FlashOnHit();
                 }
                 
-                // Calcul des dégâts: base damage  * multiplier zone * facteur armure
+                // Calcul des degats: base damage * multiplier zone * facteur armure
                 float zoneMult = 1f;
                 float armorFactor = 1f;
                 if (hitZone != null)
@@ -140,7 +140,8 @@ namespace Proto3GD.FPS
             mat.color = new Color(1f, 0.9f, 0.3f);
             renderer.material = mat;
             
-            SphereCollider collider = visual.GetComponent<SphereCollider>();
+            // ensure collider exists
+            visual.GetComponent<SphereCollider>();
             
             Rigidbody rb = bullet.AddComponent<Rigidbody>();
             rb.mass = 0.01f;
