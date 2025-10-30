@@ -1377,11 +1377,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 143447146}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &46947978 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 8422785729160626329, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-  m_PrefabInstance: {fileID: 2142068711}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &65149286
 GameObject:
   m_ObjectHideFlags: 0
@@ -21168,7 +21163,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
   m_PrefabInstance: {fileID: 2142068711}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 561289268}
+  m_GameObject: {fileID: 0}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aa01fa35b1b406ba5f5ba9baea07030, type: 3}
@@ -21179,7 +21174,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7205156207043545737, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
   m_PrefabInstance: {fileID: 2142068711}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 561289268}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea2fd7c3991641a083d0e0107f502736, type: 3}
@@ -23091,11 +23086,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!1 &561289268 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-  m_PrefabInstance: {fileID: 2142068711}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &570933236
 Mesh:
   m_ObjectHideFlags: 0
@@ -29615,7 +29605,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 2142068712}
-  destination: {fileID: 279159151}
+  destination: {fileID: 678060606}
   teleportKey: 116
 --- !u!65 &678060605
 BoxCollider:
@@ -29647,7 +29637,7 @@ Transform:
   m_GameObject: {fileID: 678060603}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.410034, y: 0.63569355, z: -8.97}
+  m_LocalPosition: {x: 6.410034, y: 0.63569355, z: -7.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -64742,11 +64732,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!20 &1660266238 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 3725817409442096485, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-  m_PrefabInstance: {fileID: 2142068711}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1675522525
 GameObject:
   m_ObjectHideFlags: 0
@@ -86076,37 +86061,25 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1177083132}
     - target: {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: weaponModel
       value: 
       objectReference: {fileID: 3574266}
-    - target: {fileID: 3635843694372808814, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.85
-      objectReference: {fileID: 0}
-    - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: maxFOV
-      value: 110
-      objectReference: {fileID: 0}
-    - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: minFOV
-      value: 90
-      objectReference: {fileID: 0}
-    - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: weaponCamera
+    - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: weapon
       value: 
-      objectReference: {fileID: 46947978}
-    - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: maxSpeedForFOV
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      propertyPath: fovTransitionSpeed
-      value: 4
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1853436261}
+    - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: textAmmo
+      value: 
+      objectReference: {fileID: 2092651267}
+    - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: weaponShake
+      value: 
+      objectReference: {fileID: 1853436266}
+    - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: bulletSpawnPoint
+      value: 
+      objectReference: {fileID: 1177083132}
     - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: speedDisplay
       value: 
@@ -86162,44 +86135,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2142068722}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
 --- !u!4 &2142068712 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8703966557384231457, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
   m_PrefabInstance: {fileID: 2142068711}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2142068722
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 561289268}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad10986b331ce024f8de44517166fc57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponSettings: {fileID: 11400000, guid: c3876e400c078074d8c4b7800835f143, type: 2}
-  weaponShake: {fileID: 1853436266}
-  enemyTag: Enemy
-  textAmmo: {fileID: 2092651267}
-  looseAmmo: 0
-  bulletSpawnPoint: {fileID: 1177083132}
-  weapon: {fileID: 1853436261}
-  aimCamera: {fileID: 1660266238}
-  hitMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  zoneDamageMultipliers:
-  - zoneName: Body
-    multiplier: 1
-  - zoneName: Head
-    multiplier: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
