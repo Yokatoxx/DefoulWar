@@ -3,11 +3,10 @@ using UnityEngine;
 
 namespace HordeSystem
 {
-    /// <summary>
-    /// Gestionnaire global des hordes d'ennemis.
-    /// Gère la création, fusion et assignation des hordes.
-    /// Coordonne le comportement collectif de chaque horde.
-    /// </summary>
+
+    // Gestionnaire global des hordes d'ennemis.
+    // Gère la création, fusion et assignation des hordes.
+    // Coordonne le comportement collectif de chaque horde.
     public class HordeManager : MonoBehaviour
     {
         public static HordeManager Instance { get; private set; }
@@ -53,9 +52,6 @@ namespace HordeSystem
             InvokeRepeating(nameof(UpdateHordeBehaviors), 0.5f, 0.5f);
         }
         
-        /// <summary>
-        /// Met à jour le comportement collectif de toutes les hordes.
-        /// </summary>
         private void UpdateHordeBehaviors()
         {
             foreach (var horde in activeHordes)
@@ -66,9 +62,7 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Détermine et applique le comportement collectif d'une horde.
-        /// </summary>
+        // Détermine et applique le comportement collectif d'une horde.
         private void UpdateHordeBehavior(HordeData horde)
         {
             if (horde.PlayerTarget != null)
@@ -102,9 +96,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Enregistre un nouvel ennemi dans le système.
-        /// </summary>
         public void RegisterEnemy(NormalEnemyAI enemy)
         {
             if (enemy == null) return;
@@ -130,9 +121,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Retire un ennemi du système (généralement à sa mort).
-        /// </summary>
         public void UnregisterEnemy(NormalEnemyAI enemy)
         {
             if (enemy == null) return;
@@ -146,9 +134,6 @@ namespace HordeSystem
             aloneEnemies.Remove(enemy);
         }
         
-        /// <summary>
-        /// Trouve la meilleure horde pour un ennemi.
-        /// </summary>
         private HordeData FindBestHordeForEnemy(NormalEnemyAI enemy)
         {
             CleanupHordes();
@@ -171,9 +156,6 @@ namespace HordeSystem
             return closestHorde;
         }
         
-        /// <summary>
-        /// Essaie de créer une nouvelle horde avec cet ennemi comme fondateur.
-        /// </summary>
         private bool TryCreateNewHorde(NormalEnemyAI enemy)
         {
             CleanupEmptyHordes();
@@ -206,9 +188,7 @@ namespace HordeSystem
             return false;
         }
         
-        /// <summary>
-        /// Crée une nouvelle horde.
-        /// </summary>
+        // Crée une nouvelle horde.
         private HordeData CreateHorde(Vector3 position, int size, NormalEnemyAI firstMember = null)
         {
             HordeData horde = new HordeData(nextHordeId++, position, size);
@@ -224,9 +204,6 @@ namespace HordeSystem
             return horde;
         }
         
-        /// <summary>
-        /// Récupère les ennemis isolés proches d'une position.
-        /// </summary>
         private List<NormalEnemyAI> GetNearbyAloneEnemies(Vector3 position, float maxDistance)
         {
             List<NormalEnemyAI> nearby = new List<NormalEnemyAI>();
@@ -245,9 +222,7 @@ namespace HordeSystem
             return nearby;
         }
         
-        /// <summary>
-        /// Vérifie périodiquement si les ennemis isolés peuvent rejoindre une horde.
-        /// </summary>
+        // Vérifie périodiquement si les ennemis isolés peuvent rejoindre une horde.
         private void CheckAloneEnemies()
         {
             CleanupHordes();
@@ -280,9 +255,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Nettoie les hordes (membres morts, etc.).
-        /// </summary>
         private void CleanupHordes()
         {
             foreach (var horde in activeHordes)
@@ -291,17 +263,12 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Supprime les hordes vides.
-        /// </summary>
         private void CleanupEmptyHordes()
         {
             activeHordes.RemoveAll(h => !h.IsValid);
         }
         
-        /// <summary>
-        /// Appelé quand une nouvelle vague commence - force la revérification.
-        /// </summary>
+        // Appelé quand une nouvelle vague commence - force la revérification.
         public void OnNewWaveStarted()
         {
             Debug.Log("[HordeManager] Nouvelle vague détectée - revérification des ennemis isolés");
@@ -316,7 +283,6 @@ namespace HordeSystem
             }
         }
         
-        // Méthodes de debug
         private void OnDrawGizmos()
         {
             if (!Application.isPlaying || activeHordes == null) return;

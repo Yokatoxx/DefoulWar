@@ -2,9 +2,6 @@ using UnityEngine;
 
 namespace HordeSystem
 {
-    /// <summary>
-    /// État initial - L'ennemi attend d'être assigné à une horde ou reste isolé.
-    /// </summary>
     public class NormalIdleState : BaseEnemyState
     {
         private float idleTimer;
@@ -16,7 +13,6 @@ namespace HordeSystem
         {
             idleTimer = 0f;
             
-            // Arrêter le mouvement
             if (enemy.Agent != null)
             {
                 enemy.Agent.isStopped = true;

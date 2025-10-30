@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace HordeSystem
 {
-    /// <summary>
-    /// État où l'ennemi fait partie d'une horde active.
-    /// L'ennemi suit le COMPORTEMENT COLLECTIF de la horde, pas ses propres décisions.
-    /// </summary>
+    // 'ennemi fait partie d'une horde active.
+
     public class InHordeState : BaseEnemyState
     {
         private Transform player;
@@ -30,18 +28,14 @@ namespace HordeSystem
                 player = playerObj.transform;
             }
             
-            // Vitesse normale au début
             if (enemy.Agent != null)
             {
                 enemy.Agent.speed = enemy.MoveSpeed;
             }
-            
-            Debug.Log($"[{enemy.name}] État: InHorde - Suit le comportement collectif de la horde {enemy.CurrentHorde?.HordeId}");
         }
         
         public override void OnUpdate()
         {
-            // Vérifier si la horde existe encore
             if (enemy.CurrentHorde == null || enemy.IsAlone)
             {
                 Debug.Log($"[{enemy.name}] Horde dissoute, retour à SearchingHorde");
@@ -49,10 +43,8 @@ namespace HordeSystem
                 return;
             }
             
-            // SUIVRE LE COMPORTEMENT COLLECTIF DE LA HORDE
             ExecuteHordeBehavior();
             
-            // Mise à jour périodique de la position
             repositionTimer += Time.deltaTime;
             if (repositionTimer >= RepositionInterval)
             {
@@ -60,7 +52,6 @@ namespace HordeSystem
                 UpdateFormationPosition();
             }
             
-            // Détection locale du joueur pour alerte
             if (player != null && !hasAlertedHorde)
             {
                 float distanceToPlayer = Vector3.Distance(enemy.transform.position, player.position);
@@ -76,16 +67,12 @@ namespace HordeSystem
         
         public override void OnExit()
         {
-            // Réinitialiser la vitesse
             if (enemy.Agent != null)
             {
                 enemy.Agent.speed = enemy.MoveSpeed;
             }
         }
         
-        /// <summary>
-        /// Exécute le comportement collectif assigné par la horde.
-        /// </summary>
         private void ExecuteHordeBehavior()
         {
             if (enemy.CurrentHorde == null) return;
@@ -114,48 +101,33 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Comportement : Patrouille dispersée autour du point de ralliement.
-        /// </summary>
         private void BehaviorPatrol()
         {
-            // Vitesse normale
             if (enemy.Agent != null && Mathf.Abs(enemy.Agent.speed - enemy.MoveSpeed) > 0.1f)
             {
                 enemy.Agent.speed = enemy.MoveSpeed;
             }
             
-            // Se déplacer vers la position de formation
             MoveToAssignedPosition();
         }
         
-        /// <summary>
-        /// Comportement : Poursuite coordonnée du joueur.
-        /// </summary>
         private void BehaviorChase()
         {
-            // Vitesse de poursuite
             if (enemy.Agent != null && Mathf.Abs(enemy.Agent.speed - enemy.ChaseSpeed) > 0.1f)
             {
                 enemy.Agent.speed = enemy.ChaseSpeed;
             }
             
-            // Tous se dirigent vers la cible collective en formation
             MoveToAssignedPosition();
         }
         
-        /// <summary>
-        /// Comportement : Attaque groupée synchronisée.
-        /// </summary>
         private void BehaviorAttack()
         {
-            // Vitesse de poursuite
             if (enemy.Agent != null)
             {
                 enemy.Agent.speed = enemy.ChaseSpeed;
             }
             
-            // Si proche du joueur, attaquer
             if (player != null)
             {
                 float distanceToPlayer = Vector3.Distance(enemy.transform.position, player.position);
@@ -183,12 +155,9 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Comportement : Encerclement coordonné de la cible.
-        /// </summary>
+        // encerclement coordonné de la cible.
         private void BehaviorSurround()
         {
-            // Vitesse de poursuite
             if (enemy.Agent != null)
             {
                 enemy.Agent.speed = enemy.ChaseSpeed;
@@ -210,25 +179,17 @@ namespace HordeSystem
                 }
             }
         }
-        
-        /// <summary>
-        /// Comportement : Retraite coordonnée.
-        /// </summary>
+
         private void BehaviorRetreat()
         {
-            // Vitesse de poursuite pour retraite rapide
             if (enemy.Agent != null)
             {
                 enemy.Agent.speed = enemy.ChaseSpeed;
             }
             
-            // Reculer vers le point de ralliement
             MoveToAssignedPosition();
         }
         
-        /// <summary>
-        /// Met à jour la position assignée en formation.
-        /// </summary>
         private void UpdateFormationPosition()
         {
             if (enemy.CurrentHorde != null)
@@ -237,9 +198,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Déplace l'ennemi vers sa position assignée en formation.
-        /// </summary>
         private void MoveToAssignedPosition()
         {
             if (enemy.Agent != null && assignedPosition != Vector3.zero)
@@ -249,9 +207,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Oriente l'ennemi vers une cible.
-        /// </summary>
         private void LookAtTarget(Vector3 targetPosition)
         {
             Vector3 direction = (targetPosition - enemy.transform.position).normalized;

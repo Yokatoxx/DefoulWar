@@ -3,9 +3,6 @@ using UnityEngine.AI;
 
 namespace HordeSystem
 {
-    /// <summary>
-    /// Contrôleur principal pour un ennemi normal avec système de horde et state machine.
-    /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     public class NormalEnemyAI : MonoBehaviour
     {
@@ -80,9 +77,6 @@ namespace HordeSystem
             currentState?.OnUpdate();
         }
         
-        /// <summary>
-        /// Change l'état actuel de la state machine.
-        /// </summary>
         public void ChangeState(BaseEnemyState newState)
         {
             if (currentState != null)
@@ -103,9 +97,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Assigne cet ennemi à une horde.
-        /// </summary>
         public void AssignToHorde(HordeData horde)
         {
             currentHorde = horde;
@@ -122,10 +113,8 @@ namespace HordeSystem
                 ChangeState(new JoiningHordeState(this));
             }
         }
-        
-        /// <summary>
-        /// Marque cet ennemi comme isolé.
-        /// </summary>
+
+        // Marque cet ennemi comme isolé.
         public void SetAlone(bool alone)
         {
             isAlone = alone;
@@ -141,10 +130,7 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Alerte toute la horde qu'un ennemi a détecté le joueur.
-        /// Tous les membres de la horde vont poursuivre le joueur.
-        /// </summary>
+        // Alerte toute la horde qu'un ennemi a détecté le joueur.
         public void AlertHorde(Transform playerTransform)
         {
             if (currentHorde == null || playerTransform == null) return;
@@ -171,9 +157,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Tente d'attaquer le joueur (respecte le cooldown).
-        /// </summary>
         public void TryAttack()
         {
             if (Time.time >= lastAttackTime + attackCooldown)
@@ -183,9 +166,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Exécute l'attaque.
-        /// </summary>
         private void PerformAttack()
         {
             // Détection du joueur dans la portée d'attaque
@@ -213,9 +193,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Appelé quand l'ennemi meurt.
-        /// </summary>
         public void Die()
         {
             if (isDead) return;
@@ -244,18 +221,13 @@ namespace HordeSystem
             Destroy(gameObject, 2f);
         }
         
-        /// <summary>
-        /// Appelé quand l'ennemi prend des dégâts.
-        /// </summary>
         public void TakeDamage(float damage)
         {
             if (isDead) return;
             
-            // Intégration avec votre système de santé existant si présent
             var healthComponents = GetComponents<MonoBehaviour>();
             foreach (var component in healthComponents)
             {
-                // Recherche d'un component de santé compatible
                 var componentType = component.GetType();
                 if (componentType.Name.Contains("Health") || componentType.Name.Contains("health"))
                 {
@@ -264,7 +236,6 @@ namespace HordeSystem
                     {
                         takeDamageMethod.Invoke(component, new object[] { damage });
                         
-                        // Vérifier si mort via propriété IsDead
                         var isDeadProp = componentType.GetProperty("IsDead");
                         if (isDeadProp != null && (bool)isDeadProp.GetValue(component))
                         {
@@ -275,16 +246,10 @@ namespace HordeSystem
                 }
             }
             
-            // Si aucun système de santé trouvé
-            if (showDebugInfo)
-            {
-                Debug.Log($"[{name}] Aucun système de santé trouvé, appliquez EnemyHealth pour une meilleure intégration");
-            }
         }
         
         private void OnDestroy()
         {
-            // S'assurer de se désenregistrer
             if (!isDead && HordeManager.Instance != null)
             {
                 HordeManager.Instance.UnregisterEnemy(this);

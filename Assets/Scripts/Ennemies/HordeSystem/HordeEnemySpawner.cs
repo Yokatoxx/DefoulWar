@@ -3,9 +3,6 @@ using UnityEngine;
 
 namespace HordeSystem
 {
-    /// <summary>
-    /// Spawner d'ennemis avec support des vagues et intégration au système de horde.
-    /// </summary>
     public class HordeEnemySpawner : MonoBehaviour
     {
         [Header("Spawn Settings")]
@@ -34,7 +31,7 @@ namespace HordeSystem
         [Header("Debug")]
         [SerializeField] private bool showDebugInfo = true;
         
-        // État interne
+        // État
         private List<GameObject> spawnedEnemies = new List<GameObject>();
         private int currentWave;
         private int enemiesSpawnedInWave;
@@ -62,7 +59,6 @@ namespace HordeSystem
         {
             if (!isSpawning) return;
             
-            // Si on attend la prochaine vague
             if (waitingForWave)
             {
                 waveTimer += Time.deltaTime;
@@ -76,7 +72,6 @@ namespace HordeSystem
                 return;
             }
             
-            // Spawn des ennemis
             if (enemiesSpawnedInWave < enemiesPerWave)
             {
                 spawnTimer += Time.deltaTime;
@@ -96,13 +91,9 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Démarre une nouvelle vague.
-        /// </summary>
         [ContextMenu("Start New Wave")]
         public void StartNewWave()
         {
-            // Vérifier si on a atteint le nombre max de vagues
             if (maxWaves >= 0 && currentWave >= maxWaves)
             {
                 if (showDebugInfo)
@@ -130,9 +121,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Spawn un ennemi à un point de spawn.
-        /// </summary>
         private void SpawnEnemy()
         {
             if (enemyPrefab == null)
@@ -141,10 +129,8 @@ namespace HordeSystem
                 return;
             }
             
-            // Choisir un spawn point
             Transform spawnPoint = GetNextSpawnPoint();
             
-            // Instancier l'ennemi
             GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
             spawnedEnemies.Add(enemy);
             
@@ -154,22 +140,15 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Obtient le prochain spawn point (round-robin).
-        /// </summary>
         private Transform GetNextSpawnPoint()
         {
             if (spawnPoints.Length == 1)
                 return spawnPoints[0];
             
-            // Alterner entre les spawn points
             int index = enemiesSpawnedInWave % spawnPoints.Length;
             return spawnPoints[index];
         }
         
-        /// <summary>
-        /// Appelé quand tous les ennemis de la vague ont été spawnés.
-        /// </summary>
         private void OnWaveCompleted()
         {
             if (showDebugInfo)
@@ -177,10 +156,8 @@ namespace HordeSystem
                 Debug.Log($"[HordeEnemySpawner] Vague {currentWave} complétée");
             }
             
-            // Nettoyer les ennemis morts
             spawnedEnemies.RemoveAll(e => e == null);
             
-            // Préparer la prochaine vague
             if (maxWaves < 0 || currentWave < maxWaves)
             {
                 waitingForWave = true;
@@ -192,9 +169,6 @@ namespace HordeSystem
             }
         }
         
-        /// <summary>
-        /// Arrête le spawning.
-        /// </summary>
         [ContextMenu("Stop Spawning")]
         public void StopSpawning()
         {
@@ -206,10 +180,7 @@ namespace HordeSystem
                 Debug.Log($"[HordeEnemySpawner] Spawning arrêté");
             }
         }
-        
-        /// <summary>
-        /// Détruit tous les ennemis spawnés.
-        /// </summary>
+
         [ContextMenu("Kill All Enemies")]
         public void KillAllEnemies()
         {

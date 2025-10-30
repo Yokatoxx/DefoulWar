@@ -2,9 +2,6 @@ using UnityEngine;
 
 namespace HordeSystem
 {
-    /// <summary>
-    /// État où l'ennemi se déplace vers le point de ralliement de sa horde.
-    /// </summary>
     public class JoiningHordeState : BaseEnemyState
     {
         private const float ArrivalDistance = 3f;
@@ -18,13 +15,11 @@ namespace HordeSystem
             updatePathTimer = 0f;
             Debug.Log($"[{enemy.name}] État: JoiningHorde - Rejoindre la horde {enemy.CurrentHorde?.HordeId}");
             
-            // Définir la destination vers le point de ralliement
             UpdateDestination();
         }
         
         public override void OnUpdate()
         {
-            // Vérifier si la horde existe encore
             if (enemy.CurrentHorde == null || enemy.IsAlone)
             {
                 Debug.Log($"[{enemy.name}] Horde perdue, retour à SearchingHorde");
@@ -32,7 +27,6 @@ namespace HordeSystem
                 return;
             }
             
-            // Mettre à jour le chemin périodiquement
             updatePathTimer += Time.deltaTime;
             if (updatePathTimer >= PathUpdateInterval)
             {
@@ -40,7 +34,6 @@ namespace HordeSystem
                 UpdateDestination();
             }
             
-            // Vérifier si on est arrivé au point de ralliement
             if (enemy.Agent != null)
             {
                 float distanceToRally = Vector3.Distance(enemy.transform.position, enemy.CurrentHorde.RallyPoint);

@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace HordeSystem
 {
-    /// <summary>
-    /// Représente une horde d'ennemis avec sa position et ses membres.
-    /// La horde agit comme UNE SEULE ENTITÉ coordonnée.
-    /// </summary>
     public class HordeData
     {
         public int HordeId { get; private set; }
@@ -39,9 +35,7 @@ namespace HordeSystem
             CollectiveTarget = rallyPoint;
         }
         
-        /// <summary>
-        /// Ajoute un membre à la horde si possible.
-        /// </summary>
+        // Ajoute un membre à la horde si possible.
         public bool TryAddMember(NormalEnemyAI enemy)
         {
             if (IsFull || Members.Contains(enemy))
@@ -50,26 +44,17 @@ namespace HordeSystem
             Members.Add(enemy);
             return true;
         }
-        
-        /// <summary>
-        /// Retire un membre de la horde.
-        /// </summary>
         public void RemoveMember(NormalEnemyAI enemy)
         {
             Members.Remove(enemy);
         }
         
-        /// <summary>
-        /// Nettoie les membres détruits ou null.
-        /// </summary>
         public void CleanupMembers()
         {
             Members.RemoveAll(m => m == null || m.IsDead);
         }
         
-        /// <summary>
-        /// Calcule le centre moyen de la horde basé sur les positions des membres.
-        /// </summary>
+        // Calcule le centre moyen de la horde basé sur les positions des membres.
         public Vector3 CalculateCenter()
         {
             if (Members.Count == 0)
@@ -84,44 +69,31 @@ namespace HordeSystem
             return center / Members.Count;
         }
         
-        /// <summary>
-        /// Définit la cible du joueur pour toute la horde.
-        /// </summary>
+        // Définit la cible du joueur pour toute la horde.
         public void SetPlayerTarget(Transform target)
         {
             PlayerTarget = target;
             SetBehavior(HordeBehavior.Chase);
         }
         
-        /// <summary>
-        /// Retire la cible du joueur (horde revient en patrouille).
-        /// </summary>
         public void ClearPlayerTarget()
         {
             PlayerTarget = null;
             SetBehavior(HordeBehavior.Patrol);
         }
         
-        /// <summary>
-        /// Définit le comportement collectif de toute la horde.
-        /// </summary>
+        // Définit le comportement collectif de toute la horde.
         public void SetBehavior(HordeBehavior behavior)
         {
             CurrentBehavior = behavior;
             LastBehaviorUpdate = Time.time;
         }
         
-        /// <summary>
-        /// Définit la cible collective pour toute la horde.
-        /// </summary>
         public void SetCollectiveTarget(Vector3 target)
         {
             CollectiveTarget = target;
         }
         
-        /// <summary>
-        /// Calcule la position en formation pour un membre spécifique.
-        /// </summary>
         public Vector3 GetFormationPosition(NormalEnemyAI member)
         {
             if (!Members.Contains(member)) return RallyPoint;
@@ -205,9 +177,6 @@ namespace HordeSystem
         }
     }
     
-    /// <summary>
-    /// Comportements collectifs possibles pour une horde.
-    /// </summary>
     public enum HordeBehavior
     {
         Patrol,
@@ -216,10 +185,6 @@ namespace HordeSystem
         Surround,
         Retreat
     }
-    
-    /// <summary>
-    /// Types de formations pour la horde.
-    /// </summary>
     public enum FormationType
     {
         Scatter,

@@ -2,9 +2,6 @@ using UnityEngine;
 
 namespace HordeSystem
 {
-    /// <summary>
-    /// État où l'ennemi cherche activement une horde à rejoindre.
-    /// </summary>
     public class SearchingHordeState : BaseEnemyState
     {
         private float searchTimer;
