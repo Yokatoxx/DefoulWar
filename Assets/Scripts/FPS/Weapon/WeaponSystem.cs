@@ -14,7 +14,8 @@ public class WeaponSystem : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI textAmmo;
     private bool isReloading = false;
-    private bool looseAmmo = false;
+
+    [SerializeField] private bool looseAmmo = false;
     public bool IsReloading => isReloading;
 
     private float lastShootTime;
@@ -91,7 +92,7 @@ public class WeaponSystem : MonoBehaviour
         }
 
         if (animator != null) animator.SetBool("isShooting", true);
-        if (weaponShake != null) weaponShake.Shake();
+        if (weaponShake != null) weaponShake.Recoil();
 
         // Ne pas tirer plus de balles que le chargeur restant
         int shotsToFire = Mathf.Min(weaponSettings.bulletsPerShot, currentMagazine);

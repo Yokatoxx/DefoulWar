@@ -2,102 +2,173 @@ using UnityEngine;
 
 public class WeaponShake : MonoBehaviour
 {
-    [SerializeField] private WeaponSettings weaponSettings;
-
-    [Header("Cible du shake")]
-    [Tooltip("Transform sur lequel appliquer le shake (souvent un enfant visuel). Si null, utilise ce GameObject.")]
+    [Header("Cible")]
+    [Tooltip("Transform sur lequel appliquer le recul/shake (souvent un enfant visuel). Si null, utilise ce GameObject.")]
     [SerializeField] private Transform shakeTransform;
 
-    [Header("Paramètres")]
-    [SerializeField] private float defaultDuration = 0.1f;
-    [SerializeField] private float defaultMagnitude = 0.1f;
-    [SerializeField] private AnimationCurve fadeCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
-    [SerializeField] private bool usePerlin = true;
-    [SerializeField] private float perlinFrequency = 25f;
+    [Header("Recoil (défauts)")]
+    [SerializeField] private float recoilKickBack = 0.045f;   // m, déplacement vers -Z local
+    [SerializeField] private float recoilKickUp = 1.5f;       // ° pitch (X)
+    [SerializeField] private float recoilRandomYaw = 0.6f;    // ° (Y) aléatoire
+    [SerializeField] private float recoilRandomRoll = 0.25f;  // ° (Z) aléatoire
+    [SerializeField] private float recoilInDuration = 0.06f;  // s vers le pic
+    [SerializeField] private float recoilOutDuration = 0.12f; // s retour à neutre
+    [SerializeField] private AnimationCurve recoilCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-    private Vector3 currentOffset;
-    private Coroutine shakeRoutine;
-    private float perlinSeedX;
-    private float perlinSeedY;
+    [Header("Shake léger")]
+    [SerializeField] private float shakeDuration = 0.08f;
+    [SerializeField] private float shakeMagnitude = 0.008f; // m
+    [SerializeField] private bool shakeUsePerlin = true;
+    [SerializeField] private float shakePerlinFreq = 25f;
+
+    // Offsets séparés (recoil + shake), appliqués de manière additive
+    private Vector3 posOffRecoil, posOffShake, appliedPos;
+    private Quaternion rotOffRecoil = Quaternion.identity, rotOffShake = Quaternion.identity, appliedRot = Quaternion.identity;
+
+    private Coroutine recoilCo;
+    private Coroutine shakeCo;
+    private float perlinSeedX, perlinSeedY;
 
     private void Awake()
     {
         if (shakeTransform == null) shakeTransform = transform;
-        // Seeds aléatoires pour le bruit Perlin
         perlinSeedX = Random.value * 1000f;
-        perlinSeedY = Random.value * 1000f;
+        perlinSeedY = Random.value * 2000f;
+        appliedPos = Vector3.zero;
+        appliedRot = Quaternion.identity;
+    }
+
+    // API simple: utilise les valeurs par défaut
+    public void Recoil()
+    {
+        Recoil(recoilKickBack, recoilKickUp, recoilRandomYaw, recoilRandomRoll, recoilInDuration, recoilOutDuration);
+    }
+
+    // API avancée
+    public void Recoil(float kickBack, float kickUpDeg, float yawRandDeg, float rollRandDeg, float inDur, float outDur)
+    {
+        if (recoilCo != null) StopCoroutine(recoilCo);
+        recoilCo = StartCoroutine(RecoilCoroutine(kickBack, kickUpDeg, yawRandDeg, rollRandDeg, inDur, outDur));
     }
 
     public void Shake()
     {
-        float mag = weaponSettings != null ? weaponSettings.shakeAmount : defaultMagnitude;
-        Shake(mag, defaultDuration);
+        if (shakeCo != null) StopCoroutine(shakeCo);
+        shakeCo = StartCoroutine(ShakeCoroutine(shakeDuration, shakeMagnitude));
     }
 
-    public void Shake(float magnitude, float duration)
+    private System.Collections.IEnumerator RecoilCoroutine(float kickBack, float kickUpDeg, float yawRandDeg, float rollRandDeg, float inDur, float outDur)
     {
-        if (shakeRoutine != null)
+        // Point de départ = offsets actuels pour une superposition fluide
+        Vector3 startPos = posOffRecoil;
+        Quaternion startRot = rotOffRecoil;
+
+        // Cible: déplacement vers -Z et rotation
+        float yaw = Random.Range(-yawRandDeg, yawRandDeg);
+        float roll = Random.Range(-rollRandDeg, rollRandDeg);
+
+        Vector3 targetPos = startPos + new Vector3(0f, 0f, -kickBack);
+        Quaternion targetRot = Quaternion.Euler(-kickUpDeg, yaw, roll) * startRot;
+
+        // Aller au pic
+        float t = 0f;
+        float inTime = Mathf.Max(0.0001f, inDur);
+        while (t < 1f)
         {
-            StopCoroutine(shakeRoutine);
-            ApplyOffset(Vector3.zero); // retirer l’offset restant
+            float k = recoilCurve != null ? recoilCurve.Evaluate(t) : t;
+            posOffRecoil = Vector3.LerpUnclamped(startPos, targetPos, k);
+            rotOffRecoil = Quaternion.SlerpUnclamped(startRot, targetRot, k);
+            ApplyCombinedOffsets();
+            t += Time.deltaTime / inTime;
+            yield return null;
         }
-        shakeRoutine = StartCoroutine(ShakeCoroutine(Mathf.Max(0f, duration), Mathf.Max(0f, magnitude)));
+        posOffRecoil = targetPos;
+        rotOffRecoil = targetRot;
+        ApplyCombinedOffsets();
+
+        // Retour
+        t = 0f;
+        float outTime = Mathf.Max(0.0001f, outDur);
+        while (t < 1f)
+        {
+            float k = recoilCurve != null ? 1f - recoilCurve.Evaluate(t) : 1f - t;
+            posOffRecoil = Vector3.LerpUnclamped(Vector3.zero, targetPos, k);
+            rotOffRecoil = Quaternion.SlerpUnclamped(Quaternion.identity, targetRot, k);
+            ApplyCombinedOffsets();
+            t += Time.deltaTime / outTime;
+            yield return null;
+        }
+
+        posOffRecoil = Vector3.zero;
+        rotOffRecoil = Quaternion.identity;
+        ApplyCombinedOffsets();
+        recoilCo = null;
     }
 
     private System.Collections.IEnumerator ShakeCoroutine(float duration, float magnitude)
     {
         float elapsed = 0f;
-
         while (elapsed < duration)
         {
-            float t = duration > 0f ? elapsed / duration : 1f;
-            float strength = fadeCurve != null ? fadeCurve.Evaluate(t) : 1f;
-
-            Vector2 r;
-            if (usePerlin)
+            Vector2 rnd;
+            if (shakeUsePerlin)
             {
-                float time = Time.time * perlinFrequency;
-                float px = Mathf.PerlinNoise(perlinSeedX, time) * 2f - 1f;
-                float py = Mathf.PerlinNoise(perlinSeedY, time) * 2f - 1f;
-                r = new Vector2(px, py);
+                float t = Time.time * shakePerlinFreq;
+                float x = Mathf.PerlinNoise(perlinSeedX, t) * 2f - 1f;
+                float y = Mathf.PerlinNoise(perlinSeedY, t) * 2f - 1f;
+                rnd = new Vector2(x, y);
             }
             else
             {
-                r = Random.insideUnitCircle;
+                rnd = Random.insideUnitCircle;
             }
 
-            Vector3 newOffset = new Vector3(r.x, r.y, 0f) * (magnitude * strength);
+            posOffShake = new Vector3(rnd.x, rnd.y, 0f) * magnitude;
+            rotOffShake = Quaternion.identity; // on peut ajouter un léger roll si souhaité
 
-            // Applique seulement le delta pour ne pas écraser la position de base
-            ApplyOffset(newOffset);
-
+            ApplyCombinedOffsets();
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        // Retire l’offset à la fin
-        ApplyOffset(Vector3.zero);
-        shakeRoutine = null;
+        posOffShake = Vector3.zero;
+        rotOffShake = Quaternion.identity;
+        ApplyCombinedOffsets();
+        shakeCo = null;
     }
 
-    private void ApplyOffset(Vector3 newOffset)
+    // Applique uniquement le delta entre l’offset total courant et celui déjà appliqué
+    private void ApplyCombinedOffsets()
     {
-        // Ajouter seulement la différence pour ne pas se battre avec d’autres scripts qui positionnent le Transform
-        Vector3 delta = newOffset - currentOffset;
-        if (delta.sqrMagnitude != 0f && shakeTransform != null)
-        {
-            shakeTransform.localPosition += delta;
-        }
-        currentOffset = newOffset;
+        if (shakeTransform == null) return;
+
+        Vector3 totalPos = posOffRecoil + posOffShake;
+        Quaternion totalRot = rotOffRecoil * rotOffShake;
+
+        Vector3 dPos = totalPos - appliedPos;
+        Quaternion dRot = totalRot * Quaternion.Inverse(appliedRot);
+
+        if (dPos.sqrMagnitude > 0f)
+            shakeTransform.localPosition += dPos;
+
+        shakeTransform.localRotation = shakeTransform.localRotation * dRot;
+
+        appliedPos = totalPos;
+        appliedRot = totalRot;
     }
 
     private void OnDisable()
     {
-        if (shakeRoutine != null)
-        {
-            StopCoroutine(shakeRoutine);
-            shakeRoutine = null;
-        }
-        ApplyOffset(Vector3.zero);
+        // Retire proprement tout offset restant
+        if (shakeTransform == null) return;
+        // Revenir à l’état sans offset
+        shakeTransform.localPosition -= appliedPos;
+        shakeTransform.localRotation = shakeTransform.localRotation * Quaternion.Inverse(appliedRot);
+
+        posOffRecoil = posOffShake = appliedPos = Vector3.zero;
+        rotOffRecoil = rotOffShake = appliedRot = Quaternion.identity;
+
+        if (recoilCo != null) { StopCoroutine(recoilCo); recoilCo = null; }
+        if (shakeCo != null) { StopCoroutine(shakeCo); shakeCo = null; }
     }
 }
