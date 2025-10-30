@@ -11,6 +11,7 @@ public class WeaponSystem : MonoBehaviour
     [SerializeField] private WeaponSettings weaponSettings;
     [SerializeField] private WeaponShake weaponShake;
     [SerializeField] private SoundPlayer soundPlayer;
+    [SerializeField] private PlayerStunAutoFire playerStunAutoFire;
 
     [SerializeField] private string enemyTag = "Enemy";
 
@@ -18,6 +19,7 @@ public class WeaponSystem : MonoBehaviour
     private bool isReloading = false;
 
     [SerializeField] private bool looseAmmo = false;
+    private bool canReload = true;
     public bool IsReloading => isReloading;
 
     private float lastShootTime;
@@ -69,13 +71,22 @@ public class WeaponSystem : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
+        if(playerStunAutoFire.IsStunned == true)
+        {
+            canReload = false;
+        }
+        else
+        {
+            canReload = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.R) && canReload)
         {
             StartReload();
         }
 
         // Auto-reload si chargeur vide et reserve disponible
-        if (currentMagazine <= 0 && currentReserve > 0 && !isReloading)
+        if (currentMagazine <= 0 && currentReserve > 0 && !isReloading && canReload)
         {
             StartReload();
         }
@@ -86,7 +97,7 @@ public class WeaponSystem : MonoBehaviour
         if (isReloading) return;
         if (lastShootTime + weaponSettings.shotDelay >= Time.time) return;
 
-        if (currentMagazine <= 0)
+        if (currentMagazine <= 0 && canReload)
         {
             // Chargeur vide: tenter reload
             StartReload();
