@@ -17,6 +17,8 @@ namespace FPS.Weapon
 
         [SerializeField] private TextMeshProUGUI textAmmo;
         private bool isReloading = false;
+        
+        private PlayerStunAutoFire stunController;
 
         [SerializeField] private bool looseAmmo = false;
         public bool IsReloading => isReloading;
@@ -54,6 +56,9 @@ namespace FPS.Weapon
             currentMagazine = weaponSettings.magazineSize;
             currentReserve = weaponSettings.maxAmmo;
             UpdateAmmoUI();
+            
+            // Get stun controller from parent (player)
+            stunController = GetComponentInParent<PlayerStunAutoFire>();
         }
 
         private void Update()
@@ -75,8 +80,9 @@ namespace FPS.Weapon
                 StartReload();
             }
 
-            // Auto-reload when magazine empty and reserve available
-            if (currentMagazine <= 0 && currentReserve > 0 && !isReloading)
+            // Auto-reload when magazine empty and reserve available (but not during stun)
+            bool isPlayerStunned = stunController != null && stunController.IsStunned;
+            if (currentMagazine <= 0 && currentReserve > 0 && !isReloading && !isPlayerStunned)
             {
                 StartReload();
             }
@@ -89,8 +95,12 @@ namespace FPS.Weapon
 
             if (currentMagazine <= 0)
             {
-                // Empty mag: try reload
-                StartReload();
+                // Empty mag: try reload (but not during stun)
+                bool isPlayerStunned = stunController != null && stunController.IsStunned;
+                if (!isPlayerStunned)
+                {
+                    StartReload();
+                }
                 return;
             }
 

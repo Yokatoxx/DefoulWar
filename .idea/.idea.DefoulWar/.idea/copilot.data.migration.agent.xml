@@ -3,6 +3,8 @@
   <component name="AgentMigrationStateService">
     <option name="migrationStatus" value="IN_PROGRESS" />
     <option name="pendingSessionIds">
+      <option value="1783dbf4-9853-4b4d-a7b9-9e421bacc439" />
+      <option value="1b0908c6-9992-4868-89c9-16cf74d37dfd" />
       <option value="207ca17a-20f1-4239-b252-30db422e9bd2" />
       <option value="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <option value="22a7e080-3b21-4c9b-84e0-15c05590ac35" />
@@ -17,6 +19,7 @@
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <option value="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
       <option value="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
+      <option value="90c93295-7ff7-44dd-bc63-9777d360cbb2" />
       <option value="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe" />
       <option value="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
@@ -27,6 +30,7 @@
       <option value="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
       <option value="cedbed48-39b3-48c4-81c7-0c3611446c9b" />
       <option value="e71e8876-e6c3-4478-8ea2-71e6d768e1dd" />
+      <option value="eae77cb2-6671-4fd6-b462-87ff19ebe898" />
       <option value="ed42f51a-7d74-4a5a-bd8a-4f714bb60130" />
       <option value="f0ca7a07-7d4d-40c3-8058-d574206231b6" />
       <option value="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
@@ -34,6 +38,21 @@
     </option>
     <option name="pendingTurns">
       <map>
+        <entry key="1783dbf4-9853-4b4d-a7b9-9e421bacc439">
+          <value>
+            <set>
+              <option value="a29d19e8-c13a-4cff-8e6b-c60daabd9512" />
+            </set>
+          </value>
+        </entry>
+        <entry key="1b0908c6-9992-4868-89c9-16cf74d37dfd">
+          <value>
+            <set>
+              <option value="85b79edc-9285-45ed-a418-9459afb74d62" />
+              <option value="095cdfe1-0920-48ac-a467-a67242535e3b" />
+            </set>
+          </value>
+        </entry>
         <entry key="207ca17a-20f1-4239-b252-30db422e9bd2">
           <value>
             <set>
@@ -149,6 +168,14 @@
             </set>
           </value>
         </entry>
+        <entry key="90c93295-7ff7-44dd-bc63-9777d360cbb2">
+          <value>
+            <set>
+              <option value="afc4d4da-b62f-46e5-bc88-b0dee3fc5f48" />
+              <option value="5364cce1-1c12-41a8-8a47-fc5ffd95c76d" />
+            </set>
+          </value>
+        </entry>
         <entry key="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe">
           <value>
             <set>
@@ -229,6 +256,16 @@
             </set>
           </value>
         </entry>
+        <entry key="eae77cb2-6671-4fd6-b462-87ff19ebe898">
+          <value>
+            <set>
+              <option value="9e87f5fc-1667-48f1-9c18-f97dce4c7d19" />
+              <option value="9d1dbde3-9ab4-4dd5-b143-d3899b0fc0cd" />
+              <option value="1d769267-0318-4e57-bd8a-fd51ae6e8b94" />
+              <option value="3eae10cd-9600-4093-8f6e-78eaedbf17c6" />
+            </set>
+          </value>
+        </entry>
         <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130">
           <value>
             <set>
@@ -256,6 +293,16 @@
       </map>
     </option>
     <pendingWorkingSetItems>
+      <entry key="1783dbf4-9853-4b4d-a7b9-9e421bacc439">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/RechargeAnim.cs" />
+        </set>
+      </entry>
+      <entry key="1b0908c6-9992-4868-89c9-16cf74d37dfd">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/RechargeAnim.cs" />
+        </set>
+      </entry>
       <entry key="207ca17a-20f1-4239-b252-30db422e9bd2" />
       <entry key="20c9c51b-c869-4736-a779-06d9aa46d146" />
       <entry key="21da08ed-59f2-4ce1-9592-74c1ed70a669">
@@ -291,6 +338,11 @@
       <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <entry key="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
       <entry key="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
+      <entry key="90c93295-7ff7-44dd-bc63-9777d360cbb2">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/WeaponSystem.cs" />
+        </set>
+      </entry>
       <entry key="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe" />
       <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
@@ -303,6 +355,11 @@
         </set>
       </entry>
       <entry key="e71e8876-e6c3-4478-8ea2-71e6d768e1dd" />
+      <entry key="eae77cb2-6671-4fd6-b462-87ff19ebe898">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/RechargeAnim.cs" />
+        </set>
+      </entry>
       <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130" />
       <entry key="f0942681-0223-4301-8aca-6d3acd664b1c" />
       <entry key="f0ca7a07-7d4d-40c3-8058-d574206231b6" />

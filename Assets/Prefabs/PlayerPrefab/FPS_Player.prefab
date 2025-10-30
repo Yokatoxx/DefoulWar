@@ -83,6 +83,7 @@ GameObject:
   - component: {fileID: 6005410421240447297}
   - component: {fileID: 9097555686013398260}
   - component: {fileID: 2920386777163252129}
+  - component: {fileID: 5863324203292837109}
   m_Layer: 3
   m_Name: FPS_Player
   m_TagString: Player
@@ -218,6 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea2fd7c3991641a083d0e0107f502736, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  soundPlayer: {fileID: 0}
   maxHealth: 100
   currentHealth: 0
   enableRegen: 1
@@ -327,7 +329,7 @@ MonoBehaviour:
   maxCollisionAngle: 15
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 128
   obstacleCheckDistance: 1.5
   dashFOV: 90
   fovTransitionSpeed: 15
@@ -336,6 +338,7 @@ MonoBehaviour:
   playerController: {fileID: 2084425902901004486}
   fpsMovement: {fileID: 4379777072623147912}
   cameraTransform: {fileID: 1403591587188792743}
+  sound: {fileID: 0}
   isDashing: 0
 --- !u!114 &8826018477589334518
 MonoBehaviour:
@@ -373,7 +376,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultStunDuration: 2.5
   autoFireInterval: 0.12
-  reloadIfEmptyDuringStun: 1
+  sound: {fileID: 0}
+  weaponSystem: {fileID: 2920386777163252129}
 --- !u!114 &9097555686013398260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,6 +416,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponSettings: {fileID: 11400000, guid: c3876e400c078074d8c4b7800835f143, type: 2}
   weaponShake: {fileID: 0}
+  soundPlayer: {fileID: 0}
   enemyTag: Enemy
   textAmmo: {fileID: 0}
   looseAmmo: 0
@@ -426,6 +431,18 @@ MonoBehaviour:
     multiplier: 1
   - zoneName: Head
     multiplier: 2
+--- !u!114 &5863324203292837109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6833f5aaacc0db844a8ac4ee01ada2ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4673607940017463061
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,7 +520,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 319
+    m_Bits: 447
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

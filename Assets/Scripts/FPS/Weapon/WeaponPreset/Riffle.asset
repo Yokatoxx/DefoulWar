@@ -21,7 +21,7 @@ MonoBehaviour:
   maxAmmo: 120
   bulletDammage: 15
   shakeAmount: 0.1
-  recoilAmount: 0.1
+  recoilAmount: 0
   addBulletSpread: 1
   isAutomatic: 1
   bulletSpreadVaraiance: {x: 0.005, y: 0.02, z: 0.06}
