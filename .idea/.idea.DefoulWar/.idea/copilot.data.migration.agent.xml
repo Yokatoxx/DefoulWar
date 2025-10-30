@@ -11,6 +11,7 @@
       <option value="2bf59f0a-8e1d-421e-b2e4-c5d81fdb4742" />
       <option value="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
       <option value="47fb342d-157d-4601-916d-863d4c5bb05d" />
+      <option value="4826de1a-5d74-427e-a2a8-4a8141a5d11a" />
       <option value="4be5e487-2ecd-4468-bbe0-731bc52fc849" />
       <option value="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
@@ -94,6 +95,21 @@
               <option value="91e686aa-6b0e-4255-ac93-925f067dec9f" />
               <option value="ca8f1020-f356-4500-8a72-7d08eb32ae7d" />
               <option value="f8e4fc63-62b4-4442-8830-9cfbcc5302f8" />
+            </set>
+          </value>
+        </entry>
+        <entry key="4826de1a-5d74-427e-a2a8-4a8141a5d11a">
+          <value>
+            <set>
+              <option value="8fefdc4e-759b-4fa3-8e54-13f893745161" />
+              <option value="bb435bdc-4e2b-4b0a-99d2-602ac4a04e11" />
+              <option value="da71288d-9eea-42b9-89ae-7e78c9da55ef" />
+              <option value="3bca887f-544b-416f-92df-a465aa90a7af" />
+              <option value="274fbcc7-2b91-4f4e-a0df-bb015a04934c" />
+              <option value="a1b63af0-1ef1-4a24-9a55-4ed251681f2e" />
+              <option value="7abd9216-19b0-47d4-95ed-694ec178f20b" />
+              <option value="7870e014-674a-4512-be70-c079b1541135" />
+              <option value="0156223e-3df7-4588-b972-3a9eaff13dfa" />
             </set>
           </value>
         </entry>
@@ -211,9 +227,9 @@
         <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130">
           <value>
             <set>
-              <option value="955d2192-5ffe-447c-bbba-697019039c77" />
-              <option value="3e51a508-7145-4e9b-b11a-bcba1b991bea" />
               <option value="368e0c97-6b16-45e5-aa1c-9267fe840cd8" />
+              <option value="3e51a508-7145-4e9b-b11a-bcba1b991bea" />
+              <option value="955d2192-5ffe-447c-bbba-697019039c77" />
             </set>
           </value>
         </entry>
@@ -242,6 +258,35 @@
       <entry key="2a979126-8eed-4dfc-9945-ed810f6081dc" />
       <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
       <entry key="47fb342d-157d-4601-916d-863d4c5bb05d" />
+      <entry key="4826de1a-5d74-427e-a2a8-4a8141a5d11a">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeData.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeManager.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/BaseEnemyState.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/NormalIdleState.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/SearchingHordeState.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/JoiningHordeState.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/InHordeState.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/NormalEnemyAI.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeEnemySpawner.cs" />
+          <option value="file://$PROJECT_DIR$/HORDE_SYSTEM_GUIDE.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_QUICKSTART.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_SYSTEM_DIAGRAM.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_INSTALLATION.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_README.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_CORRECTION_STATUS.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_FIRST_TEST.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_FINAL_REPORT.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_INDEX.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_NEW_FEATURES.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_ERROR_FIX.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_FINAL_FIX.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_SUCCESS.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_COLLECTIVE_SYSTEM.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_COLLECTIVE_READY.md" />
+          <option value="file://$PROJECT_DIR$/HORDE_ALL_FIXED.md" />
+        </set>
+      </entry>
       <entry key="4be5e487-2ecd-4468-bbe0-731bc52fc849" />
       <entry key="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
@@ -254,11 +299,7 @@
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <entry key="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
       <entry key="e71e8876-e6c3-4478-8ea2-71e6d768e1dd" />
-      <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130">
-        <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" />
-        </set>
-      </entry>
+      <entry key="ed42f51a-7d74-4a5a-bd8a-4f714bb60130" />
       <entry key="f0942681-0223-4301-8aca-6d3acd664b1c" />
       <entry key="f0ca7a07-7d4d-40c3-8058-d574206231b6" />
       <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />

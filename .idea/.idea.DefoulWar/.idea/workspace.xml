@@ -5,8 +5,48 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeData.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeData.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeEnemySpawner.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeEnemySpawner.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeManager.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/BaseEnemyState.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/BaseEnemyState.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/InHordeState.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/InHordeState.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/JoiningHordeState.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/JoiningHordeState.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/NormalEnemyAI.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/NormalEnemyAI.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/NormalIdleState.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/NormalIdleState.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/SearchingHordeState.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/SearchingHordeState.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_ALL_FIXED.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_COLLECTIVE_READY.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_COLLECTIVE_SYSTEM.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_CORRECTION_STATUS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_ERROR_FIX.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_FINAL_FIX.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_FINAL_REPORT.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_FIRST_TEST.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_INDEX.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_INSTALLATION.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_NEW_FEATURES.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_QUICKSTART.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_SUCCESS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_SYSTEM_DIAGRAM.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HORDE_SYSTEM_GUIDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/DebugScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/DebugScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ShaderGraphSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ShaderGraphSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,11 +70,18 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/EnemySpawner.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeEnemySpawner.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/HordeSystem/HordeManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/BaseEnemyState.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/InHordeState.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/JoiningHordeState.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/NormalEnemyAI.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/NormalIdleState.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/NormalEnemyState/SearchingHordeState.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashEnergyEnemy.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunAutoFire.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunDebugTrigger.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunVisuals.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/Slide.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -42,6 +89,9 @@
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="34bpBg6gTItnPAQxE5WjD7M5H6O" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -64,7 +114,7 @@
 }</component>
   <component name="RunManager" selected="Standalone Player.Start Unity">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\6000.0.58f2\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="E:\Unity\6000.0.58f2\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath &quot;E:\Documents\Projet Unity\DefoulWar&quot; -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="E:\Documents\Projet Unity\DefoulWar" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -76,7 +126,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\6000.0.58f2\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="E:\Unity\6000.0.58f2\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath &quot;E:\Documents\Projet Unity\DefoulWar&quot; -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="E:\Documents\Projet Unity\DefoulWar" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -131,6 +181,7 @@
       <workItem from="1761500729594" duration="989000" />
       <workItem from="1761560908329" duration="9495000" />
       <workItem from="1761599429074" duration="13000" />
+      <workItem from="1761833141113" duration="7280000" />
     </task>
     <servers />
   </component>
