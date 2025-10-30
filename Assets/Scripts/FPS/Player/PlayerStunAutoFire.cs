@@ -4,42 +4,37 @@ using UnityEngine;
 namespace Proto3GD.FPS
 {
     /// <summary>
-    /// Étourdit le joueur et déclenche un tir automatique pendant une durée.
-    /// Bloque les inputs via FPSPlayerController (déjà branché) et tente ExternalTryShoot() côté arme.
+    /// Étourdit le joueur et déclenche des tirs automatiques via WeaponSystem pendant une durée.
     /// </summary>
     [DisallowMultipleComponent]
     public class PlayerStunAutoFire : MonoBehaviour
     {
         [Header("Stun & Auto-Fire Settings")]
         [SerializeField] private float defaultStunDuration = 2.5f;
-        [SerializeField] private float autoFireInterval = 0.12f;
-        [SerializeField] private bool reloadIfEmptyDuringStun = true;
+        [SerializeField, Tooltip("Intervalle entre deux tentatives de tir pendant le stun.")]
+        private float autoFireInterval = 0.12f;
+
+        [Header("FX")]
+        [SerializeField] private SoundPlayer sound;
 
         private bool isStunned;
         private float stunEndTime;
         private Coroutine routine;
         private float? overrideInterval;
 
-        private WeaponController weaponController;
-        private global::FPS.ProjectileWeaponController projectileController;
-
-        [SerializeField] private SoundPlayer sound;
+        // Nouvelle référence unique au système d'arme
+        [SerializeField] private WeaponSystem weaponSystem;
 
         private void Awake()
         {
-            weaponController = GetComponentInChildren<WeaponController>();
-            if (weaponController == null)
-            {
-                projectileController = GetComponentInChildren<global::FPS.ProjectileWeaponController>();
-            }
+            if (weaponSystem == null)
+                weaponSystem = GetComponentInChildren<WeaponSystem>();
         }
 
         private void OnEnable()
         {
-            if (weaponController == null)
-                weaponController = GetComponentInChildren<WeaponController>();
-            if (weaponController == null && projectileController == null)
-                projectileController = GetComponentInChildren<global::FPS.ProjectileWeaponController>();
+            if (weaponSystem == null)
+                weaponSystem = GetComponentInChildren<WeaponSystem>();
         }
 
         private void Update()
@@ -55,6 +50,7 @@ namespace Proto3GD.FPS
             ApplyStun(duration, null);
         }
 
+        /// <param name="customAutoFireInterval">Intervalle personnalisé entre tirs (null pour utiliser autoFireInterval)</param>
         public void ApplyStun(float duration, float? customAutoFireInterval)
         {
             float d = duration > 0f ? duration : defaultStunDuration;
@@ -67,47 +63,25 @@ namespace Proto3GD.FPS
                 sound.PlayOneShot("Taser");
             }
 
-            // Configurer l'override du fireRate sur l'arme si fourni
-            var pc = weaponController != null ? weaponController.GetComponent<global::FPS.ProjectileWeaponController>() : projectileController;
-            if (pc != null)
-            {
-                pc.SetFireRateOverride(overrideInterval);
-            }
-
             if (routine != null) StopCoroutine(routine);
             routine = StartCoroutine(AutoFireLoop());
         }
 
         private IEnumerator AutoFireLoop()
         {
+            if (weaponSystem == null)
+            {
+                Debug.LogWarning("[PlayerStunAutoFire] WeaponSystem introuvable. Auto-fire annulé.", this);
+                yield break;
+            }
+
             float interval = Mathf.Max(0.01f, overrideInterval ?? autoFireInterval);
             var wait = new WaitForSeconds(interval);
+
             while (isStunned)
             {
-                bool shot = false;
-                if (weaponController != null)
-                {
-                    var pc = weaponController.GetComponent<global::FPS.ProjectileWeaponController>();
-                    if (pc != null) shot = pc.ExternalTryShoot();
-                }
-                else if (projectileController != null)
-                {
-                    shot = projectileController.ExternalTryShoot();
-                }
-
-                if (!shot && reloadIfEmptyDuringStun)
-                {
-                    if (weaponController != null)
-                    {
-                        if (!weaponController.IsReloading && weaponController.CurrentAmmo <= 0)
-                            weaponController.StartReload();
-                    }
-                    else if (projectileController != null)
-                    {
-                        if (!projectileController.IsReloading && projectileController.CurrentAmmo <= 0)
-                            projectileController.StartReload();
-                    }
-                }
+                // Tente un tir; WeaponSystem gère cadence, munitions et reload interne.
+                weaponSystem.Shoot();
 
                 // Mettre à jour l'interval si override change (sécurité)
                 float newInterval = Mathf.Max(0.01f, overrideInterval ?? autoFireInterval);
@@ -124,13 +98,8 @@ namespace Proto3GD.FPS
         private void ClearStun()
         {
             isStunned = false;
-            // Retirer l'override de fireRate de l'arme
-            var pc = weaponController != null ? weaponController.GetComponent<global::FPS.ProjectileWeaponController>() : projectileController;
-            if (pc != null)
-            {
-                pc.SetFireRateOverride(null);
-            }
             overrideInterval = null;
+
             if (routine != null)
             {
                 StopCoroutine(routine);
