@@ -32475,6 +32475,12 @@ MonoBehaviour:
   - key: HitWall
     clip: {fileID: 8300000, guid: 3623920e6380b884dba79f26aec028bc, type: 3}
     defaultVolume: 0.772
+  - key: YellowShield
+    clip: {fileID: 8300000, guid: ddce071814e62954687338d9c579d024, type: 3}
+    defaultVolume: 0.772
+  - key: YellowShield
+    clip: {fileID: 8300000, guid: ddce071814e62954687338d9c579d024, type: 3}
+    defaultVolume: 0.772
 --- !u!4 &771383305
 Transform:
   m_ObjectHideFlags: 0
@@ -86258,6 +86264,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6005410421240447297, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: sound
+      value: 
+      objectReference: {fileID: 771383304}
+    - target: {fileID: 7205156207043545737, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: soundPlayer
       value: 
       objectReference: {fileID: 771383304}
     - target: {fileID: 8703966557384231457, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}

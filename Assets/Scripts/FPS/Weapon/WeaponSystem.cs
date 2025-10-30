@@ -1,3 +1,4 @@
+using Ennemies.Effect;
 using Proto3GD.FPS;
 using System.Collections;
 using System.Collections.Generic;
@@ -210,17 +211,26 @@ public class WeaponSystem : MonoBehaviour
 
         string zoneName = hitZone != null ? hitZone.ZoneName : "Body";
 
-        if(hitZone.ZoneName == "Head")
+        if (hitCollider.GetComponentInParent<MagicEnemy>() == null)
+        {
+
+            if (hitZone.ZoneName == "Head")
+            {
+                if (soundPlayer != null)
+                    soundPlayer.PlayOneShot("HeadShot", 0.7f, Random.Range(0.9f, 1.1f));
+            }
+            else if (hitZone.ZoneName == "Body")
+            {
+                if (soundPlayer != null)
+                    soundPlayer.PlayOneShot("Hitmarker", 0.5f, Random.Range(0.9f, 1.1f));
+            }
+            enemyHealth.TakeDamage(finalDamage, zoneName);
+        }
+        else
         {
             if (soundPlayer != null)
-                soundPlayer.PlayOneShot("HeadShot", 0.7f, Random.Range(0.9f, 1.1f));
+                soundPlayer.PlayOneShot("YellowShield", 0.2f, Random.Range(0.9f, 1.1f));
         }
-        else if(hitZone.ZoneName == "Body")
-        {
-            if (soundPlayer != null)
-                soundPlayer.PlayOneShot("Hitmarker", 0.5f, Random.Range(0.9f, 1.1f));
-        }
-        enemyHealth.TakeDamage(finalDamage, zoneName);
     }
 
     private Dictionary<string, float> BuildZoneMultiplierDict()
