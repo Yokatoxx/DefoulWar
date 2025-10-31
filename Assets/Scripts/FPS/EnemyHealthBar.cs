@@ -1,8 +1,8 @@
-// filepath: e:\Documents\Projet Unity\Proto3GD\Assets\Scripts\FPS\EnemyHealthBar.cs
+// filepath: e:\Documents\Projet Unity\DefoulWar\Assets\Scripts\FPS\EnemyHealthBar.cs
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Barre de vie world-space au-dessus d'un ennemi.
@@ -19,7 +19,7 @@ namespace Proto3GD.FPS
         [SerializeField] private Color fillColor = new Color(0.2f, 0.9f, 0.2f);
         [SerializeField] private Color backgroundColor = new Color(0f, 0f, 0f, 0.6f);
         
-        private EnemyHealth enemyHealth;
+        private Proto3GD.FPS.EnemyHealth enemyHealth;
         private Camera cam;
         private Canvas canvas;
         private Slider slider;
@@ -28,8 +28,8 @@ namespace Proto3GD.FPS
         
         private void Awake()
         {
-            enemyHealth = GetComponentInParent<EnemyHealth>();
-            if (enemyHealth == null) enemyHealth = GetComponent<EnemyHealth>();
+            enemyHealth = GetComponentInParent<Proto3GD.FPS.EnemyHealth>();
+            if (enemyHealth == null) enemyHealth = GetComponent<Proto3GD.FPS.EnemyHealth>();
             cam = Camera.main;
             
             // Créer l'UI si absente
@@ -67,11 +67,11 @@ namespace Proto3GD.FPS
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.sortingOrder = 50;
             
-            CanvasScaler scaler = gameObject.GetComponent<CanvasScaler>();
+            var scaler = gameObject.GetComponent<CanvasScaler>();
             if (scaler == null) scaler = gameObject.AddComponent<CanvasScaler>();
             scaler.dynamicPixelsPerUnit = 10f;
             
-            GraphicRaycaster raycaster = gameObject.GetComponent<GraphicRaycaster>();
+            var raycaster = gameObject.GetComponent<GraphicRaycaster>();
             if (raycaster == null) raycaster = gameObject.AddComponent<GraphicRaycaster>();
             
             // Container (BG centré)

@@ -29,3 +29,4 @@ MonoBehaviour:
   muzzleFlash: {fileID: 7980029976762078213, guid: 1f58a1dea6bbd9347843e4935585e6a2, type: 3}
   ImpactParticleSystem: {fileID: 7138884428354202179, guid: e36466f47c6d2464cbffa2864a5b0198, type: 3}
   bulletTrail: {fileID: 4795970869987127494, guid: a527b787c415e734797cb5209dacaba1, type: 3}
+  shootSound: {fileID: 8300000, guid: 6447f4df62cc993448d168aff9a645ed, type: 3}
