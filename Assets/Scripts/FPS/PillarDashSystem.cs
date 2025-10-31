@@ -1,5 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using FPS; // EnemyHealth
+using PD = Proto3GD.FPS; // DamageInfo/DamageType alias
 
 namespace Proto3GD.FPS
 {
@@ -68,6 +71,7 @@ namespace Proto3GD.FPS
         [SerializeField] private FPSPlayerController playerController;
         [SerializeField] private FPSMovement fpsMovement;
         [SerializeField] private Transform cameraTransform;
+        [SerializeField] private SoundPlayer sound;
         
         private Camera playerCamera;
         private float defaultFOV;
@@ -236,7 +240,8 @@ namespace Proto3GD.FPS
                     }
 
                     // Appliquer dégâts
-                    enemyHealth.TakeDamage(dashDamage, "Dash");
+                    // enemyHealth.TakeDamage(dashDamage, "Dash");
+                    enemyHealth.TakeDamage(new PD.DamageInfo(dashDamage, "Dash", PD.DamageType.Dash));
                 }
             }
 
@@ -261,7 +266,12 @@ namespace Proto3GD.FPS
             {
                 fwd = transform.forward;
             }
-            
+
+            if(sound != null)
+            {
+                sound.PlayOneShot("Dash");
+            }
+
             directionalDashDir = fwd.normalized;
             
             currentDashCharge = 0f;
