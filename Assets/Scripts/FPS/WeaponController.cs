@@ -24,6 +24,7 @@ namespace Proto3GD.FPS
         private bool isFiring;
         private Vector3 currentRecoil;
         private ProjectileWeaponController projectileCtrl;
+        private PlayerStunAutoFire stunController;
         
         private void Awake()
         {
@@ -35,6 +36,9 @@ namespace Proto3GD.FPS
             {
                 cameraTransform = Camera.main?.transform;
             }
+            
+            // Chercher le contrôleur de stun
+            stunController = GetComponentInParent<PlayerStunAutoFire>();
         }
         
         private void Update()
@@ -54,6 +58,13 @@ namespace Proto3GD.FPS
                 }
             }
             
+            // Bloquer l'entrée de tir si étourdi
+            bool isStunned = stunController != null && stunController.IsStunned;
+            if (isStunned)
+            {
+                isFiring = false;
+            }
+            
             // Tir continu si appui maintenu
             if (isFiring)
             {
@@ -63,7 +74,16 @@ namespace Proto3GD.FPS
         
         private void HandleOldInput()
         {
-            isFiring = Input.GetButton("Fire1");
+            // Désactiver la capture de tir si étourdi
+            if (stunController != null && stunController.IsStunned)
+            {
+                isFiring = false;
+            }
+            else
+            {
+                isFiring = Input.GetButton("Fire1");
+            }
+            
             if (Input.GetKeyDown(KeyCode.R))
             {
                 StartReload();
@@ -97,6 +117,13 @@ namespace Proto3GD.FPS
         {
             if (useNewInputSystem)
             {
+                // Si étourdi, ignorer les événements d'entrée
+                if (stunController != null && stunController.IsStunned)
+                {
+                    isFiring = false;
+                    return;
+                }
+                
                 if (context.started)
                 {
                     isFiring = true;

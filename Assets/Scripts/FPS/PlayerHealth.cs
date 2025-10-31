@@ -5,6 +5,7 @@ namespace Proto3GD.FPS
 {
     public class PlayerHealth : MonoBehaviour
     {
+        [SerializeField] private SoundPlayer soundPlayer;
         [Header("Health Settings")]
         [SerializeField] private float maxHealth = 100f;
         [SerializeField] private float currentHealth;
@@ -42,7 +43,9 @@ namespace Proto3GD.FPS
         public void TakeDamage(float damage)
         {
             if (isDead) return;
-            
+
+            soundPlayer.PlayOneShot("OuchRoblox", 0.5f, Random.Range(0.9f, 1.1f));  
+
             currentHealth = Mathf.Max(0, currentHealth - damage);
             timeSinceLastDamage = 0f;
             

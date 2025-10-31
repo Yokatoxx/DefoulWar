@@ -53,6 +53,8 @@ namespace FPS
         private bool isFiring;
         private Vector3 currentRecoil;
         
+        private PlayerStunAutoFire stunController;
+        
         // Override temporaire de cadence
         private float? fireRateOverride;
         private float EffectiveFireRate => Mathf.Max(0.01f, fireRateOverride ?? fireRate);
@@ -86,6 +88,9 @@ namespace FPS
                     firePoint = muzzle.transform;
                 }
             }
+            
+            // Chercher le contrôleur de stun sur le parent (joueur)
+            stunController = GetComponentInParent<PlayerStunAutoFire>();
         }
         
         private void Update()
@@ -100,6 +105,12 @@ namespace FPS
                 currentRecoil = Vector3.Lerp(currentRecoil, Vector3.zero, recoilRecoverySpeed * Time.deltaTime);
             }
             
+            // Bloquer le tir manuel si étourdi
+            if (stunController != null && stunController.IsStunned)
+            {
+                isFiring = false;
+            }
+            
             if (!controlledExternally && isFiring && !isReloading)
             {
                 TryShoot();
@@ -109,7 +120,15 @@ namespace FPS
         private void HandleOldInput()
         {
 
-                isFiring = Input.GetMouseButton(0);
+                // Empêcher la capture de tir si étourdi
+                if (stunController != null && stunController.IsStunned)
+                {
+                    isFiring = false;
+                }
+                else
+                {
+                    isFiring = Input.GetMouseButton(0);
+                }
                 
             
             if (Input.GetKeyDown(KeyCode.R))
@@ -300,6 +319,13 @@ namespace FPS
             
             if (useNewInputSystem)
             {
+                // Bloquer pendant le stun
+                if (stunController != null && stunController.IsStunned)
+                {
+                    isFiring = false;
+                    return;
+                }
+                
                 if (context.started)
                 {
                     isFiring = true;
@@ -345,6 +371,7 @@ namespace FPS
 
         public bool ExternalTryShoot()
         {
+            // Autoriser l'auto-fire du stun même pendant le stun; ce garde ne vérifie pas le stun
             if (isReloading) return false;
             if (Time.time < nextFireTime) return false;
             if (currentAmmo <= 0) return false;

@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/WeaponSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/WeaponSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/WeaponController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/WeaponController.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,11 +33,13 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/EnemySpawner.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/DamageInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashEnergyEnemy.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/IDamageInterceptor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunAutoFire.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunDebugTrigger.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunVisuals.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/Slide.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/RechargeAnim.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -42,6 +47,9 @@
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="34bpBg6gTItnPAQxE5WjD7M5H6O" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
