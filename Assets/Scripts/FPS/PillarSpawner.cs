@@ -20,7 +20,7 @@ namespace Proto3GD.FPS
         [SerializeField] private float maxAngleX = 15f;
         
         [Tooltip("Angle minimum de rotation (en degrés) sur l'axe Y (rotation horizontale)")]
-        [SerializeField] private float minAngleY;
+        [SerializeField] private float minAngleY = 0f;
         
         [Tooltip("Angle maximum de rotation (en degrés) sur l'axe Y (rotation horizontale)")]
         [SerializeField] private float maxAngleY = 360f;
@@ -33,7 +33,7 @@ namespace Proto3GD.FPS
         
         [Header("Spawn Settings")]
         [Tooltip("Décalage vertical par rapport à la position de l'ennemi mort")]
-        [SerializeField] private Vector3 spawnOffset;
+        [SerializeField] private Vector3 spawnOffset = Vector3.zero;
         
         [Header("Screen Shake Settings")]
         [Tooltip("Active le screenshake lors du spawn")]
@@ -108,8 +108,7 @@ namespace Proto3GD.FPS
             }
 
             // Vérifier si l'ennemi a été tué par le dash
-            var enemyHealth = enemyObject.GetComponent<EnemyHealth>();
-            if (enemyHealth != null && enemyHealth.KilledByDash)
+            if (PillarDashSystem.WasKilledByDash(enemyObject))
             {
                 Debug.Log($"Ennemi tué par dash - Pas de pilier spawné");
                 return; // Ne pas spawner de pilier si tué par dash
