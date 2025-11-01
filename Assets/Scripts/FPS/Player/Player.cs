@@ -9,22 +9,20 @@ namespace FPS
     /// </summary>
     [RequireComponent(typeof(FPSInputHandler))]
     [RequireComponent(typeof(FPSMovement))]
+    [RequireComponent(typeof(FPSMouseLook))]
     public class Player : MonoBehaviour
     {
         private FPSInputHandler inputHandler;
         private FPSMovement fpsMovement;
-        private FPSCamera fpsCamera;
+        private FPSMouseLook fpsMouseLook;
+        private PlayerStunAutoFire stunComponent;
 
         private void Awake()
         {
             inputHandler = GetComponent<FPSInputHandler>();
             fpsMovement = GetComponent<FPSMovement>();
-            fpsCamera = GetComponentInChildren<FPSCamera>();
-
-            if (fpsCamera == null)
-            {
-                Debug.LogError("FPSCamera component not found in children. Player script requires a camera.");
-            }
+            fpsMouseLook = GetComponent<FPSMouseLook>();
+            stunComponent = GetComponent<PlayerStunAutoFire>();
         }
 
         private void Start()
@@ -47,22 +45,45 @@ namespace FPS
 
         private void Update()
         {
-            // Transmettre les entrées de mouvement
-            if (fpsMovement != null && inputHandler != null)
+            // Récupérer les entrées brutes
+            Vector2 moveInput = inputHandler.MoveInput;
+            bool jumpInput = inputHandler.JumpPressed;
+            bool sprintInput = inputHandler.SprintPressed;
+            bool leanLeftInput = inputHandler.LeanLeftPressed;
+            bool leanRightInput = inputHandler.LeanRightPressed;
+
+            // Vérifier si le joueur est étourdi
+            if (stunComponent != null && stunComponent.IsStunned)
             {
-                fpsMovement.Move(inputHandler.MoveInput, inputHandler.SprintPressed, inputHandler.JumpPressed);
+                // Neutraliser les entrées de mouvement
+                moveInput = Vector2.zero;
+                jumpInput = false;
+                sprintInput = false;
+                leanLeftInput = false;
+                leanRightInput = false;
+            }
+
+            // Transmettre les entrées de mouvement
+            if (fpsMovement != null)
+            {
+                fpsMovement.Move(moveInput, sprintInput, jumpInput);
 
                 // Consommer l'événement de saut après l'avoir utilisé
-                if (inputHandler.JumpPressed)
+                if (jumpInput)
                 {
                     inputHandler.ConsumeJump();
                 }
             }
 
             // Transmettre les entrées de la caméra
-            if (fpsCamera != null && inputHandler != null)
+            if (fpsMouseLook != null)
             {
-                fpsCamera.Look(inputHandler.LookInput);
+                fpsMouseLook.Look(
+                    inputHandler.LookInput,
+                    moveInput,
+                    leanLeftInput,
+                    leanRightInput
+                );
             }
         }
     }

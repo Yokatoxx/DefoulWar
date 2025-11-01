@@ -66,7 +66,7 @@ namespace FPS
         [SerializeField] private float momentumRetention = 0.8f;
         
         [Header("References")]
-        [SerializeField] private FPSPlayerController playerController;
+        [SerializeField] private Rigidbody playerRigidbody;
         [SerializeField] private FPSMovement fpsMovement;
         [SerializeField] private Transform cameraTransform;
         [SerializeField] private SoundPlayer sound;
@@ -79,8 +79,6 @@ namespace FPS
         private float dashTimer = 0f;
         private float cooldownTimer = 0f;
         
-        private CharacterController characterController;
-        
         private static System.Collections.Generic.HashSet<GameObject> enemiesKilledByDash = new System.Collections.Generic.HashSet<GameObject>();
         
         // Runtime
@@ -91,13 +89,9 @@ namespace FPS
         
         private void Start()
         {
-            if (playerController == null)
+            if (playerRigidbody == null)
             {
-                playerController = GetComponent<FPSPlayerController>();
-                if (playerController == null)
-                {
-                    return;
-                }
+                playerRigidbody = GetComponent<Rigidbody>();
             }
 
             if (fpsMovement == null)
@@ -107,10 +101,11 @@ namespace FPS
 
             if (cameraTransform == null)
             {
-                cameraTransform = playerController.CameraTransform;
-                if (cameraTransform == null)
+                // Essayer de trouver la caméra principale si elle n'est pas assignée
+                var playerCameraComponent = GetComponentInChildren<Camera>();
+                if(playerCameraComponent != null)
                 {
-                    return;
+                    cameraTransform = playerCameraComponent.transform;
                 }
             }
 
@@ -123,8 +118,6 @@ namespace FPS
                     targetFOV = defaultFOV;
                 }
             }
-
-            characterController = playerController.Controller;
         }
         
         private void Update()
@@ -167,7 +160,7 @@ namespace FPS
 
         private void FixedUpdate()
         {
-            if (!isDashing || characterController == null) return;
+            if (!isDashing || playerRigidbody == null) return;
 
             // Vérifier les obstacles devant le joueur
             if (CheckObstacleCollision())
@@ -181,11 +174,13 @@ namespace FPS
             // Évaluer la courbe pour obtenir le multiplicateur de vitesse
             float speedMultiplier = dashSpeedCurve.Evaluate(dashProgress);
             
-            // Mouvement en ligne droite selon la direction de dash avec la courbe appliquée
-            Vector3 dashMovement = directionalDashDir * (dashSpeed * speedMultiplier * Time.fixedDeltaTime);
+            // Définir la vélocité du Rigidbody pour le mouvement du dash
+            Vector3 dashVelocity = directionalDashDir * (dashSpeed * speedMultiplier);
+            playerRigidbody.velocity = dashVelocity;
             
+            // --- Logique de détection des ennemis (inchangée) ---
             Vector3 currentPos = transform.position;
-            Vector3 nextPos = currentPos + dashMovement;
+            Vector3 nextPos = currentPos + (dashVelocity * Time.fixedDeltaTime); // Simuler la prochaine position
             Vector3 seg = nextPos - lastDashPosition;
             float segLen = seg.magnitude;
             if (segLen > 0.0001f)
@@ -238,13 +233,11 @@ namespace FPS
                     }
 
                     // Appliquer dégâts
-                    // enemyHealth.TakeDamage(dashDamage, "Dash");
                     enemyHealth.TakeDamage(new DamageInfo(dashDamage, "Dash", DamageType.Dash));
                 }
             }
 
-            lastDashPosition = nextPos;
-            characterController.Move(dashMovement);
+            lastDashPosition = transform.position; // Mettre à jour avec la position actuelle
             Debug.DrawRay(transform.position, directionalDashDir * 3f, Color.cyan, 0.05f);
         }
 
@@ -278,6 +271,12 @@ namespace FPS
             if (fpsMovement != null)
             {
                 fpsMovement.SetSpeedToMax();
+            }
+
+            // Désactiver la gravité pendant le dash
+            if (playerRigidbody != null)
+            {
+                playerRigidbody.useGravity = false;
             }
 
             // Init timers/état
@@ -385,6 +384,13 @@ namespace FPS
         
         private void EndDash()
         {
+            // Réactiver la gravité
+            if (playerRigidbody != null)
+            {
+                playerRigidbody.useGravity = true;
+                playerRigidbody.velocity = Vector3.zero; // Stopper le mouvement immédiatement après le dash
+            }
+
             // Appliquer le momentum de sortie si activé
             if (conserveMomentum && fpsMovement != null)
             {
