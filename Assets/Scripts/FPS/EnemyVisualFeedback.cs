@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace FPS
 {
+    /// <summary>
+    /// Gère les effets visuels de l'ennemi (hit feedback, mort, etc.).
+    /// </summary>
     public class EnemyVisualFeedback : MonoBehaviour
     {
         [Header("Hit Feedback")]
@@ -30,6 +33,7 @@ namespace FPS
                 originalColors[i] = renderers[i].material.color;
             }
 
+            // S'abonner à l'événement de dégâts
             EnemyHealth health = GetComponent<EnemyHealth>();
             if (health != null)
             {
@@ -37,6 +41,9 @@ namespace FPS
             }
         }
 
+        /// <summary>
+        /// Affiche un flash quand l'ennemi est touché.
+        /// </summary>
         public void ShowHitFeedback()
         {
             if (!isFlashing)
@@ -49,6 +56,7 @@ namespace FPS
         {
             isFlashing = true;
             
+            // Changer la couleur
             foreach (Renderer r in renderers)
             {
                 if (r != null)
@@ -59,6 +67,7 @@ namespace FPS
             
             yield return new WaitForSeconds(hitFlashDuration);
             
+            // Restaurer la couleur
             for (int i = 0; i < renderers.Length; i++)
             {
                 if (renderers[i] != null)
@@ -70,13 +79,51 @@ namespace FPS
             isFlashing = false;
         }
         
+        /// <summary>
+        /// Affiche visuellement l'armure sur une zone.
+        /// </summary>
+        public void ShowArmorOnZone(string zoneName)
+        {
+            switch (zoneName.ToLower())
+            {
+                case "head":
+                    if (helmetPrefab != null)
+                    {
+                        Transform head = transform.Find("Head");
+                        if (head != null)
+                        {
+                            GameObject helmet = Instantiate(helmetPrefab, head);
+                            helmet.transform.localPosition = Vector3.zero;
+                            helmet.transform.localRotation = Quaternion.identity;
+                        }
+                    }
+                    break;
+
+                case "body":
+                case "chest":
+                    if (vestPrefab != null)
+                    {
+                        Transform body = transform.Find("Body");
+                        if (body != null)
+                        {
+                            GameObject vest = Instantiate(vestPrefab, body);
+                            vest.transform.localPosition = Vector3.zero;
+                            vest.transform.localRotation = Quaternion.identity;
+                        }
+                    }
+                    break;
+            }
+        }
+
         private void OnDeath()
         {
+            // Animation de mort (optionnel)
             StartCoroutine(DeathAnimation());
         }
         
         private System.Collections.IEnumerator DeathAnimation()
         {
+            // Faire tomber l'ennemi
             float elapsed = 0f;
             float duration = 0.5f;
             Vector3 startScale = transform.localScale;
@@ -86,6 +133,7 @@ namespace FPS
                 elapsed += Time.deltaTime;
                 float t = elapsed / duration;
                 
+                // Réduire la taille
                 transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
                 
                 yield return null;

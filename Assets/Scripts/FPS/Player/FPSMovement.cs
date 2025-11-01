@@ -5,7 +5,8 @@ using UnityEngine.Events;
 namespace FPS
 {
     /// Gère le mouvement du joueur
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(CapsuleCollider))]
     public class FPSMovement : MonoBehaviour
     {
         [Header("Events")]
@@ -41,8 +42,7 @@ namespace FPS
         [SerializeField] private float groundDistance = 0.4f;
         [SerializeField] private LayerMask groundMask;
 
-        private CharacterController controller;
-        private Vector3 velocity;
+        private Rigidbody rb;
         private Vector3 moveDirection = Vector3.zero;
         private Vector3 jumpMomentum = Vector3.zero;
         private bool isGrounded;
@@ -68,7 +68,8 @@ namespace FPS
 
         private void Awake()
         {
-            controller = GetComponent<CharacterController>();
+            rb = GetComponent<Rigidbody>();
+            rb.freezeRotation = true; // Empêche le Rigidbody de basculer
 
             defaultMoveSpeed = moveSpeed;
         }
@@ -77,6 +78,46 @@ namespace FPS
         {
             IncreaseSpeed();
             HandleGroundCheck();
+        }
+
+        private void FixedUpdate()
+        {
+            // Calculer la direction de mouvement
+            Vector3 desiredDirection = (transform.right * currentInput.x + transform.forward * currentInput.y).normalized;
+
+            if (isGrounded)
+            {
+                // Mouvement au sol
+                Vector3 targetVelocity = desiredDirection * CurrentSpeed;
+                targetVelocity.y = rb.velocity.y; // Conserver la vélocité verticale
+                rb.velocity = Vector3.Lerp(rb.velocity, targetVelocity, 0.1f); // Lissage pour éviter les mouvements brusques
+            }
+            else
+            {
+                // Contrôle en l'air
+                Vector3 airMove = desiredDirection * CurrentSpeed * airControlFactor;
+                Vector3 newVelocity = rb.velocity;
+                newVelocity.x = Mathf.Lerp(rb.velocity.x, airMove.x, airControlFactor);
+                newVelocity.z = Mathf.Lerp(rb.velocity.z, airMove.z, airControlFactor);
+                rb.velocity = newVelocity;
+            }
+
+            // Saut
+            if (jumpQueued && (isGrounded || coyoteTimeCounter > 0f))
+            {
+                // Réinitialiser la vélocité verticale pour un saut constant
+                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+                // Appliquer une force de saut
+                rb.AddForce(Vector3.up * Mathf.Sqrt(jumpHeight * -2f * Mathf.Abs(gravity)), ForceMode.Impulse);
+
+                // Consommer le saut
+                jumpQueued = false;
+                coyoteTimeCounter = 0f;
+            }
+
+            // Gérer la gravité manuellement
+            rb.AddForce(Vector3.up * gravity * gravityMultiplier, ForceMode.Acceleration);
         }
 
         // Cette méthode sera appelée par le PlayerController
@@ -107,84 +148,23 @@ namespace FPS
             }
         }
 
+        private Vector2 currentInput;
+        private bool jumpQueued;
+
         public void Move(Vector2 input, bool sprint, bool jump)
         {
             // Calculer la direction de mouvement
             Vector3 desired = (transform.right * input.x + transform.forward * input.y);
-            float desiredMag = desired.magnitude;
-            if (desiredMag > 1f) desired /= desiredMag;
             
             CurrentSpeed = sprint ? sprintSpeed : moveSpeed;
             IsMoving = desired.sqrMagnitude > 0.01f;
 
-            if (isGrounded)
-            {
-                // Réinitialiser le momentum au sol
-                jumpMomentum = Vector3.zero;
-                
-                // Mouvement au sol
-                if (desired.sqrMagnitude > 0f)
-                {
-                    controller.Move(desired * (CurrentSpeed * Time.deltaTime));
-                }
+            currentInput = input;
 
-                // Saut
-                if (jump)
-                {
-                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity); //
-                    
-                    // Capturer le momentum actuel pour le préserver en l'air
-                    if (preserveJumpMomentum && desired.sqrMagnitude > 0f)
-                    {
-                        jumpMomentum = desired * CurrentSpeed * jumpMomentumMultiplier;
-                    }
-                    
-                    // Consommer le coyote time
-                    coyoteTimeCounter = 0f;
-                }
-            }
-            else
+            if (jump)
             {
-                // Permettre le saut pendant le coyote time
-                if (jump && coyoteTimeCounter > 0f)
-                {
-                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                    
-                    // Capturer le momentum actuel pour le préserver en l'air
-                    if (preserveJumpMomentum && desired.sqrMagnitude > 0f)
-                    {
-                        jumpMomentum = desired * CurrentSpeed * jumpMomentumMultiplier;
-                    }
-                    
-                    // Consommer le coyote time
-                    coyoteTimeCounter = 0f;
-                }
-                
-                // En l'air
-                if (preserveJumpMomentum && jumpMomentum.sqrMagnitude > 0f)
-                {
-                    // Appliquer le momentum capturé au moment du saut
-                    controller.Move(jumpMomentum * Time.deltaTime);
-                    
-                    // Permettre un contrôle limité en l'air en PLUS du momentum
-                    if (desired.sqrMagnitude > 0f)
-                    {
-                        controller.Move(desired * (CurrentSpeed * airControlFactor * Time.deltaTime));
-                    }
-                }
-                else
-                {
-                    Vector3 airMove = desired * CurrentSpeed * airControlFactor;
-                    moveDirection.x = Mathf.Lerp(moveDirection.x, airMove.x, airControlFactor);
-                    moveDirection.z = Mathf.Lerp(moveDirection.z, airMove.z, airControlFactor);
-                    
-                    controller.Move(new Vector3(moveDirection.x, 0, moveDirection.z) * Time.deltaTime);
-                }
+                jumpQueued = true;
             }
-            
-            // Appliquer la gravité
-            velocity.y += gravity * gravityMultiplier * Time.deltaTime;
-            controller.Move(new Vector3(0, velocity.y, 0) * Time.deltaTime);
         }
 
         private void HandleGroundCheck()
@@ -195,7 +175,8 @@ namespace FPS
             }
             else
             {
-                isGrounded = controller.isGrounded;
+                // Fallback si groundCheck n'est pas configuré
+                isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f, groundMask);
             }
 
             // Gérer le coyote time
@@ -208,13 +189,14 @@ namespace FPS
                 coyoteTimeCounter -= Time.deltaTime;
             }
 
-            // Réinitialiser la vélocité verticale au sol
-            if (isGrounded && velocity.y < 0)
+            // Limiter la vélocité verticale à l'atterrissage pour éviter les rebonds
+            if (isGrounded && rb.velocity.y < 0)
             {
-                velocity.y = -2f;
+                // Appliquer une petite force vers le bas pour "coller" au sol
+                rb.velocity = new Vector3(rb.velocity.x, -2f, rb.velocity.z);
             }
         }
 
-        public CharacterController Controller => controller;
+        public Rigidbody Rigidbody => rb;
     }
 }

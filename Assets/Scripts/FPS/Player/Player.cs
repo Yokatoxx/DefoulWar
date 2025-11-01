@@ -27,6 +27,24 @@ namespace FPS
             }
         }
 
+        private void Start()
+        {
+            // Connecter l'événement de changement de vitesse à l'UI Manager
+            if (fpsMovement != null && UIManager.Instance != null)
+            {
+                fpsMovement.OnSpeedChanged.AddListener(UIManager.Instance.UpdateSpeedDisplay);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            // Se désabonner de l'événement pour éviter les fuites de mémoire
+            if (fpsMovement != null && UIManager.Instance != null)
+            {
+                fpsMovement.OnSpeedChanged.RemoveListener(UIManager.Instance.UpdateSpeedDisplay);
+            }
+        }
+
         private void Update()
         {
             // Transmettre les entrées de mouvement
