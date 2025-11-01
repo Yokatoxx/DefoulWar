@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 4701364012931773978}
   - component: {fileID: 3351474583499771530}
   - component: {fileID: 4793837826633410294}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -146,9 +146,9 @@ GameObject:
   - component: {fileID: 7795808518942882505}
   - component: {fileID: 3074746511472831467}
   - component: {fileID: 4062171721609725400}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -277,7 +277,7 @@ GameObject:
   - component: {fileID: 1424048076781185940}
   - component: {fileID: 4807056319870603770}
   - component: {fileID: 2284100924158128847}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy 1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -338,6 +338,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
+  spawnInvulnerabilityDuration: 0
+  spawnInvulnerableAllDamage: 0
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -388,7 +390,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6496714884535838940}
   - component: {fileID: 2587660660964780659}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -60,47 +60,28 @@ namespace Ennemies.Effect
         public void TriggerElectricDischarge()
         {
             if (electricDischargeRadius <= 0f || electricDamage <= 0f) return;
-            
-            // Vérifier le cooldown pour éviter les décharges trop rapides
             if (Time.time - lastDischargeTime < dischargeCooldown)
             {
                 return;
             }
-            
             lastDischargeTime = Time.time;
 
-            // Trouver tous les colliders dans le rayon
             int count = Physics.OverlapSphereNonAlloc(transform.position, electricDischargeRadius, DischargeBuffer);
-            
-            int enemiesHit = 0;
-
             for (int i = 0; i < count; i++)
             {
                 var col = DischargeBuffer[i];
                 if (col == null) continue;
-
-                // Infliger des dégâts aux ennemis
                 var enemyHealth = col.GetComponent<EnemyHealth>();
-                if (enemyHealth == null)
-                {
-                    enemyHealth = col.GetComponentInParent<EnemyHealth>();
-                }
-                
-                // Ne pas se toucher soi-même
+                if (enemyHealth == null) enemyHealth = col.GetComponentInParent<EnemyHealth>();
                 if (enemyHealth != null && enemyHealth != this.health && !enemyHealth.IsDead)
                 {
-                    enemyHealth.TakeDamage(electricDamage, "Electric");
-                    enemiesHit++;
-                    
-                    // Prefab d'arc électrique
+                    enemyHealth.TakeDamage(new DamageInfo(electricDamage, "Electric", DamageType.Electric));
                     if (electricEffectPrefab != null)
                     {
                         CreateElectricArc(enemyHealth.transform.position);
                     }
                 }
             }
-            
-            
             if (electricEffectPrefab != null)
             {
                 GameObject effect = Instantiate(electricEffectPrefab, transform.position, Quaternion.identity);

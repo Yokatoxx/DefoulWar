@@ -1,5 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using FPS; // EnemyHealth
+using PD = Proto3GD.FPS; // DamageInfo/DamageType alias
 
 namespace Proto3GD.FPS
 {
@@ -68,16 +71,19 @@ namespace Proto3GD.FPS
         [SerializeField] private FPSPlayerController playerController;
         [SerializeField] private FPSMovement fpsMovement;
         [SerializeField] private Transform cameraTransform;
+        [SerializeField] private SoundPlayer sound;
         
         private Camera playerCamera;
         private float defaultFOV;
         private float targetFOV;
         
-        public bool isDashing = false; 
+        public bool isDashing = false;
         private float dashTimer = 0f;
         private float cooldownTimer = 0f;
         
         private CharacterController characterController;
+        
+        private static System.Collections.Generic.HashSet<GameObject> enemiesKilledByDash = new System.Collections.Generic.HashSet<GameObject>();
         
         // Runtime
         private Vector3 directionalDashDir;
@@ -206,20 +212,36 @@ namespace Proto3GD.FPS
                     if (_hitThisDash.Contains(enemyRoot)) continue;
                     _hitThisDash.Add(enemyRoot);
 
-                    // Appliquer dégâts - EnemyHealth gère maintenant toute la logique
-                    enemyHealth.TakeDamage(dashDamage, "Dash");
-                    
-                    // Si l'ennemi est mort et qu'il était électrique, arrêter le dash
-                    if (enemyHealth.IsDead && enemyHealth.KilledByDash)
+                    // Si c'est un ennemi électrique -> stun le joueur (auto-fire)
+                    var electric = h.collider.GetComponentInParent<Ennemies.Effect.ElectricEnnemis>() ?? h.collider.GetComponent<Ennemies.Effect.ElectricEnnemis>();
+                    if (electric != null)
                     {
-                        var electric = h.collider.GetComponentInParent<Ennemies.Effect.ElectricEnnemis>() ?? h.collider.GetComponent<Ennemies.Effect.ElectricEnnemis>();
-                        if (electric != null)
-                        {
-                            // Arrêter le dash immédiatement à cause du stun électrique
-                            EndDash();
-                            return;
-                        }
+                        var playerStun = GetComponent<PlayerStunAutoFire>();
+                        if (playerStun == null) playerStun = gameObject.AddComponent<PlayerStunAutoFire>();
+                        if (electric.OverrideAutoFireInterval)
+                            playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
+                        else
+                            playerStun.ApplyStun(electric.StunDuration);
+                        
+                        // Arrêter le dash immédiatement à cause du stun électrique
+                        EndDash();
+                        return;
                     }
+
+                    // Marquer comme kill par dash si le coup sera létal
+                    bool willDie = enemyHealth.CurrentHealth <= dashDamage;
+                    if (willDie)
+                    {
+                        enemiesKilledByDash.Add(enemyRoot);
+                        StartCoroutine(CleanupEnemyTracking(enemyRoot));
+                        
+                        // Désactiver immédiatement les collisions pour permettre le dash à travers
+                        DisableEnemyCollisions(enemyRoot);
+                    }
+
+                    // Appliquer dégâts
+                    // enemyHealth.TakeDamage(dashDamage, "Dash");
+                    enemyHealth.TakeDamage(new PD.DamageInfo(dashDamage, "Dash", PD.DamageType.Dash));
                 }
             }
 
@@ -244,7 +266,12 @@ namespace Proto3GD.FPS
             {
                 fwd = transform.forward;
             }
-            
+
+            if(sound != null)
+            {
+                sound.PlayOneShot("Dash");
+            }
+
             directionalDashDir = fwd.normalized;
             
             currentDashCharge = 0f;
@@ -314,9 +341,50 @@ namespace Proto3GD.FPS
             
             return false; // Continuer le dash
         }
-
         
 
+        // Désactive toutes les collisions d'un ennemi pour permettre au dash de passer à travers.
+        private void DisableEnemyCollisions(GameObject enemy)
+        {
+
+            Collider[] colliders = enemy.GetComponentsInChildren<Collider>();
+            foreach (Collider col in colliders)
+            {
+                col.enabled = false;
+            }
+            
+            // Désactiver également le rigidbody pour éviter les interactions physiques
+            Rigidbody rb = enemy.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.detectCollisions = false;
+            }
+            
+            Rigidbody[] childRbs = enemy.GetComponentsInChildren<Rigidbody>();
+            foreach (Rigidbody childRb in childRbs)
+            {
+                childRb.isKinematic = true;
+                childRb.detectCollisions = false;
+            }
+        }
+        
+        private System.Collections.IEnumerator CleanupEnemyTracking(GameObject enemy)
+        {
+            yield return new WaitForSeconds(2f);
+            if (enemy == null)
+            {
+                // L'ennemi a bien été détruit, on peut le retirer du tracking
+                enemiesKilledByDash.Remove(enemy);
+            }
+        }
+        
+        // Vérifie si un ennemi a été tué par le dash
+        public static bool WasKilledByDash(GameObject enemy)
+        {
+            return enemiesKilledByDash.Contains(enemy);
+        }
+        
         private void EndDash()
         {
             // Appliquer le momentum de sortie si activé

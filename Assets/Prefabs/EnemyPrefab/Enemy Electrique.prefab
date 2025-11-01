@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2689582501457834611}
   - component: {fileID: -3158992528684757622}
   - component: {fileID: -8977643811127216630}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy Electrique
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -76,6 +76,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
+  spawnInvulnerabilityDuration: 0
+  spawnInvulnerableAllDamage: 0
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -155,9 +157,9 @@ GameObject:
   - component: {fileID: 5333951548045206057}
   - component: {fileID: 2797102046993378888}
   - component: {fileID: 1006435175190009992}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -283,7 +285,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9125597042352771045}
   - component: {fileID: 6369820505073125918}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -336,9 +338,9 @@ GameObject:
   - component: {fileID: 4590870555706604448}
   - component: {fileID: 1597362537128985916}
   - component: {fileID: 2651874369235720882}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -464,6 +466,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2657800489959688396}
     m_Modifications:
+    - target: {fileID: 279363931926887754, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 433632373410999867, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1358145638506537878, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 1526104509720408023, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
       propertyPath: looping
       value: 1
@@ -540,6 +554,10 @@ PrefabInstance:
       propertyPath: EmissionModule.rateOverTime.scalar
       value: 1.73
       objectReference: {fileID: 0}
+    - target: {fileID: 2701028301115328130, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 3796568457877498773, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -584,6 +602,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: vfx_Lightning_02
       objectReference: {fileID: 0}
+    - target: {fileID: 3958596659431381315, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 4427133471936012105, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.62023
@@ -599,6 +621,10 @@ PrefabInstance:
     - target: {fileID: 8610121173949400231, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
       propertyPath: m_Materials.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9167944503377273120, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1,36 +1,37 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Proto3GD.FPS
 {
-
     // Gère la santé de l'ennemi avec zones de dégâts et tracking des hits.
-
     public class EnemyHealth : MonoBehaviour
     {
         [Header("Health Settings")]
         [SerializeField] private float maxHealth = 100f;
         [SerializeField] private float currentHealth;
         
+        [Header("Spawn Invulnerability")]
+        [Tooltip("Durée d'invulnérabilité après l'apparition (secondes)")]
+        [SerializeField] private float spawnInvulnerabilityDuration = 0f;
+        [Tooltip("Si vrai, invulnérable à tous les types de dégâts pendant l'invulnérabilité; sinon seulement aux balles")]
+        [SerializeField] private bool spawnInvulnerableAllDamage = false;
+        private float spawnInvulnerableUntil;
+        
         [Header("Hit Tracking")]
-        private Dictionary<string, int> zoneHitCount = new Dictionary<string, int>();
+        [SerializeField] private Dictionary<string, int> zoneHitCount = new Dictionary<string, int>();
         
         [Header("Events")]
         public UnityEvent OnDeath;
         public UnityEvent<float, string> OnDamageTaken;
         
-        [Header("Dash Tracking")]
-        [SerializeField] private bool killedByDash;
-        
         private bool isDead;
         private WaveManager waveManager;
-        private PillarDashSystem dashSystem;
         
         private void Awake()
         {
             currentHealth = maxHealth;
+            spawnInvulnerableUntil = Time.time + Mathf.Max(0f, spawnInvulnerabilityDuration);
             waveManager = FindFirstObjectByType<WaveManager>();
         }
         
@@ -42,67 +43,49 @@ namespace Proto3GD.FPS
             }
         }
         
-        private void EnsureDashSystem()
+        private bool IsSpawnInvulnerableFor(DamageType type)
         {
-            if (dashSystem == null)
+            if (Time.time < spawnInvulnerableUntil)
             {
-                dashSystem = FindFirstObjectByType<PillarDashSystem>();
+                if (spawnInvulnerableAllDamage) return true;
+                return type == DamageType.Bullet;
             }
+            return false;
         }
         
-        // Inflige des dégâts à l'ennemi et enregistre la zone touchée.
-        public void TakeDamage(float damage, string zoneName)
+        // Nouveau pipeline: tente d'appliquer un dégât détaillé. Retourne true si appliqué.
+        public bool TryApplyDamage(DamageInfo info)
         {
-            if (isDead) return;
-            
-            // Détecter si les dégâts viennent d'un dash
-            bool isDashDamage = zoneName == "Dash";
-            
-            // Vérifier si c'est un ennemi électrique
-            var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
-            
-            // Si c'est un ennemi électrique ET que c'est un dash, résister et stun le joueur
-            if (isDashDamage && electricEnemy != null)
+            if (isDead) return false;
+            // Intercepteurs (ex: MagicEnemy) — peuvent bloquer et déclencher des effets (renvoi)
+            bool allow = true;
+            var interceptors = GetComponents<IDamageInterceptor>();
+            if (interceptors != null && interceptors.Length > 0)
             {
-                // NE PAS appliquer de dégâts aux ennemis électriques lors du dash
-                // Mais appliquer le stun au joueur
-                EnsureDashSystem();
-                if (dashSystem != null)
+                for (int i = 0; i < interceptors.Length; i++)
                 {
-                    var player = dashSystem.gameObject;
-                    var playerStun = player.GetComponent<PlayerStunAutoFire>();
-                    if (playerStun == null)
-                    {
-                        playerStun = player.AddComponent<PlayerStunAutoFire>();
-                    }
-                    
-                    if (electricEnemy.OverrideAutoFireInterval)
-                    {
-                        playerStun.ApplyStun(electricEnemy.StunDuration, electricEnemy.StunAutoFireInterval);
-                    }
-                    else
-                    {
-                        playerStun.ApplyStun(electricEnemy.StunDuration);
-                    }
-                    
-                    Debug.Log($"[EnemyHealth] Ennemi électrique touché par dash - Résiste et stun le joueur !");
+                    try { allow = interceptors[i].OnBeforeDamage(ref info) && allow; } catch {}
                 }
-                
-                // Ne pas continuer le traitement des dégâts
-                return;
+            }
+            if (!allow) return false;
+            
+            // Invulnérabilité de spawn propre (bloque sans "retirer puis remettre")
+            if (IsSpawnInvulnerableFor(info.type))
+            {
+                return false;
             }
             
-            // Appliquer les dégâts normalement pour les autres cas
+            // Appliquer
+            float damage = Mathf.Max(0f, info.amount);
+            string zoneName = string.IsNullOrWhiteSpace(info.zoneName) ? "Body" : info.zoneName;
             currentHealth -= damage;
             
-            // Enregistrer le hit dans la zone
-            if (!zoneHitCount.ContainsKey(zoneName))
-            {
-                zoneHitCount[zoneName] = 0;
-            }
-            zoneHitCount[zoneName]++;
+            // Enregistrer le hit
+            string key = NormalizeZoneKey(zoneName);
+            if (!zoneHitCount.ContainsKey(key)) zoneHitCount[key] = 0;
+            zoneHitCount[key]++;
             
-            // Déclencher l'événement de dégâts pris
+            // Événement de dégâts pris (après application)
             OnDamageTaken?.Invoke(damage, zoneName);
             
             EnsureWaveManager();
@@ -111,18 +94,10 @@ namespace Proto3GD.FPS
                 waveManager.RecordHit(zoneName);
             }
             
-            // Si c'est un dash et l'ennemi va mourir (non électrique)
-            if (isDashDamage && currentHealth <= 0)
-            {
-                killedByDash = true;
-                
-                // Désactiver les collisions immédiatement pour permettre le dash à travers
-                DisableCollisions();
-            }
-            
             // Déclencher l'effet électrique si c'est un ennemi électrique mais seulement si les dégâts ne viennent pas déjà d'une décharge électrique
-            if (zoneName != "Electric" && zoneName != "Dash")
+            if (info.type != DamageType.Electric)
             {
+                var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
                 if (electricEnemy != null)
                 {
                     electricEnemy.TriggerElectricDischarge();
@@ -133,6 +108,27 @@ namespace Proto3GD.FPS
             {
                 Die();
             }
+            return true;
+        }
+        
+        // Compat: Inflige des dégâts à l'ennemi et enregistre la zone touchée.
+        public void TakeDamage(float damage, string zoneName)
+        {
+            // Considéré comme dégât de balle par défaut
+            var info = new DamageInfo(damage, zoneName, DamageType.Bullet);
+            TryApplyDamage(info);
+        }
+        
+        // Overload simple (zone par défaut)
+        public void TakeDamage(float damage)
+        {
+            TakeDamage(damage, "Body");
+        }
+        
+        // Nouveau: API directe avec DamageInfo
+        public void TakeDamage(in DamageInfo info)
+        {
+            TryApplyDamage(info);
         }
         
         private void Die()
@@ -149,23 +145,10 @@ namespace Proto3GD.FPS
                 waveManager.OnEnemyDeath(this);
             }
             
-            // Si c'est un DashEnergyEnemy, recharger le dash du joueur
-            var dashEnergyEnemy = GetComponent<DashEnergyEnemy>();
-            if (dashEnergyEnemy != null)
-            {
-                EnsureDashSystem();
-                if (dashSystem != null)
-                {
-                    float energyAmount = dashEnergyEnemy.DashEnergyAmount;
-                    dashSystem.OnDashEnemyKilled(energyAmount);
-                    Debug.Log($"[EnemyHealth] DashEnergyEnemy tué, recharge du dash: {energyAmount}");
-                }
-            }
-            
             Destroy(gameObject);
         }
         
-
+        
         // Applique des armures
 
         public void ApplyArmorToZones(List<string> zoneNames)
@@ -208,11 +191,6 @@ namespace Proto3GD.FPS
         public bool IsDead => isDead;
         public Dictionary<string, int> ZoneHitCount => zoneHitCount;
         
-        public void TakeDamage(float damage)
-        {
-            TakeDamage(damage, "Body");
-        }
-        
 
         // Tue immédiatement cet ennemi sans enregistrer de hit
 
@@ -222,32 +200,5 @@ namespace Proto3GD.FPS
             currentHealth = 0f;
             Die();
         }
-        
-        // Désactive toutes les collisions de cet ennemi pour permettre le dash de passer à travers
-        private void DisableCollisions()
-        {
-            Collider[] colliders = GetComponentsInChildren<Collider>();
-            foreach (Collider col in colliders)
-            {
-                col.enabled = false;
-            }
-            
-            // Désactiver également le rigidbody pour éviter les interactions physiques
-            Rigidbody rb = GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.isKinematic = true;
-                rb.detectCollisions = false;
-            }
-            
-            Rigidbody[] childRbs = GetComponentsInChildren<Rigidbody>();
-            foreach (Rigidbody childRb in childRbs)
-            {
-                childRb.isKinematic = true;
-                childRb.detectCollisions = false;
-            }
-        }
-        
-        public bool KilledByDash => killedByDash;
     }
 }
