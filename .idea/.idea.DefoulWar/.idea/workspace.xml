@@ -5,74 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/DebugScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/DebugScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/ElectricEnnemis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/ElectricEnnemis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/MagicEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/MagicEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/TacheEnnemies.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/TacheEnnemies.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Bullet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Bullet.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/CameraShake.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/CameraShake.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/DamageInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/DamageInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/DashCooldownUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/DashCooldownUI.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/DashEnergyEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/DashEnergyEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Editor.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Editor/DashUICreator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Editor/DashUICreator.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Editor/FPSSetupEditor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Editor/FPSSetupEditor.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Editor/PillarSetupEditor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Editor/PillarSetupEditor.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Effect/CameraDashEffect.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Effect/CameraDashEffect.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyArmorSync.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyArmorSync.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealth.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealth.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealthBar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealthBar.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyVisualFeedback.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyVisualFeedback.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/FPSDebugDisplay.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/FPSDebugDisplay.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/FPSDebugTools.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/FPSDebugTools.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/GameManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/GameUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/GameUI.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/HitZone.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/HitZone.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/IDamageInterceptor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/IDamageInterceptor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarDashSystem.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarSpawner.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PillarSpawner.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSInputHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSInputHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMouseLook.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMouseLook.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FollowCamera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FollowCamera.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerAdvancedMovement.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerAdvancedMovement/PlayerMovementAdvanced.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerAdvancedMovement/PlayerMovementAdvanced.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerAdvancedMovement/Sliding.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerAdvancedMovement/Sliding.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunAutoFire.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunAutoFire.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunDebugTrigger.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunDebugTrigger.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunVisuals.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunVisuals.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/SlideMovement.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/SlideMovement.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/PlayerHealth.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/PlayerHealth.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/ProjectileWeaponController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/WaveManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/WaveManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/WeaponSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/WeaponSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/WeaponController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/WeaponController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/WeaponEvolutionManager.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/WeaponEvolutionManager.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/WeaponModelGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/WeaponModelGenerator.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/ZoneDamageMultiplier.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/ZoneDamageMultiplier.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,7 +60,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "RefactorCode",
+    "git-widget-placeholder": "refactor-fps-scripts-simplification",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
