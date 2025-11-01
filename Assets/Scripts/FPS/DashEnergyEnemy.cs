@@ -3,9 +3,6 @@ using UnityEngine.AI;
 
 namespace FPS
 {
-    /// <summary>
-    /// Ennemi spécial qui fuit le joueur et recharge l'énergie de dash quand il est tué.
-    /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(EnemyHealth))]
     public class DashEnergyEnemy : MonoBehaviour
