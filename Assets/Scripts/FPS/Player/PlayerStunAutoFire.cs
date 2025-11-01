@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using FPS.Weapon;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     // Étourdit le joueur et déclenche des tirs automatiques
     [DisallowMultipleComponent]

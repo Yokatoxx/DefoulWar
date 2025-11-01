@@ -1,6 +1,5 @@
 using UnityEngine;
-using Proto3GD.FPS;
-using FPS; // Bullet
+using FPS;
 
 namespace Ennemies.Effect
 {
@@ -80,8 +79,8 @@ namespace Ennemies.Effect
         private void OnDeath()
         {
             // Vérifier si l'ennemi a été tué par un dash
-            var dashSystem = FindFirstObjectByType<PillarDashSystem>();
-            if (dashSystem != null && PillarDashSystem.WasKilledByDash(transform.root.gameObject))
+            var dashSystem = FindFirstObjectByType<DashSystem>();
+            if (dashSystem != null && DashSystem.WasKilledByDash(transform.root.gameObject))
             {
                 // Soigner le joueur
                 HealPlayer();

@@ -1,5 +1,5 @@
 using UnityEngine;
-using Proto3GD.FPS;
+using FPS;
 
 namespace Ennemies.Effect
 {

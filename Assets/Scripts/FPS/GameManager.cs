@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gestionnaire principal du jeu (pause, game over, restart).

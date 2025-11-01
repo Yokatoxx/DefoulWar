@@ -2,14 +2,12 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using FPS; // EnemyHealth
-using PD = Proto3GD.FPS; // DamageInfo/DamageType alias
-
-namespace Proto3GD.FPS
+namespace FPS
 {
 
     // Système de dash directionnel
     // Permet au joueur de dasher dans la direction de la caméra et de tuer les ennemis sur son passage
-    public class PillarDashSystem : MonoBehaviour
+    public class DashSystem : MonoBehaviour
     {
         [Header("Dash Settings")]
         [Tooltip("Vitesse du dash")]
@@ -241,7 +239,7 @@ namespace Proto3GD.FPS
 
                     // Appliquer dégâts
                     // enemyHealth.TakeDamage(dashDamage, "Dash");
-                    enemyHealth.TakeDamage(new PD.DamageInfo(dashDamage, "Dash", PD.DamageType.Dash));
+                    enemyHealth.TakeDamage(new DamageInfo(dashDamage, "Dash", DamageType.Dash));
                 }
             }
 
@@ -334,7 +332,7 @@ namespace Proto3GD.FPS
                 // Si l'angle est trop abrupt (surface trop perpendiculaire à la direction du dash)
                 if (angle > maxCollisionAngle)
                 {
-                    Debug.Log($"[PillarDashSystem] Dash arrêté par collision ! Angle: {angle:F1}° (max: {maxCollisionAngle}°)");
+                    Debug.Log($"[DashSystem] Dash arrêté par collision ! Angle: {angle:F1}° (max: {maxCollisionAngle}°)");
                     return true; // Arrêter le dash
                 }
             }
@@ -394,7 +392,7 @@ namespace Proto3GD.FPS
                 Vector3 dashMomentum = directionalDashDir * dashSpeed * momentumRetention;
                 fpsMovement.ApplyExternalMomentum(dashMomentum);
                 
-                Debug.Log($"[PillarDashSystem] Momentum conservé: {dashMomentum.magnitude:F1} m/s dans la direction {directionalDashDir}");
+                Debug.Log($"[DashSystem] Momentum conservé: {dashMomentum.magnitude:F1} m/s dans la direction {directionalDashDir}");
             }
             
             isDashing = false;
@@ -432,7 +430,7 @@ namespace Proto3GD.FPS
             // Ajouter l'énergie (multipliée par le montant configuré sur l'ennemi)
             currentDashCharge = Mathf.Clamp01(currentDashCharge + (energyPerEnemy * energyAmount));
             
-            Debug.Log($"[PillarDashSystem] Dash rechargé! {oldCharge:P0} → {currentDashCharge:P0} (+{energyPerEnemy * energyAmount:P0})");
+            Debug.Log($"[DashSystem] Dash rechargé! {oldCharge:P0} → {currentDashCharge:P0} (+{energyPerEnemy * energyAmount:P0})");
         }
     }
 }

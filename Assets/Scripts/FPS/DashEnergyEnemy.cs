@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Ennemi spécial qui fuit le joueur et recharge l'énergie de dash quand il est tué.
@@ -248,4 +248,3 @@ namespace Proto3GD.FPS
         }
     }
 }
-

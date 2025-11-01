@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gère les effets visuels de l'ennemi (hit feedback, mort, etc.).
@@ -141,4 +141,3 @@ namespace Proto3GD.FPS
         }
     }
 }
-

@@ -1,5 +1,5 @@
 // filepath: e:\Documents\Projet Unity\DefoulWar\Assets\Scripts\FPS\IDamageInterceptor.cs
-namespace Proto3GD.FPS
+namespace FPS
 {
     // Permet à un composant sur l'ennemi de modifier/bloquer le DamageInfo avant application
     public interface IDamageInterceptor

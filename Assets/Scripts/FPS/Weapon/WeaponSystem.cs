@@ -1,5 +1,5 @@
 using Ennemies.Effect;
-using Proto3GD.FPS; // EnemyHealth, DamageInfo, DamageType
+using FPS; // EnemyHealth, DamageInfo, DamageType
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;

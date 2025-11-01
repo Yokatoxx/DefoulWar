@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     // Gère la santé de l'ennemi avec zones de dégâts et tracking des hits.
     public class EnemyHealth : MonoBehaviour
@@ -88,12 +88,6 @@ namespace Proto3GD.FPS
             // Événement de dégâts pris (après application)
             OnDamageTaken?.Invoke(damage, zoneName);
             
-            EnsureWaveManager();
-            if (waveManager != null)
-            {
-                waveManager.RecordHit(zoneName);
-            }
-            
             // Déclencher l'effet électrique si c'est un ennemi électrique mais seulement si les dégâts ne viennent pas déjà d'une décharge électrique
             if (info.type != DamageType.Electric)
             {
@@ -149,38 +143,7 @@ namespace Proto3GD.FPS
         }
         
         
-        // Applique des armures
 
-        public void ApplyArmorToZones(List<string> zoneNames)
-        {
-            var levels = new Dictionary<string, int>();
-            foreach (var z in zoneNames)
-            {
-                levels[z] = 1;
-            }
-            ApplyArmorLevels(levels);
-        }
-        
-
-        // Applique des niveaux d'armure par zone
-
-        public void ApplyArmorLevels(Dictionary<string, int> zoneLevels)
-        {
-            HitZone[] hitZones = GetComponentsInChildren<HitZone>();
-            foreach (HitZone zone in hitZones)
-            {
-                string key = NormalizeZoneKey(zone.ZoneName);
-                if (zoneLevels != null && zoneLevels.TryGetValue(key, out int level))
-                {
-                    zone.SetArmorLevel(level);
-                }
-                else
-                {
-                    zone.RemoveArmor();
-                }
-            }
-        }
-        
         private static string NormalizeZoneKey(string zone)
         {
             return string.IsNullOrWhiteSpace(zone) ? string.Empty : zone.Trim().ToLowerInvariant();

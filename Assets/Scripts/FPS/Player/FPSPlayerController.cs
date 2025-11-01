@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// Contrôleur principal du joueur FPS 
     [RequireComponent(typeof(FPSInputHandler))]

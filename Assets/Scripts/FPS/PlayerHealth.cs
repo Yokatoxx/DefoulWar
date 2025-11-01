@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     public class PlayerHealth : MonoBehaviour
     {
@@ -86,4 +86,3 @@ namespace Proto3GD.FPS
         public bool IsDead => isDead;
     }
 }
-

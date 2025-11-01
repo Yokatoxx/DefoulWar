@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gère les inputs du joueur (clavier, souris, gamepad)

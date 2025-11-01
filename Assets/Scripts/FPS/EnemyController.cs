@@ -1,4 +1,4 @@
-using Proto3GD.FPS;
+using FPS;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -138,4 +138,3 @@ namespace FPS
         public EnemyState CurrentState => currentState;
     }
 }
-

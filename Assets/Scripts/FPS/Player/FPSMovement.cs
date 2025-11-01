@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using TMPro;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// Gère le mouvement du joueur
     [RequireComponent(typeof(CharacterController))]

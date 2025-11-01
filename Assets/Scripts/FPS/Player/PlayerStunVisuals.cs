@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Affiche un effet d'éclairs en overlay sur la caméra quand le joueur est stun.

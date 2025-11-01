@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gère la rotation de la caméra et le lean (inclinaison)
@@ -69,4 +69,3 @@ namespace Proto3GD.FPS
         public Transform CameraTransform => cameraTransform;
     }
 }
-

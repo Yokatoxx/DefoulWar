@@ -1,7 +1,7 @@
 // filepath: e:\Documents\Projet Unity\DefoulWar\Assets\Scripts\FPS\DamageInfo.cs
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     public enum DamageType
     {
