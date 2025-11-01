@@ -199,8 +199,17 @@ namespace FPS
             // Programmer la suivante si possible
             if ((loopWaves && waves.Count > 0) || currentWaveIndex + 1 < (waves?.Count ?? 0))
             {
-                Invoke(nameof(StartNextWave), Mathf.Max(0f, timeBetweenWaves));
+                StartCoroutine(StartNextWaveAfterDelay());
             }
+        }
+
+        private IEnumerator StartNextWaveAfterDelay()
+        {
+            if (timeBetweenWaves > 0)
+            {
+                yield return new WaitForSeconds(timeBetweenWaves);
+            }
+            StartNextWave();
         }
 
         public void ForceNextWaveNow()

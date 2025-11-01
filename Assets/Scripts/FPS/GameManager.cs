@@ -12,10 +12,6 @@ namespace FPS
         [SerializeField] private bool isPaused = false;
         [SerializeField] private bool isGameOver = false;
         
-        [Header("UI Panels")]
-        [SerializeField] private GameObject pauseMenu;
-        [SerializeField] private GameObject gameOverMenu;
-        
         private PlayerHealth playerHealth;
         
         private void Awake()
@@ -26,10 +22,6 @@ namespace FPS
             {
                 playerHealth.OnDeath.AddListener(OnPlayerDeath);
             }
-            
-            // Cacher les menus
-            if (pauseMenu != null) pauseMenu.SetActive(false);
-            if (gameOverMenu != null) gameOverMenu.SetActive(false);
         }
         
         private void Update()
@@ -48,39 +40,20 @@ namespace FPS
         {
             isPaused = true;
             Time.timeScale = 0f;
-            
-            if (pauseMenu != null)
-                pauseMenu.SetActive(true);
-            
-            // Déverrouiller le curseur
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            UIManager.Instance?.SetPauseMenu(true);
         }
         
         public void ResumeGame()
         {
             isPaused = false;
             Time.timeScale = 1f;
-            
-            if (pauseMenu != null)
-                pauseMenu.SetActive(false);
-            
-            // Verrouiller le curseur
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            UIManager.Instance?.SetPauseMenu(false);
         }
         
         private void OnPlayerDeath()
         {
             isGameOver = true;
-            
-            if (gameOverMenu != null)
-                gameOverMenu.SetActive(true);
-            
-            // Déverrouiller le curseur
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-            
+            UIManager.Instance?.ShowGameOverMenu();
             Debug.Log("Game Over!");
         }
         
