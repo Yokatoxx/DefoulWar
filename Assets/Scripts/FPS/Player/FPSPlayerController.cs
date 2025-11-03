@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// Contrôleur principal du joueur FPS 
     [RequireComponent(typeof(FPSInputHandler))]
@@ -65,11 +65,10 @@ namespace Proto3GD.FPS
             if (cameraEffects != null)
             {
                 cameraEffects.UpdateEffects(
-                    movement.IsGrounded,
-                    movement.IsMoving,
                     movement.CurrentSpeed,
-                    moveInput,
-                    sprint
+                    movement.IsGrounded,
+                    sprint,
+                    movement.IsMoving
                 );
             }
         }

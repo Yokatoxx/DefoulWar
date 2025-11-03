@@ -2,16 +2,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
-
     // Gère la santé de l'ennemi avec zones de dégâts et tracking des hits.
-
     public class EnemyHealth : MonoBehaviour
     {
         [Header("Health Settings")]
         [SerializeField] private float maxHealth = 100f;
         [SerializeField] private float currentHealth;
+        
+        [Header("Spawn Invulnerability")]
+        [Tooltip("Durée d'invulnérabilité après l'apparition (secondes)")]
+        [SerializeField] private float spawnInvulnerabilityDuration = 0f;
+        [Tooltip("Si vrai, invulnérable à tous les types de dégâts pendant l'invulnérabilité; sinon seulement aux balles")]
+        [SerializeField] private bool spawnInvulnerableAllDamage = false;
+        private float spawnInvulnerableUntil;
         
         [Header("Hit Tracking")]
         [SerializeField] private Dictionary<string, int> zoneHitCount = new Dictionary<string, int>();
@@ -26,6 +31,7 @@ namespace Proto3GD.FPS
         private void Awake()
         {
             currentHealth = maxHealth;
+            spawnInvulnerableUntil = Time.time + Mathf.Max(0f, spawnInvulnerabilityDuration);
             waveManager = FindFirstObjectByType<WaveManager>();
         }
         
@@ -37,32 +43,53 @@ namespace Proto3GD.FPS
             }
         }
         
-        // Inflige des dégâts à l'ennemi et enregistre la zone touchée.
-        public void TakeDamage(float damage, string zoneName)
+        private bool IsSpawnInvulnerableFor(DamageType type)
         {
-            if (isDead) return;
+            if (Time.time < spawnInvulnerableUntil)
+            {
+                if (spawnInvulnerableAllDamage) return true;
+                return type == DamageType.Bullet;
+            }
+            return false;
+        }
+        
+        // Nouveau pipeline: tente d'appliquer un dégât détaillé. Retourne true si appliqué.
+        public bool TryApplyDamage(DamageInfo info)
+        {
+            if (isDead) return false;
+            // Intercepteurs (ex: MagicEnemy) — peuvent bloquer et déclencher des effets (renvoi)
+            bool allow = true;
+            var interceptors = GetComponents<IDamageInterceptor>();
+            if (interceptors != null && interceptors.Length > 0)
+            {
+                for (int i = 0; i < interceptors.Length; i++)
+                {
+                    try { allow = interceptors[i].OnBeforeDamage(ref info) && allow; } catch {}
+                }
+            }
+            if (!allow) return false;
             
+            // Invulnérabilité de spawn propre (bloque sans "retirer puis remettre")
+            if (IsSpawnInvulnerableFor(info.type))
+            {
+                return false;
+            }
+            
+            // Appliquer
+            float damage = Mathf.Max(0f, info.amount);
+            string zoneName = string.IsNullOrWhiteSpace(info.zoneName) ? "Body" : info.zoneName;
             currentHealth -= damage;
             
-            // Enregistrer le hit dans la zone
-            if (!zoneHitCount.ContainsKey(zoneName))
-            {
-                zoneHitCount[zoneName] = 0;
-            }
-            zoneHitCount[zoneName]++;
+            // Enregistrer le hit
+            string key = NormalizeZoneKey(zoneName);
+            if (!zoneHitCount.ContainsKey(key)) zoneHitCount[key] = 0;
+            zoneHitCount[key]++;
             
-            // Déclencher l'événement de dégâts pris
+            // Événement de dégâts pris (après application)
             OnDamageTaken?.Invoke(damage, zoneName);
             
-            EnsureWaveManager();
-            if (waveManager != null)
-            {
-                waveManager.RecordHit(zoneName);
-            }
-            
             // Déclencher l'effet électrique si c'est un ennemi électrique mais seulement si les dégâts ne viennent pas déjà d'une décharge électrique
-            
-            if (zoneName != "Electric")
+            if (info.type != DamageType.Electric)
             {
                 var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
                 if (electricEnemy != null)
@@ -75,6 +102,27 @@ namespace Proto3GD.FPS
             {
                 Die();
             }
+            return true;
+        }
+        
+        // Compat: Inflige des dégâts à l'ennemi et enregistre la zone touchée.
+        public void TakeDamage(float damage, string zoneName)
+        {
+            // Considéré comme dégât de balle par défaut
+            var info = new DamageInfo(damage, zoneName, DamageType.Bullet);
+            TryApplyDamage(info);
+        }
+        
+        // Overload simple (zone par défaut)
+        public void TakeDamage(float damage)
+        {
+            TakeDamage(damage, "Body");
+        }
+        
+        // Nouveau: API directe avec DamageInfo
+        public void TakeDamage(in DamageInfo info)
+        {
+            TryApplyDamage(info);
         }
         
         private void Die()
@@ -94,39 +142,8 @@ namespace Proto3GD.FPS
             Destroy(gameObject);
         }
         
-
-        // Applique des armures
-
-        public void ApplyArmorToZones(List<string> zoneNames)
-        {
-            var levels = new Dictionary<string, int>();
-            foreach (var z in zoneNames)
-            {
-                levels[z] = 1;
-            }
-            ApplyArmorLevels(levels);
-        }
         
 
-        // Applique des niveaux d'armure par zone
-
-        public void ApplyArmorLevels(Dictionary<string, int> zoneLevels)
-        {
-            HitZone[] hitZones = GetComponentsInChildren<HitZone>();
-            foreach (HitZone zone in hitZones)
-            {
-                string key = NormalizeZoneKey(zone.ZoneName);
-                if (zoneLevels != null && zoneLevels.TryGetValue(key, out int level))
-                {
-                    zone.SetArmorLevel(level);
-                }
-                else
-                {
-                    zone.RemoveArmor();
-                }
-            }
-        }
-        
         private static string NormalizeZoneKey(string zone)
         {
             return string.IsNullOrWhiteSpace(zone) ? string.Empty : zone.Trim().ToLowerInvariant();
@@ -136,11 +153,6 @@ namespace Proto3GD.FPS
         public float MaxHealth => maxHealth;
         public bool IsDead => isDead;
         public Dictionary<string, int> ZoneHitCount => zoneHitCount;
-        
-        public void TakeDamage(float damage)
-        {
-            TakeDamage(damage, "Body");
-        }
         
 
         // Tue immédiatement cet ennemi sans enregistrer de hit

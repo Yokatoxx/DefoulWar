@@ -1,4 +1,4 @@
-using Proto3GD.FPS;
+using FPS;
 using UnityEngine;
 
 
@@ -6,7 +6,7 @@ public class FollowCamera : MonoBehaviour
 {
     public Transform target;
 
-    public PillarDashSystem dashPlayer;
+    public DashSystem dashPlayer;
 
     public bool followPosition = true;
     public bool followRotation = true;

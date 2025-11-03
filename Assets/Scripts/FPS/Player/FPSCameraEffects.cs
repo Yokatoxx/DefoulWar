@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gère les effets visuels de la caméra (headbob, FOV dynamique)
@@ -15,19 +15,19 @@ namespace Proto3GD.FPS
         [SerializeField] private float bobSmoothing = 8f;
 
         [Header("FOV Settings")]
-        [SerializeField] private float minFOV = 60f;
-        [SerializeField] private float maxFOV = 90f;
-        [SerializeField] private float minSpeedForFOV = 5f;
-        [SerializeField] private float maxSpeedForFOV = 20f;
-        [SerializeField] private float jumpFOV = 45f;
+        [SerializeField] private float defaultFOV = 60f;
+        [SerializeField] private float sprintFOV = 70f;
+        [SerializeField] private float jumpFOV = 65f;
         [SerializeField] private float fovTransitionSpeed = 8f;
+
+        [Header("References")]
         [SerializeField, Tooltip("Caméra de l'arme à synchroniser avec le FOV principal")]
         private Camera weaponCamera;
 
         private Camera cam;
-        private float targetFOV;
-        private float bobTimer;
         private Vector3 camDefaultLocalPos;
+        private float bobTimer;
+        private float targetFOV;
         private bool isJumping;
 
         private void Awake()
@@ -38,7 +38,7 @@ namespace Proto3GD.FPS
                 cam = gameObject.AddComponent<Camera>();
             }
             
-            camDefaultLocalPos = cam.transform.localPosition;
+            camDefaultLocalPos = transform.localPosition;
         }
         
         private void Start()
@@ -46,23 +46,18 @@ namespace Proto3GD.FPS
             // Initialiser le FOV après que la caméra soit créée
             if (cam != null)
             {
-                targetFOV = minFOV;
-                cam.fieldOfView = minFOV;
+                targetFOV = defaultFOV;
+                cam.fieldOfView = defaultFOV;
             }
             
             // Initialiser le FOV de la caméra d'arme
             if (weaponCamera != null)
             {
-                weaponCamera.fieldOfView = minFOV;
+                weaponCamera.fieldOfView = defaultFOV;
             }
         }
 
-        private void Update()
-        {
-            UpdateFOV();
-        }
-
-        public void UpdateEffects(bool isGrounded, bool isMoving, float currentSpeed, Vector2 moveInput, bool isSprinting)
+        public void UpdateEffects(float currentSpeed, bool isGrounded, bool isSprinting, bool isMoving)
         {
             // Gérer le FOV selon l'état
             if (!isGrounded && !isJumping)
@@ -77,20 +72,33 @@ namespace Proto3GD.FPS
                     isJumping = false;
                 }
                 
-                // FOV basé sur la vitesse
-                float speedRatio = Mathf.InverseLerp(minSpeedForFOV, maxSpeedForFOV, currentSpeed);
-                targetFOV = Mathf.Lerp(minFOV, maxFOV, speedRatio);
+                // FOV de sprint ou normal
+                if (isSprinting && isMoving)
+                {
+                    targetFOV = sprintFOV;
+                }
+                else
+                {
+                    targetFOV = defaultFOV;
+                }
             }
 
-            // Headbob
-            if (isMoving && isGrounded)
+            // Appliquer le headbob
+            UpdateHeadbob(currentSpeed, isGrounded, isMoving);
+            
+            // Appliquer le FOV
+            UpdateFOV();
+        }
+
+        private void UpdateHeadbob(float currentSpeed, bool isGrounded, bool isMoving)
+        {
+            if (isGrounded && isMoving && currentSpeed > 0.1f)
             {
                 bobTimer += Time.deltaTime * bobFrequency * currentSpeed;
                 float bobX = Mathf.Sin(bobTimer) * bobHorizontalAmplitude;
                 float bobY = Mathf.Cos(bobTimer * 2f) * bobVerticalAmplitude;
                 Vector3 targetPos = camDefaultLocalPos + new Vector3(bobX, bobY, 0f);
-                transform.localPosition = Vector3.Lerp(cam.transform.localPosition, targetPos, Time.deltaTime * bobSmoothing);
-
+                transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, Time.deltaTime * bobSmoothing);
             }
             else
             {
@@ -114,5 +122,11 @@ namespace Proto3GD.FPS
         }
 
         public Camera Camera => cam;
+        public float CurrentFOV => cam != null ? cam.fieldOfView : defaultFOV;
+        public float TargetFOV
+        {
+            get => targetFOV;
+            set => targetFOV = value;
+        }
     }
 }

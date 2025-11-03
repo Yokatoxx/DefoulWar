@@ -1,8 +1,8 @@
-// filepath: e:\Documents\Projet Unity\Proto3GD\Assets\Scripts\FPS\EnemyHealthBar.cs
+// filepath: e:\Documents\Projet Unity\DefoulWar\Assets\Scripts\FPS\EnemyHealthBar.cs
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Barre de vie world-space au-dessus d'un ennemi.
@@ -67,11 +67,11 @@ namespace Proto3GD.FPS
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.sortingOrder = 50;
             
-            CanvasScaler scaler = gameObject.GetComponent<CanvasScaler>();
+            var scaler = gameObject.GetComponent<CanvasScaler>();
             if (scaler == null) scaler = gameObject.AddComponent<CanvasScaler>();
             scaler.dynamicPixelsPerUnit = 10f;
             
-            GraphicRaycaster raycaster = gameObject.GetComponent<GraphicRaycaster>();
+            var raycaster = gameObject.GetComponent<GraphicRaycaster>();
             if (raycaster == null) raycaster = gameObject.AddComponent<GraphicRaycaster>();
             
             // Container (BG centré)

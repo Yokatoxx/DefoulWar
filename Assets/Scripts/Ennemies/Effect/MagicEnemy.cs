@@ -1,12 +1,12 @@
 using UnityEngine;
-using Proto3GD.FPS;
+using FPS;
 
 namespace Ennemies.Effect
 {
     // Ennemi magique qui renvoie les tirs du joueur et soigne le joueur lorsqu'il est tué par un dash.
 
     [RequireComponent(typeof(EnemyHealth))]
-    public class MagicEnemy : MonoBehaviour
+    public class MagicEnemy : MonoBehaviour, IDamageInterceptor
     {
         
         [Tooltip("Mode de réflexion: true = Hitscan instantané, false = Projectile physique")]
@@ -54,7 +54,6 @@ namespace Ennemies.Effect
             if (health != null)
             {
                 health.OnDeath.AddListener(OnDeath);
-                health.OnDamageTaken.AddListener(OnDamageTaken);
             }
         }
         
@@ -66,10 +65,7 @@ namespace Ennemies.Effect
                 magicShieldEffect.SetActive(true);
             }
             
-            else
-            {
-                cachedBulletPrefab = magicBulletPrefab;
-            }
+            cachedBulletPrefab = magicBulletPrefab;
         }
         
         private void OnDestroy()
@@ -77,15 +73,14 @@ namespace Ennemies.Effect
             if (health != null)
             {
                 health.OnDeath.RemoveListener(OnDeath);
-                health.OnDamageTaken.RemoveListener(OnDamageTaken);
             }
         }
         
         private void OnDeath()
         {
             // Vérifier si l'ennemi a été tué par un dash
-            var dashSystem = FindFirstObjectByType<PillarDashSystem>();
-            if (dashSystem != null && PillarDashSystem.WasKilledByDash(transform.root.gameObject))
+            var dashSystem = FindFirstObjectByType<DashSystem>();
+            if (dashSystem != null && DashSystem.WasKilledByDash(transform.root.gameObject))
             {
                 // Soigner le joueur
                 HealPlayer();
@@ -98,48 +93,48 @@ namespace Ennemies.Effect
             }
         }
         
-
-        // Intercepte les tirs
-
-        private void OnDamageTaken(float damage, string zoneName)
+        // IDamageInterceptor: intercepte les dégâts
+        public bool OnBeforeDamage(ref DamageInfo damage)
         {
-            // Annuler les dégâts cet ennemi ne prend pas de dégâts des balles
-            if (health != null && zoneName != "Dash")
+            // Autoriser le dash à passer (tue l'ennemi et soigne le joueur à la mort)
+            if (damage.type == DamageType.Dash)
             {
-                var healthField = typeof(EnemyHealth).GetField("currentHealth", 
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (healthField != null)
+                return true; // appliquer
+            }
+            
+            // Bloquer les dégâts de balle et renvoyer vers le joueur
+            if (damage.type == DamageType.Bullet)
+            {
+                // Cooldown
+                if (Time.time - lastReflectTime < reflectCooldown)
                 {
-                    float currentHealth = (float)healthField.GetValue(health);
-                    healthField.SetValue(health, currentHealth + damage);
+                    return false; // bloqué, pas de dégâts
                 }
+                lastReflectTime = Time.time;
+                
+                var player = FindFirstObjectByType<PlayerHealth>();
+                if (player != null)
+                {
+                    if (useHitscanReflect)
+                    {
+                        ReflectHitscan(player);
+                    }
+                    else
+                    {
+                        CreateMagicBullet(player.transform.position);
+                    }
+                    // Effet visuel à l'impact si fourni
+                    if (reflectEffectPrefab != null)
+                    {
+                        CreateReflectEffect(transform.position + Vector3.up * 1.5f);
+                    }
+                }
+                
+                return false; // on bloque le dégât d'origine
             }
             
-            // Vérifier le cooldown
-            if (Time.time - lastReflectTime < reflectCooldown)
-            {
-                return;
-            }
-            
-            
-            // Trouver le joueur pour renvoyer le projectile
-            var player = FindFirstObjectByType<PlayerHealth>();
-            if (player == null) return;
-            
-            lastReflectTime = Time.time;
-            
-            
-            // Choisir le mode de réflexion
-            if (useHitscanReflect)
-            {
-                // Hitscan
-                ReflectHitscan(player);
-            }
-            else
-            {
-                // Projectile
-                CreateMagicBullet(player.transform.position);
-            }
+            // Par défaut, laisser passer
+            return true;
         }
         
         // Renvoie un tir hitscan instantané vers le joueur
@@ -155,7 +150,6 @@ namespace Ennemies.Effect
         }
         
         // Crée un projectile magique
-
         private void CreateMagicBullet(Vector3 targetPosition)
         {
             if (cachedBulletPrefab == null)
@@ -192,7 +186,6 @@ namespace Ennemies.Effect
                     rb.linearVelocity = directionToPlayer * reflectedBulletSpeed;
                 }
             }
-            
         }
         
         // Soigne le joueur

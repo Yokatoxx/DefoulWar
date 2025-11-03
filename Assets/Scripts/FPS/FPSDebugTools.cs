@@ -1,9 +1,7 @@
 // filepath: e:\Documents\Projet Unity\Proto3GD\Assets\Scripts\FPS\FPSDebugTools.cs
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Outils de debug en jeu: tuer tous les ennemis, augmenter/réinitialiser l'armure.
@@ -12,12 +10,7 @@ namespace Proto3GD.FPS
     {
         [Header("Hotkeys")]
         [SerializeField] private KeyCode killAllKey = KeyCode.F6;
-        [SerializeField] private KeyCode armorLevelUpKey = KeyCode.F7;
-        [SerializeField] private KeyCode armorResetKey = KeyCode.F8;
         [SerializeField] private bool showButtons = true;
-        
-        [Header("Armor Settings")]
-        [SerializeField] private int armorDeltaPerPress = 1; // +1 niveau par pression
         
         private WaveManager waveManager;
         
@@ -32,14 +25,6 @@ namespace Proto3GD.FPS
             {
                 KillAllEnemies();
             }
-            if (Input.GetKeyDown(armorLevelUpKey))
-            {
-                IncreaseArmorForAllZones(armorDeltaPerPress);
-            }
-            if (Input.GetKeyDown(armorResetKey))
-            {
-                ResetArmorLevels();
-            }
         }
         
         private void OnGUI()
@@ -53,16 +38,6 @@ namespace Proto3GD.FPS
             if (GUI.Button(new Rect(x, y, w, h), $"Kill All Enemies ({killAllKey})"))
             {
                 KillAllEnemies();
-            }
-            y += h + 4;
-            if (GUI.Button(new Rect(x, y, w, h), $"Armor +{armorDeltaPerPress} All Zones ({armorLevelUpKey})"))
-            {
-                IncreaseArmorForAllZones(armorDeltaPerPress);
-            }
-            y += h + 4;
-            if (GUI.Button(new Rect(x, y, w, h), $"Reset Armor ({armorResetKey})"))
-            {
-                ResetArmorLevels();
             }
         }
         
@@ -88,42 +63,6 @@ namespace Proto3GD.FPS
             {
                 waveManager.ForceNextWaveNow();
             }
-        }
-        
-        private void IncreaseArmorForAllZones(int delta)
-        {
-            if (waveManager == null) return;
-            // Collecter la liste des noms de zones depuis les ennemis actifs
-            HashSet<string> zones = new HashSet<string>();
-            var hitZones = FindObjectsByType<HitZone>(FindObjectsSortMode.None);
-            foreach (var z in hitZones)
-            {
-                if (!string.IsNullOrEmpty(z.ZoneName))
-                {
-                    zones.Add(z.ZoneName);
-                }
-            }
-            if (zones.Count == 0) return;
-            
-            // Construire un dictionnaire des niveaux actuels + delta et persister
-            var deltas = new Dictionary<string, int>();
-            foreach (var z in zones)
-            {
-                deltas[z] = delta;
-            }
-            waveManager.IncreaseArmorLevels(deltas);
-            waveManager.ReapplyArmorToActiveEnemies();
-            
-            Debug.Log($"[Debug] Increased persistent armor by +{delta} for zones: {string.Join(", ", zones)}");
-        }
-        
-        private void ResetArmorLevels()
-        {
-            if (waveManager == null) return;
-            // Réinitialiser dans le WaveManager et sur les ennemis présents
-            waveManager.ResetAllArmorLevels();
-            waveManager.ReapplyArmorToActiveEnemies();
-            Debug.Log("[Debug] Reset persistent armor levels and reapplied (no armor). ");
         }
     }
 }
