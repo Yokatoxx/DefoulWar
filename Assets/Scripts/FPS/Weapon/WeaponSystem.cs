@@ -207,6 +207,7 @@ namespace FPS.Weapon
             if (hitCollider == null) return;
 
             var enemyHealth = hitCollider.GetComponentInParent<EnemyHealth>();
+            enemyHealth.hitPosition = hitPoint;
             if (enemyHealth == null) return;
 
             float finalDamage = weaponSettings.bulletDammage;

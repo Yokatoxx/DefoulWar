@@ -230,6 +230,8 @@ namespace FPS
                     bool willDie = enemyHealth.CurrentHealth <= dashDamage;
                     if (willDie)
                     {
+                        enemyHealth.KilledByDashEvent();
+                        
                         enemiesKilledByDash.Add(enemyRoot);
                         StartCoroutine(CleanupEnemyTracking(enemyRoot));
                         
@@ -240,11 +242,13 @@ namespace FPS
                     // Appliquer dégâts
                     // enemyHealth.TakeDamage(dashDamage, "Dash");
                     enemyHealth.TakeDamage(new DamageInfo(dashDamage, "Dash", DamageType.Dash));
+                    
                 }
             }
 
             lastDashPosition = nextPos;
             characterController.Move(dashMovement);
+            
             Debug.DrawRay(transform.position, directionalDashDir * 3f, Color.cyan, 0.05f);
         }
 

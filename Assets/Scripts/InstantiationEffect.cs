@@ -1,5 +1,5 @@
 using System;
-using Proto3GD.FPS;
+using FPS;
 using UnityEngine;
 using UnityEngine.Events;
 
