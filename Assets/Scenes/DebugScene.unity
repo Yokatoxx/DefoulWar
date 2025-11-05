@@ -23617,6 +23617,55 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &636856198
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 636856200}
+  - component: {fileID: 636856199}
+  m_Layer: 0
+  m_Name: VolumeDammage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &636856199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636856198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 1
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: c7fc8b3a1ab809544b19d877038fce51, type: 2}
+--- !u!4 &636856200
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 636856198}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 21.493963, y: -13.02482, z: 122.415306}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &649958412
 GameObject:
   m_ObjectHideFlags: 0
@@ -85967,6 +86016,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &2139974715 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4673607940017463061, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+  m_PrefabInstance: {fileID: 2142068711}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2140838940 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1403591587188792743, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
@@ -85977,6 +86031,27 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 3725817409442096485, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
   m_PrefabInstance: {fileID: 2142068711}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2140838950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2139974715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8cf531fcf648344dbf94632bdbd70cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volume: {fileID: 636856199}
+  playerHealth: {fileID: 494411355}
+  targetCamera: {fileID: 2140838945}
+  intensityAtFullHealth: 0
+  intensityAtZeroHealth: 0.65
+  vignetteColor: {r: 0.6, g: 0, b: 0, a: 1}
+  smoothSpeed: 10
+  hideThreshold: 0.01
+  volumePriority: 100
 --- !u!1 &2140954019
 GameObject:
   m_ObjectHideFlags: 0
@@ -86432,7 +86507,7 @@ PrefabInstance:
     - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: volume
       value: 
-      objectReference: {fileID: 1675522526}
+      objectReference: {fileID: 0}
     - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: dashSystem
       value: 
@@ -86451,6 +86526,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2142068724}
+    - targetCorrespondingSourceObject: {fileID: 4673607940017463061, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2140838950}
   m_SourcePrefab: {fileID: 100100000, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
 --- !u!4 &2142068712 stripped
 Transform:
@@ -86648,6 +86726,7 @@ SceneRoots:
   - {fileID: 3574256}
   - {fileID: 1505711016}
   - {fileID: 1675522527}
+  - {fileID: 636856200}
   - {fileID: 706900313}
   - {fileID: 1837805965}
   - {fileID: 1878430969}
