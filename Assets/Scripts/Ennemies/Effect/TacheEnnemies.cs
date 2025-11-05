@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.AI;
 using UnityEngine.UI;
-using Proto3GD.FPS;
+using FPS;
 
 namespace Ennemies.Effect
 {

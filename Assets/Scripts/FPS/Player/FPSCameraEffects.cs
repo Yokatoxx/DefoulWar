@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gère les effets visuels de la caméra (headbob, FOV dynamique)
@@ -130,4 +130,3 @@ namespace Proto3GD.FPS
         }
     }
 }
-

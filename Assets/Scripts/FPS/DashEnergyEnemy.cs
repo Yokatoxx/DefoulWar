@@ -1,11 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
-    /// <summary>
-    /// Ennemi spécial qui fuit le joueur et recharge l'énergie de dash quand il est tué.
-    /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(EnemyHealth))]
     public class DashEnergyEnemy : MonoBehaviour
@@ -248,4 +245,3 @@ namespace Proto3GD.FPS
         }
     }
 }
-

@@ -1,4 +1,4 @@
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Multiplicateur de dégâts par zone pour les armes.

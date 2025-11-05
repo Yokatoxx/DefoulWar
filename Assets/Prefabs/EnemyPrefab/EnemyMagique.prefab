@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2689582501457834611}
   - component: {fileID: -3158992528684757622}
   - component: {fileID: 2145429180474956741}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EnemyMagique
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -75,6 +75,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
+  spawnInvulnerabilityDuration: 0
+  spawnInvulnerableAllDamage: 0
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -157,9 +159,9 @@ GameObject:
   - component: {fileID: 5333951548045206057}
   - component: {fileID: 2797102046993378888}
   - component: {fileID: 1006435175190009992}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -285,7 +287,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9125597042352771045}
   - component: {fileID: 6369820505073125918}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -338,9 +340,9 @@ GameObject:
   - component: {fileID: 4590870555706604448}
   - component: {fileID: 1597362537128985916}
   - component: {fileID: 2651874369235720882}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -1,5 +1,5 @@
 using UnityEngine;
-using Proto3GD.FPS;
+using FPS;
 
 namespace Ennemies.Effect
 {
@@ -11,7 +11,7 @@ namespace Ennemies.Effect
 
         [Header("Auto-fire pendant le stun (override optionnel)")]
         [Tooltip("Si activé, remplace l'intervalle d'auto-fire du joueur pendant ce stun.")]
-        [SerializeField] private bool overrideAutoFireInterval = false;
+        [SerializeField] private bool overrideAutoFireInterval;
         [SerializeField, Min(0.01f)] private float stunAutoFireInterval = 0.12f;
 
         [Header("Dégâts électriques aux ennemis proches")]
@@ -25,6 +25,10 @@ namespace Ennemies.Effect
         [SerializeField] private float effectDuration = 0.5f;
         [Tooltip("Temps minimum entre deux décharges (en secondes).")]
         [SerializeField] private float dischargeCooldown = 0.2f;
+        
+        [Header("Protection contre le dash")]
+        [Tooltip("Les ennemis électriques résistent au dash et ne meurent pas")]
+        [SerializeField] private bool resistToDash = true;
 
         private EnemyHealth health;
         private static readonly Collider[] DischargeBuffer = new Collider[32];
@@ -67,47 +71,28 @@ namespace Ennemies.Effect
         public void TriggerElectricDischarge()
         {
             if (electricDischargeRadius <= 0f || electricDamage <= 0f) return;
-            
-            // Vérifier le cooldown pour éviter les décharges trop rapides
             if (Time.time - lastDischargeTime < dischargeCooldown)
             {
                 return;
             }
-            
             lastDischargeTime = Time.time;
 
-            // Trouver tous les colliders dans le rayon
             int count = Physics.OverlapSphereNonAlloc(transform.position, electricDischargeRadius, DischargeBuffer);
-            
-            int enemiesHit = 0;
-
             for (int i = 0; i < count; i++)
             {
                 var col = DischargeBuffer[i];
                 if (col == null) continue;
-
-                // Infliger des dégâts aux ennemis
                 var enemyHealth = col.GetComponent<EnemyHealth>();
-                if (enemyHealth == null)
-                {
-                    enemyHealth = col.GetComponentInParent<EnemyHealth>();
-                }
-                
-                // Ne pas se toucher soi-même
+                if (enemyHealth == null) enemyHealth = col.GetComponentInParent<EnemyHealth>();
                 if (enemyHealth != null && enemyHealth != this.health && !enemyHealth.IsDead)
                 {
-                    enemyHealth.TakeDamage(electricDamage, "Electric");
-                    enemiesHit++;
-                    
-                    // Prefab d'arc électrique
+                    enemyHealth.TakeDamage(new DamageInfo(electricDamage, "Electric", DamageType.Electric));
                     if (electricEffectPrefab != null)
                     {
                         CreateElectricArc(enemyHealth.transform.position);
                     }
                 }
             }
-            
-            
             if (electricEffectPrefab != null)
             {
                 GameObject effect = Instantiate(electricEffectPrefab, transform.position, Quaternion.identity);
@@ -135,7 +120,6 @@ namespace Ennemies.Effect
         public float StunAutoFireInterval => stunAutoFireInterval;
         public float ElectricDischargeRadius => electricDischargeRadius;
         public float ElectricDamage => electricDamage;
-
-
+        public bool ResistToDash => resistToDash;
     }
 }

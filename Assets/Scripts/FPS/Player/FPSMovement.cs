@@ -1,13 +1,16 @@
 using UnityEngine;
-using UnityEngine.Rendering;
-using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// Gère le mouvement du joueur
     [RequireComponent(typeof(CharacterController))]
     public class FPSMovement : MonoBehaviour
     {
+        [Header("Events")]
+        public UnityEvent<float> OnSpeedChanged = new UnityEvent<float>();
+
         [Header("Movement Settings")]
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float sprintSpeed = 8f;
@@ -22,7 +25,6 @@ namespace Proto3GD.FPS
         private float coyoteTime = 0.15f;
 
         private float defaultMoveSpeed;
-        [SerializeField] private TextMeshProUGUI speedDisplay;
 
         [Header("Air Control")]
         [SerializeField, Tooltip("Contrôle en l'air (0 = aucun, 1 = identique au sol)")]
@@ -77,14 +79,17 @@ namespace Proto3GD.FPS
             HandleGroundCheck();
         }
 
+        // Cette méthode sera appelée par le PlayerController
+
         private void IncreaseSpeed()
         {
+            float previousSpeed = moveSpeed;
+
             if (IsMoving)
             {
                 if (moveSpeed < speedLimit)
                 {
                     moveSpeed += increaseSpeedFactor * Time.deltaTime;
-                    speedDisplay.text = "Speed: " + Mathf.RoundToInt(moveSpeed).ToString();
                     if (CurrentSpeed > maxAirSpeed)
                     {
                         CurrentSpeed = maxAirSpeed;
@@ -93,8 +98,12 @@ namespace Proto3GD.FPS
             }
             else
             {
-                speedDisplay.text = "Speed: " + Mathf.RoundToInt(moveSpeed).ToString();
                 moveSpeed = defaultMoveSpeed;
+            }
+
+            if (!Mathf.Approximately(previousSpeed, moveSpeed))
+            {
+                OnSpeedChanged?.Invoke(moveSpeed);
             }
         }
 
