@@ -122,6 +122,11 @@ namespace FPS
                     Debug.Log($"Enemy attacked player for {attackDamage} damage!");
                 }
             }
+            var indicator = FindObjectOfType<EnemyScreenDetector>();
+            if (indicator != null)
+            {
+                indicator.RegisterHit(transform, attackDamage);
+            }
         }
         
         private void OnDrawGizmosSelected()

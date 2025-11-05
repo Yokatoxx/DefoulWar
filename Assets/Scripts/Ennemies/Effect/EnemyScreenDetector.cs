@@ -1,5 +1,3 @@
-using FPS;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,31 +5,33 @@ using UnityEngine.UI;
 public class EnemyScreenDetector : MonoBehaviour
 {
     [Header("Références")]
-    [Tooltip("Caméra utilisée pour déterminer le champ de vision (par défaut: Camera.main).")]
+    [Tooltip("Caméra utilisée pour orienter les indicateurs (par défaut: Camera.main).")]
     [SerializeField] private Camera targetCamera;
     [Tooltip("Transform du joueur (par défaut: ce GameObject).")]
     [SerializeField] private Transform player;
-
-    [Header("Détection")]
-    [Tooltip("Rayon de détection des ennemis (m).")]
-    [SerializeField] private float detectionRadius = 30f;
-    [Tooltip("Distance à partir de laquelle l’icône est au max d’opacité.")]
-    [SerializeField] private float minDistanceForMaxAlpha = 3f;
-    [Tooltip("Fréquence de scan des ennemis (s).")]
-    [SerializeField] private float scanInterval = 0.5f;
-    [Tooltip("Calque(s) à considérer pour les raycasts éventuels (facultatif).")]
-    [SerializeField] private LayerMask enemyMask = ~0;
 
     [Header("HUD")]
     [SerializeField] private Image indicatorLeft;
     [SerializeField] private Image indicatorRight;
     [SerializeField] private Image indicatorBack;
 
-    [SerializeField] private float alphaSmoothSpeed = 10f;
+    [Header("Intensité en fonction de la distance")]
+    [Tooltip("Distance (m) à partir de laquelle l’alpha est maximum.")]
+    [SerializeField] private float minDistanceForMaxAlpha = 3f;
+    [Tooltip("Distance (m) au-delà de laquelle l’alpha tend vers 0.")]
+    [SerializeField] private float maxDistanceForMinAlpha = 30f;
 
-    private readonly List<EnemyController> enemies = new List<EnemyController>();
-    private float leftAlpha, rightAlpha, backAlpha;
-    private float targetLeftAlpha, targetRightAlpha, targetBackAlpha;
+    [Header("Courbe de décroissance")]
+    [Tooltip("Vitesse de fade des indicateurs (unités d’alpha par seconde).")]
+    [SerializeField] private float fadeOutSpeed = 2.5f;
+    [Tooltip("Gain d’alpha en fonction des dégâts reçus (alpha += damage * factor).")]
+    [SerializeField] private float damageToAlphaFactor = 0.02f;
+    [Tooltip("Alpha max autorisé par pulse.")]
+    [SerializeField, Range(0f, 1f)] private float maxPulseAlpha = 1f;
+
+    private float leftAlpha;
+    private float rightAlpha;
+    private float backAlpha;
 
     private void Awake()
     {
@@ -43,93 +43,55 @@ public class EnemyScreenDetector : MonoBehaviour
         SetImageAlpha(indicatorBack, 0f);
     }
 
-    private void OnEnable()
-    {
-        StartCoroutine(ScanLoop());
-    }
-
-    private void OnDisable()
-    {
-        StopAllCoroutines();
-    }
-
-    private IEnumerator ScanLoop()
-    {
-        var wait = new WaitForSeconds(Mathf.Max(0.05f, scanInterval));
-        while (true)
-        {
-            RefreshEnemyCache();
-            yield return wait;
-        }
-    }
-
-    private void RefreshEnemyCache()
-    {
-        enemies.Clear();
-        // Récupère tous les EnemyController actifs
-        foreach (var e in FindObjectsOfType<EnemyController>())
-        {
-            if (e != null && e.isActiveAndEnabled)
-                enemies.Add(e);
-        }
-    }
-
     private void Update()
     {
-        // Réinitialiser cibles
-        targetLeftAlpha = 0f;
-        targetRightAlpha = 0f;
-        targetBackAlpha = 0f;
+        // Fade vers 0
+        if (leftAlpha > 0f) leftAlpha = Mathf.Max(0f, leftAlpha - fadeOutSpeed * Time.deltaTime);
+        if (rightAlpha > 0f) rightAlpha = Mathf.Max(0f, rightAlpha - fadeOutSpeed * Time.deltaTime);
+        if (backAlpha > 0f) backAlpha = Mathf.Max(0f, backAlpha - fadeOutSpeed * Time.deltaTime);
 
-        if (targetCamera == null || player == null)
+        ApplyAlphas();
+    }
+
+    // À appeler depuis les scripts d’attaque ennemie (melee, projectiles, etc.)
+    public void RegisterHit(Transform attacker, float damage = 0f)
+    {
+        if (attacker == null) return;
+        RegisterHit(attacker.position, damage);
+    }
+
+    // Variante avec position directe
+    public void RegisterHit(Vector3 attackerWorldPosition, float damage = 0f)
+    {
+        if (targetCamera == null || player == null) return;
+
+        // Direction depuis la caméra (plus fiable pour gauche/droite/derrière)
+        Vector3 camPos = targetCamera.transform.position;
+        Vector3 camFwd = targetCamera.transform.forward;
+        Vector3 camRight = targetCamera.transform.right;
+        Vector3 dir = (attackerWorldPosition - camPos).normalized;
+
+        float forwardDot = Vector3.Dot(camFwd, dir);
+        float rightDot = Vector3.Dot(camRight, dir);
+
+        // Alpha basé sur distance + bonus dégâts
+        float dist = Vector3.Distance(player.position, attackerWorldPosition);
+        float distAlpha = 1f - Mathf.InverseLerp(minDistanceForMaxAlpha, maxDistanceForMinAlpha, dist);
+        float pulse = Mathf.Clamp01(distAlpha + damage * damageToAlphaFactor);
+        pulse = Mathf.Min(pulse, maxPulseAlpha);
+
+        if (forwardDot < 0f)
         {
-            ApplyAlphas();
-            return;
+            // Derrière
+            backAlpha = Mathf.Max(backAlpha, pulse);
         }
-
-        var cam = targetCamera;
-        Vector3 camPos = cam.transform.position;
-        Vector3 camFwd = cam.transform.forward;
-        Vector3 camRight = cam.transform.right;
-
-        foreach (var enemy in enemies)
+        else
         {
-            if (enemy == null) continue;
-
-            Vector3 toEnemy = enemy.transform.position - player.position;
-            float dist = toEnemy.magnitude;
-            if (dist > detectionRadius) continue;
-
-            // Visible à l’écran ou non
-            Vector3 viewport = cam.WorldToViewportPoint(enemy.transform.position);
-            bool inFront = viewport.z > 0f;
-            bool onScreen = inFront && viewport.x >= 0f && viewport.x <= 1f && viewport.y >= 0f && viewport.y <= 1f;
-
-            if (onScreen)
-                continue;
-
-            // Direction normalisée depuis la caméra (meilleure référence pour gauche/droite/derrière)
-            Vector3 dir = (enemy.transform.position - camPos).normalized;
-
-            float forwardDot = Vector3.Dot(camFwd, dir);
-            float rightDot = Vector3.Dot(camRight, dir);
-
-            // Calcul alpha cible par proximité (plus proche => plus opaque)
-            float alpha = 1f - Mathf.InverseLerp(minDistanceForMaxAlpha, detectionRadius, dist);
-            alpha = Mathf.Clamp01(alpha);
-
-            if (forwardDot < 0f)
-            {
-                // Derrière
-                targetBackAlpha = Mathf.Max(targetBackAlpha, alpha);
-            }
+            // Devant ou latéral: gauche/droite selon le signe de rightDot
+            if (rightDot < 0f)
+                leftAlpha = Mathf.Max(leftAlpha, pulse);
             else
-            {
-                if (rightDot < 0f)
-                    targetLeftAlpha = Mathf.Max(targetLeftAlpha, alpha);
-                else
-                    targetRightAlpha = Mathf.Max(targetRightAlpha, alpha);
-            }
+                rightAlpha = Mathf.Max(rightAlpha, pulse);
         }
 
         ApplyAlphas();
@@ -137,11 +99,6 @@ public class EnemyScreenDetector : MonoBehaviour
 
     private void ApplyAlphas()
     {
-        // Lissage
-        leftAlpha = Mathf.Lerp(leftAlpha, targetLeftAlpha, Time.deltaTime * alphaSmoothSpeed);
-        rightAlpha = Mathf.Lerp(rightAlpha, targetRightAlpha, Time.deltaTime * alphaSmoothSpeed);
-        backAlpha = Mathf.Lerp(backAlpha, targetBackAlpha, Time.deltaTime * alphaSmoothSpeed);
-
         SetImageAlpha(indicatorLeft, leftAlpha);
         SetImageAlpha(indicatorRight, rightAlpha);
         SetImageAlpha(indicatorBack, backAlpha);
@@ -153,7 +110,23 @@ public class EnemyScreenDetector : MonoBehaviour
         var c = img.color;
         c.a = Mathf.Clamp01(a);
         img.color = c;
-
         img.enabled = c.a > 0.01f;
+    }
+
+    // Outils de test dans l’éditeur
+    [ContextMenu("Test Hit Gauche")]
+    private void TestLeft()
+    {
+        RegisterHit(targetCamera.transform.position - targetCamera.transform.right * 5f, 10f);
+    }
+    [ContextMenu("Test Hit Droite")]
+    private void TestRight()
+    {
+        RegisterHit(targetCamera.transform.position + targetCamera.transform.right * 5f, 10f);
+    }
+    [ContextMenu("Test Hit Derrière")]
+    private void TestBack()
+    {
+        RegisterHit(targetCamera.transform.position - targetCamera.transform.forward * 5f, 10f);
     }
 }
