@@ -5788,7 +5788,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -38177,7 +38177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -86632,16 +86632,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetCamera: {fileID: 2140838945}
   player: {fileID: 2142068712}
-  detectionRadius: 10
-  minDistanceForMaxAlpha: 3
-  scanInterval: 0.5
-  enemyMask:
-    serializedVersion: 2
-    m_Bits: 128
   indicatorLeft: {fileID: 229693039}
   indicatorRight: {fileID: 2144182529}
   indicatorBack: {fileID: 979099894}
-  alphaSmoothSpeed: 50
+  minDistanceForMaxAlpha: 3
+  maxDistanceForMinAlpha: 30
+  fadeOutSpeed: 2.5
+  damageToAlphaFactor: 0.02
+  maxPulseAlpha: 1
 --- !u!1 &2144182526
 GameObject:
   m_ObjectHideFlags: 0
@@ -86700,7 +86698,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
