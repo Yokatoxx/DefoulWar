@@ -27,6 +27,11 @@ namespace FPS
         
         private bool isDead;
         private WaveManager waveManager;
+
+        // Centralisation: suivi de l'origine des dégâts/kill
+        private DamageType lastHitType = DamageType.Other;
+        private DamageType lastKillType = DamageType.Other;
+        private Transform lastAttacker;
         
         private void Awake()
         {
@@ -79,6 +84,10 @@ namespace FPS
             float damage = Mathf.Max(0f, info.amount);
             string zoneName = string.IsNullOrWhiteSpace(info.zoneName) ? "Body" : info.zoneName;
             currentHealth -= damage;
+
+            // Centralisation: enregistrer la source du dernier coup
+            lastHitType = info.type;
+            lastAttacker = info.attacker;
             
             // Enregistrer le hit
             string key = NormalizeZoneKey(zoneName);
@@ -100,6 +109,8 @@ namespace FPS
             
             if (currentHealth <= 0)
             {
+                // Centralisation: consigner le type de kill avant la mort
+                lastKillType = info.type;
                 Die();
             }
             return true;
@@ -142,8 +153,6 @@ namespace FPS
             Destroy(gameObject);
         }
         
-        
-
         private static string NormalizeZoneKey(string zone)
         {
             return string.IsNullOrWhiteSpace(zone) ? string.Empty : zone.Trim().ToLowerInvariant();
@@ -153,14 +162,18 @@ namespace FPS
         public float MaxHealth => maxHealth;
         public bool IsDead => isDead;
         public Dictionary<string, int> ZoneHitCount => zoneHitCount;
+
+        // Centralisation: exposer la cause de mort et la source
+        public DamageType LastHitType => lastHitType;
+        public DamageType LastKillType => lastKillType;
+        public Transform LastAttacker => lastAttacker;
         
-
         // Tue immédiatement cet ennemi sans enregistrer de hit
-
         public void KillImmediate()
         {
             if (isDead) return;
             currentHealth = 0f;
+            lastKillType = DamageType.Other;
             Die();
         }
     }

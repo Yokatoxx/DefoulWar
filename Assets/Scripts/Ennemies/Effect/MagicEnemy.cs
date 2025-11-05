@@ -78,9 +78,8 @@ namespace Ennemies.Effect
         
         private void OnDeath()
         {
-            // Vérifier si l'ennemi a été tué par un dash
-            var dashSystem = FindFirstObjectByType<DashSystem>();
-            if (dashSystem != null && DashSystem.WasKilledByDash(transform.root.gameObject))
+            // Vérifier si l'ennemi a été tué par un dash (centralisé via EnemyHealth)
+            if (health != null && health.LastKillType == DamageType.Dash)
             {
                 // Soigner le joueur
                 HealPlayer();
