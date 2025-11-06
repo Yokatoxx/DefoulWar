@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gère l'interface utilisateur du jeu (santé, munitions, vague).
@@ -29,8 +29,6 @@ namespace Proto3GD.FPS
         
         [Header("References")]
         [SerializeField] private PlayerHealth playerHealth;
-        [SerializeField] private WeaponController weaponController; // hitscan
-        [SerializeField] private ProjectileWeaponController projectileWeaponController; // projectiles
         [SerializeField] private WaveManager waveManager;
         
         private void Start()
@@ -38,10 +36,6 @@ namespace Proto3GD.FPS
             // Auto-trouver les références si non assignées
             if (playerHealth == null)
                 playerHealth = FindFirstObjectByType<PlayerHealth>();
-            if (weaponController == null)
-                weaponController = FindFirstObjectByType<WeaponController>();
-            if (projectileWeaponController == null)
-                projectileWeaponController = FindFirstObjectByType<ProjectileWeaponController>();
             if (waveManager == null)
                 waveManager = FindFirstObjectByType<WaveManager>();
             
@@ -66,10 +60,6 @@ namespace Proto3GD.FPS
             UpdateHealthUI(playerHealth != null ? playerHealth.HealthPercentage : 1f);
         }
         
-        private void Update()
-        {
-            UpdateWeaponUI();
-        }
         
         private void UpdateHealthUI(float healthPercentage)
         {
@@ -84,34 +74,6 @@ namespace Proto3GD.FPS
             }
         }
         
-        private void UpdateWeaponUI()
-        {
-            // Priorité à l'arme à projectiles si présente
-            if (projectileWeaponController != null)
-            {
-                if (ammoText != null)
-                {
-                    ammoText.text = $"{projectileWeaponController.CurrentAmmo} / {projectileWeaponController.MaxAmmo}";
-                }
-                if (reloadText != null)
-                {
-                    reloadText.gameObject.SetActive(projectileWeaponController.IsReloading);
-                }
-                return;
-            }
-            
-            if (weaponController != null)
-            {
-                if (ammoText != null)
-                {
-                    ammoText.text = $"{weaponController.CurrentAmmo} / {weaponController.MaxAmmo}";
-                }
-                if (reloadText != null)
-                {
-                    reloadText.gameObject.SetActive(weaponController.IsReloading);
-                }
-            }
-        }
         
         private void UpdateEnemyCount(int remaining)
         {

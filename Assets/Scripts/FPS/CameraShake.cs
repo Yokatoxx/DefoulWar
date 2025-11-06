@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gère les effets de screenshake pour la caméra

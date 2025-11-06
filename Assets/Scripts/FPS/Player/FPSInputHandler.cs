@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Gère les inputs du joueur (clavier, souris, gamepad)
@@ -41,6 +41,7 @@ namespace Proto3GD.FPS
             // Actions
             LeanLeftPressed = Input.GetKey(KeyCode.Q);
             LeanRightPressed = Input.GetKey(KeyCode.E);
+            SprintPressed = Input.GetKey(KeyCode.LeftShift);
             
             // Jump - ne pas utiliser GetKeyDown ici, le gérer directement
             if (Input.GetButtonDown("Jump"))

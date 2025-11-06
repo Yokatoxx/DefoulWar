@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Proto3GD.FPS; // EnemyHealth, HitZone
+using FPS; // EnemyHealth, HitZone
 
 namespace FPS
 {
@@ -71,12 +71,10 @@ namespace FPS
                     hitZone.FlashOnHit();
                 }
                 
-                // Calcul des degats: base damage * multiplier zone * facteur armure
+                // Calcul des degats: base damage * multiplier zone
                 float zoneMult = 1f;
-                float armorFactor = 1f;
                 if (hitZone != null)
                 {
-                    armorFactor = hitZone.ArmorFactor;
                     if (useWeaponZoneMultipliers && zoneMultiplierMap != null && zoneMultiplierMap.TryGetValue(zoneName, out float m))
                     {
                         zoneMult = m;
@@ -87,7 +85,7 @@ namespace FPS
                     }
                 }
                 
-                float finalDamage = damage * zoneMult * armorFactor;
+                float finalDamage = damage * zoneMult;
                 enemyHealth.TakeDamage(finalDamage, zoneName);
             }
             

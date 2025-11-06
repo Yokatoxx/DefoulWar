@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
     /// <summary>
     /// Affiche une jauge visuelle de la charge du dash sur l'HUD
@@ -10,7 +10,7 @@ namespace Proto3GD.FPS
     {
         [Header("References")]
         [SerializeField, Tooltip("Référence au système de dash du joueur")]
-        private PillarDashSystem dashSystem;
+        private DashSystem dashSystem;
         
         [SerializeField, Tooltip("Image de remplissage de la jauge")]
         private Image fillImage;
@@ -42,10 +42,10 @@ namespace Proto3GD.FPS
             // Trouver automatiquement le système de dash si pas assigné
             if (dashSystem == null)
             {
-                dashSystem = FindFirstObjectByType<PillarDashSystem>();
+                dashSystem = FindFirstObjectByType<DashSystem>();
                 if (dashSystem == null)
                 {
-                    Debug.LogError("DashCooldownUI: Aucun PillarDashSystem trouvé dans la scène!");
+                    Debug.LogError("DashCooldownUI: Aucun DashSystem trouvé dans la scène!");
                 }
             }
             
@@ -105,7 +105,7 @@ namespace Proto3GD.FPS
         /// <summary>
         /// Définir le système de dash manuellement
         /// </summary>
-        public void SetDashSystem(PillarDashSystem system)
+        public void SetDashSystem(DashSystem system)
         {
             dashSystem = system;
         }

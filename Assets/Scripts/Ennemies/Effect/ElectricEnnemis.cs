@@ -1,5 +1,5 @@
 using UnityEngine;
-using Proto3GD.FPS;
+using FPS;
 
 namespace Ennemies.Effect
 {
@@ -11,7 +11,7 @@ namespace Ennemies.Effect
 
         [Header("Auto-fire pendant le stun (override optionnel)")]
         [Tooltip("Si activé, remplace l'intervalle d'auto-fire du joueur pendant ce stun.")]
-        [SerializeField] private bool overrideAutoFireInterval = false;
+        [SerializeField] private bool overrideAutoFireInterval;
         [SerializeField, Min(0.01f)] private float stunAutoFireInterval = 0.12f;
 
         [Header("Dégâts électriques aux ennemis proches")]
@@ -25,6 +25,10 @@ namespace Ennemies.Effect
         [SerializeField] private float effectDuration = 0.5f;
         [Tooltip("Temps minimum entre deux décharges (en secondes).")]
         [SerializeField] private float dischargeCooldown = 0.2f;
+        
+        [Header("Protection contre le dash")]
+        [Tooltip("Les ennemis électriques résistent au dash et ne meurent pas")]
+        [SerializeField] private bool resistToDash = true;
 
         private EnemyHealth health;
         private static readonly Collider[] DischargeBuffer = new Collider[32];
@@ -105,7 +109,6 @@ namespace Ennemies.Effect
         public float StunAutoFireInterval => stunAutoFireInterval;
         public float ElectricDischargeRadius => electricDischargeRadius;
         public float ElectricDamage => electricDamage;
-
-
+        public bool ResistToDash => resistToDash;
     }
 }

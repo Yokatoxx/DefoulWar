@@ -1,11 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Proto3GD.FPS
+namespace FPS
 {
-    /// <summary>
-    /// Ennemi spécial qui fuit le joueur et recharge l'énergie de dash quand il est tué.
-    /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(EnemyHealth))]
     public class DashEnergyEnemy : MonoBehaviour
@@ -47,6 +44,8 @@ namespace Proto3GD.FPS
         [Tooltip("Quantité d'énergie de dash donnée quand tué (entre 0 et 1, 1 = charge complète)")]
         [SerializeField] private float dashEnergyAmount = 1f;
         
+        public float DashEnergyAmount => dashEnergyAmount;
+        
         [Header("References")]
         [SerializeField] private LayerMask obstacleLayer;
         
@@ -79,17 +78,6 @@ namespace Proto3GD.FPS
             }
             
             agent.speed = idleSpeed;
-            
-            // S'abonner à l'événement de mort
-            if (enemyHealth != null)
-            {
-                enemyHealth.OnDeath.AddListener(OnDeath);
-                Debug.Log($"[DashEnergyEnemy] Abonné à l'événement OnDeath de {gameObject.name}");
-            }
-            else
-            {
-                Debug.LogWarning($"[DashEnergyEnemy] EnemyHealth introuvable sur {gameObject.name}!");
-            }
         }
         
         private void Update()
@@ -229,23 +217,7 @@ namespace Proto3GD.FPS
             }
         }
         
-        private void OnDeath()
-        {
-            Debug.Log($"[DashEnergyEnemy] OnDeath appelé! Énergie donnée: {dashEnergyAmount}");
-            
-            // Notifier le système de dash que cet ennemi a été tué
-            PillarDashSystem dashSystem = FindFirstObjectByType<PillarDashSystem>();
-            if (dashSystem != null)
-            {
-                Debug.Log($"[DashEnergyEnemy] PillarDashSystem trouvé, appel de OnDashEnemyKilled");
-                dashSystem.OnDashEnemyKilled(dashEnergyAmount);
-            }
-            else
-            {
-                Debug.LogWarning("[DashEnergyEnemy] PillarDashSystem introuvable dans la scène!");
-            }
-        }
-        
+
         private void OnDrawGizmosSelected()
         {
             // Visualiser la portée de détection
@@ -273,4 +245,3 @@ namespace Proto3GD.FPS
         }
     }
 }
-

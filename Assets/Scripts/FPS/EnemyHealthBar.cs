@@ -19,7 +19,7 @@ namespace FPS
         [SerializeField] private Color fillColor = new Color(0.2f, 0.9f, 0.2f);
         [SerializeField] private Color backgroundColor = new Color(0f, 0f, 0f, 0.6f);
         
-        private Proto3GD.FPS.EnemyHealth enemyHealth;
+        private EnemyHealth enemyHealth;
         private Camera cam;
         private Canvas canvas;
         private Slider slider;
@@ -28,8 +28,8 @@ namespace FPS
         
         private void Awake()
         {
-            enemyHealth = GetComponentInParent<Proto3GD.FPS.EnemyHealth>();
-            if (enemyHealth == null) enemyHealth = GetComponent<Proto3GD.FPS.EnemyHealth>();
+            enemyHealth = GetComponentInParent<EnemyHealth>();
+            if (enemyHealth == null) enemyHealth = GetComponent<EnemyHealth>();
             cam = Camera.main;
             
             // Créer l'UI si absente
