@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2689582501457834611}
   - component: {fileID: -3158992528684757622}
   - component: {fileID: 2145429180474956741}
+  - component: {fileID: 7108234100319031770}
   m_Layer: 7
   m_Name: EnemyMagique
   m_TagString: Enemy
@@ -136,16 +137,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHitscanReflect: 1
-  reflectedBulletSpeed: 30
   reflectedDamage: 15
   reflectCooldown: 0.1
+  reflectedBulletSpeed: 30
   magicBulletPrefab: {fileID: 0}
   reflectEffectPrefab: {fileID: 0}
   reflectEffectDuration: 0.5
+  hitScanFx: {fileID: 7108234100319031770}
   healAmount: 30
   healEffectPrefab: {fileID: 0}
   healEffectDuration: 1
   magicShieldEffect: {fileID: 0}
+--- !u!114 &7108234100319031770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffb9538ddc5165d45a36c66ef66221da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trailPrefab: {fileID: 4795970869987127494, guid: a527b787c415e734797cb5209dacaba1, type: 3}
+  impactFX: {fileID: 0}
+  trailWidth: 1
+  firePoint: {fileID: 2657800489959688396}
+  upOffset: 1.5
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,12 +288,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zoneName: Head
   baseDamageMultiplier: 1
-  hasArmor: 0
-  armorLevel: 0
-  armorDamageReduction: 0.5
-  level1Color: {r: 0, g: 0, b: 1, a: 1}
-  level2Color: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-  level3Color: {r: 1, g: 0.5, b: 0, a: 1}
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
 --- !u!1 &4242204456841231454
@@ -452,11 +465,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zoneName: Body
   baseDamageMultiplier: 1
-  hasArmor: 0
-  armorLevel: 0
-  armorDamageReduction: 0.5
-  level1Color: {r: 0, g: 0, b: 1, a: 1}
-  level2Color: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-  level3Color: {r: 1, g: 0.5, b: 0, a: 1}
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
