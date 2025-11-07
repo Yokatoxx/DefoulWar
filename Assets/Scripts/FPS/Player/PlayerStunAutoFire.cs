@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-using FPS.Weapon;
+using FPS;
 
 namespace FPS
 {
