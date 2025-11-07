@@ -18,9 +18,12 @@
       <option value="4be5e487-2ecd-4468-bbe0-731bc52fc849" />
       <option value="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
+      <option value="711e78cd-a212-4c91-b26f-c3b96d7541f5" />
+      <option value="7bb11d94-e779-47d8-affa-8eece5f7b5ad" />
       <option value="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
       <option value="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
       <option value="90c93295-7ff7-44dd-bc63-9777d360cbb2" />
+      <option value="91c794e3-84b0-4fd4-8a95-bb35c22168ce" />
       <option value="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe" />
       <option value="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
@@ -104,12 +107,12 @@
         <entry key="35396471-365a-4898-9cbb-3dc4b5de8690">
           <value>
             <set>
+              <option value="2d14360b-fcb9-48de-ba24-5fe98d4fc076" />
               <option value="6ddffc4d-1676-4006-bfca-b2fa28b4157d" />
+              <option value="a7e2b68b-b67f-4912-85eb-3724b1c4a0a2" />
               <option value="bf804127-8e5d-4281-890e-8ff69c0bfb8c" />
               <option value="e4a6a053-b96d-4fec-ac72-6a9f3322b0d7" />
               <option value="f380b8f6-283d-4401-a2c5-ada974a2bfc8" />
-              <option value="2d14360b-fcb9-48de-ba24-5fe98d4fc076" />
-              <option value="a7e2b68b-b67f-4912-85eb-3724b1c4a0a2" />
             </set>
           </value>
         </entry>
@@ -167,6 +170,24 @@
             </set>
           </value>
         </entry>
+        <entry key="711e78cd-a212-4c91-b26f-c3b96d7541f5">
+          <value>
+            <set>
+              <option value="7cec00fb-860b-44cf-bd08-1f988403d8a3" />
+            </set>
+          </value>
+        </entry>
+        <entry key="7bb11d94-e779-47d8-affa-8eece5f7b5ad">
+          <value>
+            <set>
+              <option value="265f89ef-423f-4c4c-a8b0-12415644206b" />
+              <option value="4666c0dd-8ded-4e54-9448-b47f0a6cdbbb" />
+              <option value="87d88666-7add-447f-8e64-a564f5a67fba" />
+              <option value="93d959ed-e99d-47ff-92d0-98d1b356a383" />
+              <option value="c2393bb0-3fcc-4687-9372-8874191c7fe2" />
+            </set>
+          </value>
+        </entry>
         <entry key="7cedbc0b-a2e2-4763-b45d-84524a48d7af">
           <value>
             <set>
@@ -187,6 +208,14 @@
             <set>
               <option value="5364cce1-1c12-41a8-8a47-fc5ffd95c76d" />
               <option value="afc4d4da-b62f-46e5-bc88-b0dee3fc5f48" />
+            </set>
+          </value>
+        </entry>
+        <entry key="91c794e3-84b0-4fd4-8a95-bb35c22168ce">
+          <value>
+            <set>
+              <option value="1ae7e136-d14e-4f0d-b874-988581ed9581" />
+              <option value="dc68a429-b264-4932-ae94-c1af0fd526dd" />
             </set>
           </value>
         </entry>
@@ -322,53 +351,27 @@
       <entry key="22a7e080-3b21-4c9b-84e0-15c05590ac35" />
       <entry key="2a65d596-5bce-4824-b43d-e0f1c87e6c68" />
       <entry key="2a979126-8eed-4dfc-9945-ed810f6081dc" />
-      <entry key="35396471-365a-4898-9cbb-3dc4b5de8690">
-        <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/WaveManager.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/FPSDebugTools.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealth.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DamageInfo.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/IDamageInterceptor.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/EnemyHealthBar.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashSystem.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/ZoneDamageMultiplier.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PlayerHealth.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunVisuals.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/PlayerStunAutoFire.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMouseLook.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSInputHandler.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSCameraEffects.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/HitZone.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/GameUI.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/GameManager.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/EnemyVisualFeedback.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashEnergyEnemy.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashCooldownUI.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/CameraShake.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Weapon/WeaponSystem.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FollowCamera.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/EnemyController.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Effect/CameraDashEffect.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Bullet.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/TacheEnnemies.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/MagicEnemy.cs" />
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/ElectricEnnemis.cs" />
-        </set>
-      </entry>
+      <entry key="35396471-365a-4898-9cbb-3dc4b5de8690" />
       <entry key="3a578943-0f0f-4069-8aa6-2cd4f60dc9f5" />
       <entry key="47fb342d-157d-4601-916d-863d4c5bb05d" />
       <entry key="48d5d22b-a2aa-454e-99f3-185c5e54b18d" />
       <entry key="4be5e487-2ecd-4468-bbe0-731bc52fc849" />
       <entry key="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
+      <entry key="711e78cd-a212-4c91-b26f-c3b96d7541f5" />
+      <entry key="7bb11d94-e779-47d8-affa-8eece5f7b5ad" />
       <entry key="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
       <entry key="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
       <entry key="90c93295-7ff7-44dd-bc63-9777d360cbb2" />
+      <entry key="91c794e3-84b0-4fd4-8a95-bb35c22168ce">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" />
+        </set>
+      </entry>
       <entry key="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe" />
       <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
+      <entry key="b29f6e5d-5777-4be7-8acf-0f4af0d439e3" />
       <entry key="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <entry key="c385f004-16f2-4ca7-92db-56f732837536" />
