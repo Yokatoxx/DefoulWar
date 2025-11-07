@@ -60799,7 +60799,11 @@ MonoBehaviour:
   animator: {fileID: 1511197081}
   playerMovement: {fileID: 2142068719}
   moveBool: Walk
+  useShootTrigger: 1
   shootTrigger: Shoot
+  shootBoolName: IsShooting
+  shootBoolAutoResetTime: 0.12
+  forceResetOnStateChange: 1
 --- !u!43 &1515118125
 Mesh:
   m_ObjectHideFlags: 0
