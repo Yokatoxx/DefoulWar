@@ -8,11 +8,12 @@ using Unity.Properties;
 [NodeDescription(name: "FindNearestHorde", story: "Trouve une horde", category: "Action", id: "b2b2fca2a4edceaaab11c9ca796dd520")]
 public partial class FindNearestHordeAction : Action
 {
-    public BlackboardVariable<Horde> NearestHorde;
-    public BlackboardVariable<Vector3> TargetPosition;
+    public BlackboardVariable<GameObject> NearestHorde; // GameObject du leader
+    public BlackboardVariable<Vector3> TargetPos;
 
     protected override Status OnStart()
     {
+        Debug.Log("[FindNearestHorde] OnStart");
         return Status.Running;
     }
 
@@ -20,31 +21,42 @@ public partial class FindNearestHordeAction : Action
     {
         if (HordeManager.instance == null)
         {
+            Debug.LogWarning("[FindNearestHorde] HordeManager.instance is null");
             return Status.Failure;
         }
-        var agent = this.GameObject;
 
-        if (agent == null)
-            return Status.Failure;
-
-        Horde nearest = HordeManager.instance.FindNearestHorde(agent.transform.position);
-        if (nearest != null)
+        var agentGO = this.GameObject;
+        if (agentGO == null)
         {
-            if (NearestHorde != null)
-                NearestHorde.Value = nearest;
-
-            if (TargetPosition != null)
-                TargetPosition.Value = nearest.rallyPoint;
-            Debug.LogWarning("TEST (Sucess ici)");
-            return Status.Success;
+            Debug.LogWarning("[FindNearestHorde] GameObject agent is null");
+            return Status.Failure;
         }
 
-        Debug.LogWarning("AUCUNE HORDE A PROXIMITE");
-        return Status.Failure;
+        var pos = agentGO.transform.position;
+        Horde nearest = HordeManager.instance.FindNearestHorde(pos);
+        if (nearest == null)
+        {
+            Debug.Log("[FindNearestHorde] Aucune horde trouvée pour " + agentGO.name);
+            return Status.Failure;
+        }
+
+        // leader peut être null => on prend rallyPoint mais on veut un leader GameObject pour blackboard
+        GameObject leaderGO = nearest.leader != null ? nearest.leader.gameObject : null;
+        if (NearestHorde != null)
+        {
+            NearestHorde.Value = leaderGO;
+        }
+        if (TargetPos != null)
+        {
+            TargetPos.Value = nearest.rallyPoint;
+        }
+
+        Debug.Log($"[FindNearestHorde] Pour {agentGO.name} trouvée horde (leader={(leaderGO ? leaderGO.name : "null")}) rallyPoint={nearest.rallyPoint} members={nearest.members?.Count ?? 0}");
+        return Status.Success;
     }
 
     protected override void OnEnd()
     {
+        Debug.Log("[FindNearestHorde] OnEnd");
     }
 }
-
