@@ -9,6 +9,7 @@ using Unity.Properties;
 public partial class JoinHordeAction : Action
 {
     // On reçoit ici le GameObject du leader (ou null)
+    [SerializeReference, SerializeField]
     public BlackboardVariable<GameObject> HordeLeaderObject;
 
     protected override Status OnStart() => Status.Running;

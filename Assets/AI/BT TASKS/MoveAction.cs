@@ -8,8 +8,10 @@ using Unity.Properties;
 [NodeDescription(name: "Move", story: "Déplacement vers", category: "Action", id: "516bef1be81c15a1a85bff2bfb4c5e14")]
 public partial class MoveToAction : Action
 {
+    [SerializeReference, SerializeField]
     public BlackboardVariable<Vector3> TargetPos;
     // Optionnel : lier la variable NearestHorde si vous en avez une sur le blackboard
+    [SerializeReference, SerializeField]
     public BlackboardVariable<GameObject> NearestHorde;
     public float updateThreshold = 0.5f;
     public float timeout = 12f;

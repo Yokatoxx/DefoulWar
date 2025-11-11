@@ -8,6 +8,7 @@ using Unity.Properties;
 [NodeDescription(name: "SetTargetToRallyPoint", story: "SetTargetToRallyPoint", category: "Action", id: "c0a49b5a826cef481df49109e5d265d2")]
 public partial class SetTargetToRallyPointAction : Action
 {
+    [SerializeReference, SerializeField]
     public BlackboardVariable<Vector3> TargetPos;
 
     protected override Status OnStart() => Status.Running;

@@ -8,7 +8,9 @@ using Unity.Properties;
 [NodeDescription(name: "FindNearestHorde", story: "Trouve une horde", category: "Action", id: "b2b2fca2a4edceaaab11c9ca796dd520")]
 public partial class FindNearestHordeAction : Action
 {
+    [SerializeReference, SerializeField]
     public BlackboardVariable<GameObject> NearestHorde; // GameObject du leader
+    [SerializeReference, SerializeField]
     public BlackboardVariable<Vector3> TargetPos;
 
     protected override Status OnStart()
