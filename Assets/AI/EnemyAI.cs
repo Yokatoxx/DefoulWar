@@ -1,82 +1,135 @@
 // EnemyAI.cs
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))] // Force la présence du composant
+[RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI : MonoBehaviour
 {
     [Header("Composants")]
-    public NavMeshAgent agent; // Référence à l'agent
-    // Le Behavior Tree va lire et écrire cette variable.
-    // Le HordeManager va aussi l'utiliser.
+    public NavMeshAgent agent;
+
     [Header("Horde Info")]
     public Horde currentHorde = null;
 
     [Header("Stats")]
     public float baseMoveSpeed = 3.5f;
     public float currentMoveSpeed;
-    // ... autres stats comme la vie ...
 
-    // Assurez-vous d'avoir une méthode Awake ou Start pour initialiser
+    [Header("Spawn Info (optionnel)")]
+    public Transform spawnPoint;
+
+    // Event fired when the agent reaches its destination (within stoppingDistance)
+    public event Action<Vector3> OnReachedDestination;
+
+    private Coroutine _arrivalCheckerCoroutine;
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         currentMoveSpeed = baseMoveSpeed;
-        agent.speed = currentMoveSpeed;
+        if (agent != null)
+            agent.speed = currentMoveSpeed;
+    }
+
+    void OnEnable()
+    {
+        // Ensure registration with manager when enabled
+        if (HordeManager.instance != null)
+            HordeManager.instance.RegisterEnemy(this);
     }
 
     void Start()
     {
+        // Defensive: Start also registers, but OnEnable handles most cases
         if (HordeManager.instance != null)
         {
             HordeManager.instance.RegisterEnemy(this);
         }
     }
 
+    void OnDisable()
+    {
+        // If disabled but not destroyed, unregister from alone list
+        if (HordeManager.instance != null)
+        {
+            HordeManager.instance.UnregisterEnemy(this);
+        }
+    }
+
     void OnDestroy()
     {
-        // Très important : se désinscrire en mourant !
-        if (HordeManager.instance != null && currentHorde != null)
+        // Important: leave horde and unregister
+        if (HordeManager.instance != null)
         {
-            HordeManager.instance.LeaveHorde(this);
+            if (currentHorde != null)
+            {
+                // use LeaveHorde to trigger proper cleanup and buff removal
+                HordeManager.instance.LeaveHorde(this);
+            }
+
+            HordeManager.instance.UnregisterEnemy(this);
         }
     }
 
-    // Cette méthode est juste pour l'exemple.
-    // Votre Behavior Tree appellera les actions de mouvement.
     void Update()
     {
-        // Si je suis dans une horde, je suis son point de ralliement
-        if (currentHorde != null)
+        // Keep agent speed in sync with currentMoveSpeed (buffs/debuffs)
+        if (agent != null && agent.isActiveAndEnabled)
         {
-            // Simule le mouvement vers le point de ralliement
-            // (Votre BT gérera ça)
-            // Vector3 direction = (currentHorde.rallyPoint - transform.position).normalized;
-            // transform.position += direction * currentMoveSpeed * Time.deltaTime;
+            if (!Mathf.Approximately(agent.speed, currentMoveSpeed))
+                agent.speed = currentMoveSpeed;
         }
+
+        // Optional: behavior tree controls movement. Keep local logic light.
     }
 
-    // --- MÉTHODE CLÉ POUR LE BEHAVIOR TREE ---
-
-    /// <summary>
-    /// Dit à l'IA de se déplacer vers une destination
-    /// </summary>
+    // --- Movement API used by Behavior Tree actions ---
     public void MoveTo(Vector3 destination)
     {
-        if (agent.isActiveAndEnabled)
+        if (agent != null && agent.isActiveAndEnabled)
         {
             agent.SetDestination(destination);
+            if (_arrivalCheckerCoroutine != null)
+                StopCoroutine(_arrivalCheckerCoroutine);
+            _arrivalCheckerCoroutine = StartCoroutine(CheckArrival(destination));
         }
     }
 
-    /// <summary>
-    /// Dit à l'IA d'arrêter de bouger
-    /// </summary>
     public void StopMoving()
     {
-        if (agent.isActiveAndEnabled)
+        if (agent != null && agent.isActiveAndEnabled)
         {
             agent.ResetPath();
+            if (_arrivalCheckerCoroutine != null)
+            {
+                StopCoroutine(_arrivalCheckerCoroutine);
+                _arrivalCheckerCoroutine = null;
+            }
         }
+    }
+
+    private IEnumerator CheckArrival(Vector3 destination)
+    {
+        // Wait until agent path is computed
+        yield return null;
+
+        // If no path or agent inactive, exit
+        if (agent == null || !agent.isOnNavMesh)
+            yield break;
+
+        // Loop until reached (or path invalid)
+        while (agent.pathPending || agent.remainingDistance > Mathf.Max(agent.stoppingDistance, 0.1f))
+        {
+            // If no path or agent disabled, stop checking
+            if (!agent.isActiveAndEnabled)
+                yield break;
+            yield return null;
+        }
+
+        // Reached
+        _arrivalCheckerCoroutine = null;
+        OnReachedDestination?.Invoke(destination);
     }
 }

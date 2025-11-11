@@ -366,6 +366,7 @@ MonoBehaviour:
     rallyPoint: {x: 0, y: 0, z: 0}
   baseMoveSpeed: 3.5
   currentMoveSpeed: 0
+  spawnPoint: {fileID: 0}
 --- !u!136 &4732238601529796811
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -401,14 +402,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Graph: {fileID: 0}
-  m_BlackboardVariableOverridesList: []
+  m_Graph: {fileID: 2557552582224327509, guid: bfe9245a7a18d8a4f8af2f528ce67ee3, type: 2}
+  m_BlackboardVariableOverridesList:
+  - rid: 6663876352121504074
   m_OriginalGraph: {fileID: 0}
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 6663876352121504074
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        m_Value: {fileID: 1807755940922956229}
 --- !u!1 &7277404602049207658
 GameObject:
   m_ObjectHideFlags: 0

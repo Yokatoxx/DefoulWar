@@ -1,202 +1,211 @@
-// HordeManager.cs
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Version debug/verbose du HordeManager.
+/// - Logge les appels critiques pour diagnostiquer pourquoi aucune horde n'est créée / trouvée.
+/// - Expose des propriétés publiques pour lire activeHordes / aloneEnemies depuis l'inspector ou d'autres scripts.
+/// Utilisez temporairement en remplacement de votre HordeManager, puis remettez la version de production ensuite.
+/// </summary>
 public class HordeManager : MonoBehaviour
 {
-    // --- Singleton Pattern ---
     public static HordeManager instance;
+
+    [Header("Règles des Hordes (debug)")]
+    public int maxHordes = 2;
+    public int minHordeSize = 4;
+    public float checkAloneInterval = 5.0f;
+
+    // Rendre publiques pour debug
+    [HideInInspector] public List<Horde> activeHordes = new List<Horde>();
+    [HideInInspector] public List<EnemyAI> aloneEnemies = new List<EnemyAI>();
+
+    [Header("Debug options")]
+    public bool logCalls = true;
+    public bool autoStartCheckCoroutine = true;
 
     void Awake()
     {
         if (instance == null)
         {
             instance = this;
-            // DontDestroyOnLoad(gameObject); // Optionnel
+            if (logCalls) Debug.Log("[HordeManagerDebug] Instance assigned in Awake.");
         }
         else
         {
+            Debug.LogWarning("[HordeManagerDebug] Duplicate instance detected, destroying this.");
             Destroy(gameObject);
+            return;
         }
     }
 
-    [Header("Règles des Hordes")]
-    [SerializeField] private int maxHordes = 2;
-    [SerializeField] private int minHordeSize = 4;
-    [SerializeField] private float checkAloneInterval = 5.0f; // Temps en secondes
-
-    [Header("Listes (Debug)")]
-    [SerializeField] private List<Horde> activeHordes = new List<Horde>();
-    [SerializeField] private List<EnemyAI> aloneEnemies = new List<EnemyAI>();
-
-    // --- Initialisation ---
     void Start()
     {
-        // Lance la coroutine qui gère la logique avancée
-        StartCoroutine(CheckAloneEnemiesLogic());
+        if (autoStartCheckCoroutine)
+            StartCoroutine(CheckAloneEnemiesLogic());
+
+        if (logCalls) Debug.Log($"[HordeManagerDebug] Start: maxHordes={maxHordes} minHordeSize={minHordeSize}");
     }
 
-    // --- Interface Publique (pour le BT et les Ennemis) ---
+    // --- API public pour le BT / scripts (mêmes signatures que votre implémentation) ---
 
-    /// <summary>
-    /// Appelé par EnemyAI à son Start()
-    /// </summary>
     public void RegisterEnemy(EnemyAI enemy)
     {
-        if (!aloneEnemies.Contains(enemy))
+        if (enemy == null) return;
+        if (!aloneEnemies.Contains(enemy) && enemy.currentHorde == null)
         {
             aloneEnemies.Add(enemy);
+            if (logCalls) Debug.Log($"[HordeManagerDebug] RegisterEnemy: {enemy.name} (aloneEnemies={aloneEnemies.Count})");
         }
     }
 
-    /// <summary>
-    /// Appelé par le Behavior Tree (Action: "Trouver Horde")
-    /// </summary>
-    public Horde FindNearestHorde(Vector3 position)
+    public void UnregisterEnemy(EnemyAI enemy)
     {
-        Horde nearestHorde = null;
-        float minDistance = float.MaxValue;
-
-        foreach (Horde horde in activeHordes)
-        {
-            // Met à jour le point de ralliement avant de check
-            horde.UpdateRallyPoint();
-
-            float distance = Vector3.Distance(position, horde.rallyPoint);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                nearestHorde = horde;
-            }
-        }
-        return nearestHorde;
-    }
-
-    /// <summary>
-    /// Appelé par le Behavior Tree (Condition: "Peut Créer Horde ?")
-    /// </summary>
-    public bool CanFormNewHorde()
-    {
-        return activeHordes.Count < maxHordes;
-    }
-
-    /// <summary>
-    /// Appelé par le Behavior Tree (Action: "Créer Horde")
-    /// </summary>
-    public void CreateHorde(EnemyAI founder)
-    {
-        if (!CanFormNewHorde() || founder.currentHorde != null) return;
-
-        Horde newHorde = new Horde(founder);
-        activeHordes.Add(newHorde);
-
-        // Le fondateur n'est plus seul
-        if (aloneEnemies.Contains(founder))
-        {
-            aloneEnemies.Remove(founder);
-        }
-    }
-
-    /// <summary>
-    /// Appelé par le Behavior Tree (Action: "Rejoindre Horde")
-    /// </summary>
-    public void JoinHorde(EnemyAI enemy, Horde horde)
-    {
-        if (enemy.currentHorde != null) return; // Déjà dans une horde
-
-        horde.AddMember(enemy);
-
+        if (enemy == null) return;
         if (aloneEnemies.Contains(enemy))
         {
             aloneEnemies.Remove(enemy);
+            if (logCalls) Debug.Log($"[HordeManagerDebug] UnregisterEnemy: {enemy.name} (aloneEnemies={aloneEnemies.Count})");
         }
     }
 
-    /// <summary>
-    /// Appelé par EnemyAI (OnDestroy) ou si l'ennemi s'enfuit
-    /// </summary>
+    public Horde FindNearestHorde(Vector3 position)
+    {
+        if (activeHordes == null || activeHordes.Count == 0)
+        {
+            if (logCalls) Debug.Log("[HordeManagerDebug] FindNearestHorde: no active hordes.");
+            return null;
+        }
+
+        Horde nearest = null;
+        float minDist = float.MaxValue;
+        foreach (var h in activeHordes)
+        {
+            if (h == null) continue;
+            h.UpdateRallyPoint();
+            float d = Vector3.Distance(position, h.rallyPoint);
+            if (d < minDist)
+            {
+                minDist = d;
+                nearest = h;
+            }
+        }
+
+        if (logCalls) Debug.Log($"[HordeManagerDebug] FindNearestHorde: nearest={(nearest != null ? "found" : "null")} dist={minDist}");
+        return nearest;
+    }
+
+    public bool CanFormNewHorde()
+    {
+        bool can = activeHordes.Count < maxHordes;
+        if (logCalls) Debug.Log($"[HordeManagerDebug] CanFormNewHorde => {can} (activeHordes={activeHordes.Count} / max={maxHordes})");
+        return can;
+    }
+
+    public void CreateHorde(EnemyAI founder)
+    {
+        if (founder == null)
+        {
+            Debug.LogWarning("[HordeManagerDebug] CreateHorde called with null founder.");
+            return;
+        }
+
+        if (!CanFormNewHorde())
+        {
+            if (logCalls) Debug.Log($"[HordeManagerDebug] CreateHorde: cannot form new horde (active={activeHordes.Count}).");
+            return;
+        }
+
+        if (founder.currentHorde != null)
+        {
+            if (logCalls) Debug.Log($"[HordeManagerDebug] CreateHorde: founder {founder.name} already in a horde.");
+            return;
+        }
+
+        Horde h = new Horde(founder);
+        activeHordes.Add(h);
+        if (aloneEnemies.Contains(founder)) aloneEnemies.Remove(founder);
+        if (logCalls) Debug.Log($"[HordeManagerDebug] CreateHorde: created by {founder.name}. activeHordes={activeHordes.Count}");
+    }
+
+    public void JoinHorde(EnemyAI enemy, Horde horde)
+    {
+        if (enemy == null || horde == null)
+        {
+            Debug.LogWarning("[HordeManagerDebug] JoinHorde: null param.");
+            return;
+        }
+        if (enemy.currentHorde != null)
+        {
+            if (logCalls) Debug.Log($"[HordeManagerDebug] JoinHorde: {enemy.name} already in a horde.");
+            return;
+        }
+
+        horde.AddMember(enemy);
+        if (aloneEnemies.Contains(enemy)) aloneEnemies.Remove(enemy);
+        if (logCalls) Debug.Log($"[HordeManagerDebug] JoinHorde: {enemy.name} joined horde (size={horde.members.Count}).");
+    }
+
     public void LeaveHorde(EnemyAI enemy)
     {
-        if (enemy.currentHorde == null) return;
-
-        enemy.currentHorde.RemoveMember(enemy);
-
-        // L'ennemi redevient "seul" (s'il n'est pas mort)
+        if (enemy == null || enemy.currentHorde == null) return;
+        var h = enemy.currentHorde;
+        h.RemoveMember(enemy);
         if (enemy != null && enemy.gameObject.activeInHierarchy)
-        {
             RegisterEnemy(enemy);
-        }
+
+        if (logCalls) Debug.Log($"[HordeManagerDebug] LeaveHorde: {enemy.name} left horde.");
     }
 
-    /// <summary>
-    /// Appelé par la classe Horde quand elle n'a plus de membres
-    /// </summary>
     public void DisbandHorde(Horde horde)
     {
+        if (horde == null) return;
         if (activeHordes.Contains(horde))
         {
             activeHordes.Remove(horde);
+            if (logCalls) Debug.Log("[HordeManagerDebug] DisbandHorde: removed a horde. activeHordes=" + activeHordes.Count);
         }
     }
 
-    // --- Logique des Buffs ---
-
+    // Buffs
     public void ApplyBuff(EnemyAI enemy)
     {
-        // === METTEZ VOTRE LOGIQUE DE BUFF ICI ===
-        // Exemple:
+        if (enemy == null) return;
         enemy.currentMoveSpeed = enemy.baseMoveSpeed * 1.5f;
-        // enemy.GetComponent<Renderer>().material.color = Color.red;
-        Debug.Log($"{enemy.name} a reçu un buff de horde !");
+        if (logCalls) Debug.Log($"[HordeManagerDebug] ApplyBuff: {enemy.name} speed -> {enemy.currentMoveSpeed}");
     }
 
     public void RemoveBuff(EnemyAI enemy)
     {
-        // === METTEZ VOTRE LOGIQUE DE DEBUFF ICI ===
-        // Assurez-vous de vérifier si l'ennemi n'est pas détruit
-        if (enemy != null)
-        {
-            enemy.currentMoveSpeed = enemy.baseMoveSpeed;
-            // enemy.GetComponent<Renderer>().material.color = Color.white;
-            Debug.Log($"{enemy.name} a perdu son buff de horde.");
-        }
+        if (enemy == null) return;
+        enemy.currentMoveSpeed = enemy.baseMoveSpeed;
+        if (logCalls) Debug.Log($"[HordeManagerDebug] RemoveBuff: {enemy.name} speed -> {enemy.currentMoveSpeed}");
     }
 
-    // --- Logique Avancée (Votre cas spécial) ---
-
-    /// <summary>
-    /// Coroutine qui gère les ennemis "seuls" et forme des hordes "minables".
-    /// </summary>
+    // Coroutine advanced logic (same behaviour)
     private IEnumerator CheckAloneEnemiesLogic()
     {
-        // Boucle infinie
         while (true)
         {
-            // Attend X secondes avant le prochain check
             yield return new WaitForSeconds(checkAloneInterval);
 
-            // Votre logique : "Si maxHorde est rempli, et qu'il reste des ennemis >= hordeMinSize"
             if (activeHordes.Count >= maxHordes && aloneEnemies.Count >= minHordeSize)
             {
-                Debug.Log("Condition de petite horde remplie ! Création...");
-
-                // Prend le premier ennemi seul comme fondateur
+                if (logCalls) Debug.Log("[HordeManagerDebug] CheckAloneEnemiesLogic: creating small horde.");
                 EnemyAI founder = aloneEnemies[0];
+                Horde small = new Horde(founder);
+                activeHordes.Add(small);
+                aloneEnemies.RemoveAt(0);
 
-                // Crée une "petite horde" (elle n'est pas limitée par maxHordes)
-                Horde smallHorde = new Horde(founder);
-                activeHordes.Add(smallHorde); // Ajoute à la liste
-                aloneEnemies.RemoveAt(0); // Retire le fondateur des "seuls"
-
-                // (Optionnel) Force les N-1 prochains ennemis seuls à la rejoindre
-                int membersToAutoJoin = minHordeSize - 1;
-                for (int i = 0; i < membersToAutoJoin && aloneEnemies.Count > 0; i++)
-                {
-                    JoinHorde(aloneEnemies[0], smallHorde);
-                    // 'JoinHorde' s'occupe de le retirer de la liste 'aloneEnemies'
-                }
+                int toJoin = minHordeSize - 1;
+                for (int i = 0; i < toJoin && aloneEnemies.Count > 0; i++)
+                    JoinHorde(aloneEnemies[0], small);
             }
         }
     }
+
+    // Utilitaires d'inspection
+    public int GetActiveHordesCount() => activeHordes?.Count ?? 0;
+    public int GetAloneEnemiesCount() => aloneEnemies?.Count ?? 0;
 }
