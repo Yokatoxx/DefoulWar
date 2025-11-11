@@ -11,21 +11,9 @@ public partial class MoveToAction : Action
     [SerializeReference, SerializeField]
     public BlackboardVariable<Vector3> TargetPos;
     // Optionnel : lier la variable NearestHorde si vous en avez une sur le blackboard
-    [SerializeReference, SerializeField]
-    public BlackboardVariable<GameObject> NearestHorde;
-    public float updateThreshold = 0.5f;
-    public float timeout = 12f;
-    private bool _started;
-    private bool _reached;
-    private float _startTime;
-    private Vector3 _lastTarget;
-
     protected override Status OnStart()
     {
-        _started = false;
-        _reached = false;
-        _startTime = Time.time;
-        Debug.Log("[MoveTo_safe] OnStart");
+        Debug.Log($"[MoveToAction_Debug] OnStart for {this.GameObject?.name}");
         return Status.Running;
     }
 
@@ -34,94 +22,44 @@ public partial class MoveToAction : Action
         var go = this.GameObject;
         if (go == null)
         {
-            Debug.LogWarning("[MoveTo_safe] GameObject is null");
+            Debug.LogWarning("[MoveToAction_Debug] GameObject null");
             return Status.Failure;
         }
 
         var enemy = go.GetComponent<EnemyAI>();
         if (enemy == null)
         {
-            Debug.LogWarning("[MoveTo_safe] EnemyAI missing on " + go.name);
+            Debug.LogWarning($"[MoveToAction_Debug] EnemyAI missing on {go.name}");
             return Status.Failure;
         }
 
-        if (TargetPos == null)
+        Vector3 target = TargetPos != null ? TargetPos.Value : Vector3.zero;
+        Debug.Log($"[MoveToAction_Debug] {go.name} asked to MoveTo {target} (TargetPos variable {(TargetPos != null ? "OK" : "NULL")})");
+
+        // Log agent state before calling MoveTo
+        var agent = enemy.agent;
+        if (agent == null)
         {
-            Debug.LogWarning("[MoveTo_safe] TargetPos blackboard var is null");
+            Debug.LogWarning($"[MoveToAction_Debug] {go.name} has no NavMeshAgent");
             return Status.Failure;
         }
 
-        Vector3 target = TargetPos.Value;
+        Debug.Log($"[MoveToAction_Debug] Agent state: enabled={agent.enabled} isOnNavMesh={agent.isOnNavMesh} isStopped={agent.isStopped} speed={agent.speed} updatePosition={agent.updatePosition}");
 
-        // Guard: si target == Vector3.zero et qu'il n'y a pas de nearest horde -> ne pas bouger
-        bool hasNearest = (NearestHorde != null && NearestHorde.Value != null);
-        if (target == Vector3.zero && !hasNearest && enemy.currentHorde == null)
+        // Call EnemyAI.MoveTo (which we'll also instrument)
+        try
         {
-            Debug.Log($"[MoveTo_safe] {go.name} target is (0,0,0) and no nearest horde/current horde -> abort MoveTo");
-            return Status.Failure;
-        }
-
-        // Guard: NavMeshAgent present and on NavMesh
-        if (enemy.agent == null)
-        {
-            Debug.LogWarning("[MoveTo_safe] NavMeshAgent is null on " + go.name);
-            return Status.Failure;
-        }
-        if (!enemy.agent.isOnNavMesh)
-        {
-            Debug.LogWarning("[MoveTo_safe] Agent NOT on NavMesh for " + go.name + " — isOnNavMesh=false");
-            return Status.Failure;
-        }
-
-        // Start or update move if target moved enough
-        if (!_started || Vector3.Distance(target, _lastTarget) > updateThreshold)
-        {
-            _lastTarget = target;
-            _started = true;
-            _startTime = Time.time;
-            _reached = false;
-
-            Debug.Log($"[MoveTo_safe] {go.name} MoveTo -> {target}");
             enemy.MoveTo(target);
-
-            enemy.OnReachedDestination -= OnArrived;
-            enemy.OnReachedDestination += OnArrived;
+            Debug.Log($"[MoveToAction_Debug] MoveTo called for {go.name}");
         }
-
-        // Timeout
-        if (Time.time - _startTime > timeout)
+        catch (Exception ex)
         {
-            Debug.LogWarning($"[MoveTo_safe] Timeout for {go.name} after {timeout}s (target {_lastTarget})");
-            enemy.OnReachedDestination -= OnArrived;
-            enemy.StopMoving();
+            Debug.LogError($"[MoveToAction_Debug] Exception calling MoveTo on {go.name}: {ex}");
             return Status.Failure;
         }
 
-        if (_reached)
-        {
-            Debug.Log($"[MoveTo_safe] {go.name} reached {_lastTarget}");
-            enemy.OnReachedDestination -= OnArrived;
-            return Status.Success;
-        }
-
-        return Status.Running;
+        return Status.Success;
     }
 
-    protected override void OnEnd()
-    {
-        var go = this.GameObject;
-        if (go == null) return;
-        var enemy = go.GetComponent<EnemyAI>();
-        if (enemy != null)
-        {
-            enemy.OnReachedDestination -= OnArrived;
-        }
-        Debug.Log("[MoveTo_safe] OnEnd");
-    }
-
-    private void OnArrived(Vector3 dest)
-    {
-        _reached = true;
-        Debug.Log("[MoveTo_safe] OnArrived event fired for dest " + dest);
-    }
+    protected override void OnEnd() { }
 }
