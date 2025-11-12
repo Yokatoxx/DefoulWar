@@ -43,7 +43,9 @@ namespace Ennemies.Effect
         [Header("Effet visuel de protection")]
         [Tooltip("Particules ou aura de protection magique (optionnel)")]
         [SerializeField] private GameObject magicShieldEffect;
-        
+
+        [SerializeField] private MagicEnemyHitScan hitScanFx;
+
         private EnemyHealth health;
         private float lastReflectTime = -999f;
         private GameObject cachedBulletPrefab;
@@ -140,7 +142,12 @@ namespace Ennemies.Effect
         private void ReflectHitscan(PlayerHealth player)
         {
             player.TakeDamage(reflectedDamage);
-            
+
+            if (hitScanFx != null)
+            {
+                hitScanFx.FireTo(player.transform);
+            }
+
             // Effet visuel de ligne/rayon entre l'ennemi et le joueur
             Debug.DrawLine(transform.position + Vector3.up * 1.5f, player.transform.position, 
                 new Color(0.8f, 0.2f, 1f), 0.1f);

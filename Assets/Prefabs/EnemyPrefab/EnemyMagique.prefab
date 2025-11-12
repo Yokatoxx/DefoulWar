@@ -137,17 +137,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHitscanReflect: 1
+  reflectedBulletSpeed: 30
   reflectedDamage: 15
   reflectCooldown: 0.1
-  reflectedBulletSpeed: 30
   magicBulletPrefab: {fileID: 0}
   reflectEffectPrefab: {fileID: 0}
   reflectEffectDuration: 0.5
-  hitScanFx: {fileID: 7108234100319031770}
   healAmount: 30
   healEffectPrefab: {fileID: 0}
   healEffectDuration: 1
   magicShieldEffect: {fileID: 0}
+  hitScanFx: {fileID: 7108234100319031770}
 --- !u!114 &7108234100319031770
 MonoBehaviour:
   m_ObjectHideFlags: 0

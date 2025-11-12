@@ -19074,7 +19074,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 200, y: 0}
-  m_SizeDelta: {x: 250, y: 250}
+  m_SizeDelta: {x: 350, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &403811672
 MonoBehaviour:
@@ -37458,6 +37458,7 @@ GameObject:
   m_Component:
   - component: {fileID: 925040550}
   - component: {fileID: 925040551}
+  - component: {fileID: 925040552}
   m_Layer: 0
   m_Name: Dammage
   m_TagString: Untagged
@@ -37508,6 +37509,28 @@ MonoBehaviour:
   smoothSpeed: 10
   hideThreshold: 0.01
   volumePriority: 100
+--- !u!114 &925040552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925040549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c85c408c6c1c5974e953d1b29863ae04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetCamera: {fileID: 2142068713}
+  player: {fileID: 2142068712}
+  indicatorLeft: {fileID: 1763094631}
+  indicatorRight: {fileID: 403811672}
+  indicatorBack: {fileID: 1280493647}
+  minDistanceForMaxAlpha: 3
+  maxDistanceForMinAlpha: 30
+  fadeOutSpeed: 2.5
+  damageToAlphaFactor: 0.02
+  maxPulseAlpha: 1
 --- !u!1 &947489353
 GameObject:
   m_ObjectHideFlags: 0
@@ -57913,7 +57936,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -200}
-  m_SizeDelta: {x: 250, y: 250}
+  m_SizeDelta: {x: 350, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1280493647
 MonoBehaviour:
@@ -67263,7 +67286,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -200, y: 0}
-  m_SizeDelta: {x: 250, y: 250}
+  m_SizeDelta: {x: 350, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1763094631
 MonoBehaviour:
