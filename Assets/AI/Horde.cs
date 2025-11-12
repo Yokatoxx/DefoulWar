@@ -1,85 +1,49 @@
-// Horde.cs
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
 public class Horde
 {
-    public List<EnemyAI> members;
-    public EnemyAI leader; // Optional leader (used as rally point)
-    public Vector3 rallyPoint;
+    public int Id { get; private set; }
+    public List<EnemyAgent> Members { get; private set; }
+    public Vector3 Position { get; private set; }
+    public int MaxSize { get; private set; }
+    public int OriginatingSpawnId { get; private set; }
 
-    public Horde(EnemyAI founder)
+    public Horde(int id, Vector3 position, int maxSize, int originatingSpawnId = -1)
     {
-        members = new List<EnemyAI>();
-        leader = founder;
-        AddMember(founder);
+        Id = id;
+        Position = position;
+        MaxSize = maxSize;
+        OriginatingSpawnId = originatingSpawnId;
+        Members = new List<EnemyAgent>();
     }
 
-    public void AddMember(EnemyAI enemy)
+    public bool IsFull => Members.Count >= MaxSize;
+
+    public void AddMember(EnemyAgent agent)
     {
-        if (enemy == null) return;
-
-        if (!members.Contains(enemy))
+        if (!Members.Contains(agent) && !IsFull)
         {
-            members.Add(enemy);
-            enemy.currentHorde = this;
-            if (HordeManager.instance != null)
-                HordeManager.instance.ApplyBuff(enemy);
-        }
-        UpdateRallyPoint();
-    }
-
-    public void RemoveMember(EnemyAI enemy)
-    {
-        if (enemy == null) return;
-
-        if (members.Contains(enemy))
-        {
-            members.Remove(enemy);
-            // Clear enemy's horde ref and remove buff
-            if (enemy != null)
-            {
-                enemy.currentHorde = null;
-                if (HordeManager.instance != null)
-                    HordeManager.instance.RemoveBuff(enemy);
-            }
-
-            // If leader left, pick a new leader
-            if (leader == enemy)
-            {
-                leader = members.Count > 0 ? members[0] : null;
-            }
-        }
-
-        if (members.Count == 0)
-        {
-            if (HordeManager.instance != null)
-                HordeManager.instance.DisbandHorde(this);
-        }
-        else
-        {
-            UpdateRallyPoint();
+            Members.Add(agent);
+            agent.OnJoinedHorde(this);
+            RecalculatePosition();
         }
     }
 
-    public void UpdateRallyPoint()
+    public void RemoveMember(EnemyAgent agent)
     {
-        if (members == null || members.Count == 0) return;
+        if (Members.Remove(agent))
+        {
+            agent.OnLeftHorde();
+            RecalculatePosition();
+        }
+    }
 
-        if (leader != null)
-        {
-            rallyPoint = leader.transform.position;
-        }
-        else
-        {
-            Vector3 center = Vector3.zero;
-            foreach (var member in members)
-            {
-                if (member != null)
-                    center += member.transform.position;
-            }
-            rallyPoint = center / members.Count;
-        }
+    private void RecalculatePosition()
+    {
+        if (Members.Count == 0) return;
+        Vector3 sum = Vector3.zero;
+        foreach (var m in Members) sum += m.transform.position;
+        Position = sum / Members.Count;
     }
 }

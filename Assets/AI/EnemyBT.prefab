@@ -275,9 +275,9 @@ GameObject:
   - component: {fileID: 8822407487818134662}
   - component: {fileID: 6744729750470337342}
   - component: {fileID: 1424048076781185940}
-  - component: {fileID: 6774502108289080512}
   - component: {fileID: 4732238601529796811}
   - component: {fileID: -4563038597738317960}
+  - component: {fileID: -6936632228745801725}
   m_Layer: 0
   m_Name: EnemyBT
   m_TagString: Enemy
@@ -347,26 +347,6 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &6774502108289080512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1807755940922956229}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7582096fcbaacee4781545d5ecaf8303, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agent: {fileID: 6744729750470337342}
-  currentHorde:
-    members: []
-    leader: {fileID: 0}
-    rallyPoint: {x: 0, y: 0, z: 0}
-  baseMoveSpeed: 3.5
-  currentMoveSpeed: 0
-  spawnPoint: {fileID: 0}
 --- !u!136 &4732238601529796811
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -402,7 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Graph: {fileID: 2557552582224327509, guid: bfe9245a7a18d8a4f8af2f528ce67ee3, type: 2}
+  m_Graph: {fileID: -1912631415960399196, guid: 44c5c3c0d5c1122409b5f73e1edf4789, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 6663876352121504074
   m_OriginalGraph: {fileID: 0}
@@ -419,6 +399,33 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 1807755940922956229}
+--- !u!114 &-6936632228745801725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807755940922956229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 236bd37483da75846a2d8ec6701c1210, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hordeMax: 6
+  hordeMinSize: 2
+  hordeCheckInterval: 5
+  hordeJoinRadius: 30
+  playerDetectRange: 10
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  nav: {fileID: 6744729750470337342}
+  hordeId: -1
+  isAlone: 0
+  lastHordeCheckTime: -999
+  seesPlayer: 0
+  playerPosition: {x: 0, y: 0, z: 0}
+  targetPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &7277404602049207658
 GameObject:
   m_ObjectHideFlags: 0
