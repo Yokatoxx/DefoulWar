@@ -34,7 +34,7 @@ public class DashCible : MonoBehaviour
     [SerializeField] private CharacterController characterController;
     [SerializeField] private FPSMovement fpsMovement;
 
-    private bool isDashing;
+    public bool isDashing;
     private bool chainActive;
     private int remainingChains;
     private float nextAvailableTime;
