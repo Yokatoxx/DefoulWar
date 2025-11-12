@@ -8,7 +8,7 @@ namespace FPS.Effect
     public class CameraDashEffect : MonoBehaviour
     {
         [SerializeField] private Volume volume;
-        [FormerlySerializedAs("pillarDashSystem")] [SerializeField] private DashSystem dashSystem;
+        [FormerlySerializedAs("pillarDashSystem")] [SerializeField] private DashCible dashSystem;
 
         [Header("Lens Distortion")]
         [SerializeField] private float dashEffectLensIntensity = -0.5f;
