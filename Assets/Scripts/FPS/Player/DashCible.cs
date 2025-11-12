@@ -39,7 +39,7 @@ public class DashCible : MonoBehaviour
     private int remainingChains;
     private float nextAvailableTime;
     private float slowMoEndUnscaled;
-    private bool slowMoApplied;
+    public bool slowMoApplied;
     private float previousTimeScale = 1f;
     private bool pathElectricStunned;
 

@@ -89,7 +89,7 @@ namespace FPS.Effect
 
         private void Update()
         {
-            bool nowDashing = dashSystem != null && dashSystem.isDashing;
+            bool nowDashing = dashSystem != null && (dashSystem.isDashing || dashSystem.slowMoApplied);
 
             // Front montant: d�marrage des effets
             if (nowDashing && !wasDashing)
