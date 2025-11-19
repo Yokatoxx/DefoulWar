@@ -37,9 +37,12 @@ public class WeaponSystem : MonoBehaviour
         new HitZoneMultiplier("Head", 2f)
     };
 
-    // AJOUT: référence vers l'anim du viseur
     [Header("UI")]
     [SerializeField] private CrosshairAnim crosshair;
+
+    [Header("Spread avancé")]
+    [Tooltip("Longueur (m) près du canon sans aucun spread. Au-delà, le spread s’applique.")]
+    [SerializeField] private float noSpreadNearDistance = 2f;
 
     private Animator animator;
 
@@ -54,7 +57,6 @@ public class WeaponSystem : MonoBehaviour
         currentReserve = weaponSettings.maxAmmo;
         UpdateAmmoUI();
 
-        // Auto-find du crosshair si non assigné
         if (crosshair == null) crosshair = FindAnyObjectByType<CrosshairAnim>();
     }
 
@@ -87,7 +89,6 @@ public class WeaponSystem : MonoBehaviour
     {
         if (isReloading) return;
         if (lastShootTime + weaponSettings.shotDelay >= Time.time) return;
-
         if (currentMagazine <= 0)
         {
             StartReload();
@@ -96,11 +97,8 @@ public class WeaponSystem : MonoBehaviour
 
         if (animator != null) animator.SetBool("isShooting", true);
         if (weaponShake != null) weaponShake.Shake();
-
-        // AJOUT: déclencher l'anim de tir du viseur
         if (crosshair != null) crosshair.PlayShoot();
 
-        // Nombre de projectiles effectifs selon munitions
         int shotsToFire = Mathf.Min(weaponSettings.bulletsPerShot, currentMagazine);
 
         for (int i = 0; i < shotsToFire; i++)
@@ -108,29 +106,85 @@ public class WeaponSystem : MonoBehaviour
             if (weaponSettings.muzzleFlash != null && bulletSpawnPoint != null)
                 Instantiate(weaponSettings.muzzleFlash, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
 
-            // 1) Ray depuis le centre de la caméra
+            // 1) Ray centre caméra SANS spread: on vise le point exact au centre écran
             Ray camRay = GetCenterRay();
-            Vector3 camDir = ApplySpread(camRay.direction);
+            Vector3 camDir = camRay.direction;
 
-            bool camHit = Physics.Raycast(camRay.origin, camDir, out RaycastHit camHitInfo, weaponSettings.shootingDistance, hitMask, QueryTriggerInteraction.Ignore);
-            Vector3 desiredPoint = camHit ? camHitInfo.point : camRay.origin + camDir * weaponSettings.shootingDistance;
+            bool camHit = Physics.Raycast(
+                camRay.origin,
+                camDir,
+                out RaycastHit camHitInfo,
+                weaponSettings.shootingDistance,
+                hitMask,
+                QueryTriggerInteraction.Ignore
+            );
 
-            // 2) Direction depuis le canon vers le point visé
-            Vector3 muzzleDir = (desiredPoint - bulletSpawnPoint.position).normalized;
+            Vector3 desiredPoint = camHit
+                ? camHitInfo.point
+                : camRay.origin + camDir * weaponSettings.shootingDistance;
 
-            // 3) Occlusion proche
-            float distToDesired = Vector3.Distance(bulletSpawnPoint.position, desiredPoint);
-            bool muzzleHit = Physics.Raycast(bulletSpawnPoint.position, muzzleDir, out RaycastHit muzzleHitInfo, distToDesired, hitMask, QueryTriggerInteraction.Ignore);
+            // 2) BaseDir depuis le canon VERS le point visé (sans spread)
+            Vector3 baseDir = (desiredPoint - bulletSpawnPoint.position).normalized;
 
-            Vector3 endPoint = muzzleHit ? muzzleHitInfo.point : desiredPoint;
-            Vector3 endNormal = muzzleHit ? muzzleHitInfo.normal : (camHit ? camHitInfo.normal : -camDir);
-            Collider hitCollider = muzzleHit ? muzzleHitInfo.collider : (camHit ? camHitInfo.collider : null);
-
-            if (weaponSettings.bulletTrail != null)
+            // 3) Spread appliqué pour la partie LOINTAINE uniquement
+            Vector3 spreadDir = camDir;
+            if (weaponSettings.addBulletSpread)
             {
-                TrailRenderer trail = Instantiate(weaponSettings.bulletTrail, bulletSpawnPoint.position, Quaternion.identity);
-                StartCoroutine(SpawnTrail(trail, endPoint, endNormal, hitCollider));
+                spreadDir = ApplySpreadFromMuzzle(baseDir);
             }
+
+            float totalDist = weaponSettings.shootingDistance;
+            float nearDist = Mathf.Clamp(noSpreadNearDistance, 0f, totalDist);
+            float farDist = Mathf.Max(0f, totalDist - nearDist);
+
+            Vector3 startNear = bulletSpawnPoint.position;
+
+            // 4) Premier segment SANS spread (proche du canon)
+            if (nearDist > 0f)
+            {
+                if (Physics.Raycast(
+                    startNear,
+                    baseDir,
+                    out RaycastHit hitNear,
+                    nearDist,
+                    hitMask,
+                    QueryTriggerInteraction.Ignore))
+                {
+                    // Touché dans la zone sans spread: fin ici
+                    FinalizeShot(hitNear.point, hitNear.normal, hitNear.collider);
+                    ConsumeAmmoAndFinish(ref shotsToFire);
+                    continue;
+                }
+            }
+
+            // 5) Second segment AVEC spread (lointain)
+            Vector3 startFar = startNear + baseDir * nearDist;
+            bool hitFar = false;
+            RaycastHit hitFarInfo = default;
+
+            if (farDist > 0f)
+            {
+                hitFar = Physics.Raycast(
+                    startFar,
+                    spreadDir,
+                    out hitFarInfo,
+                    farDist,
+                    hitMask,
+                    QueryTriggerInteraction.Ignore
+                );
+            }
+
+            Vector3 endPoint = hitFar
+                ? hitFarInfo.point
+                : startFar + spreadDir * farDist;
+
+            Vector3 endNormal = hitFar
+                ? hitFarInfo.normal
+                : -spreadDir;
+
+            Collider hitCollider = hitFar ? hitFarInfo.collider : null;
+
+            FinalizeShot(endPoint, endNormal, hitCollider);
 
             // Consommer 1 munition par projectile
             currentMagazine--;
@@ -141,6 +195,26 @@ public class WeaponSystem : MonoBehaviour
         UpdateAmmoUI();
     }
 
+    private void FinalizeShot(Vector3 endPoint, Vector3 endNormal, Collider hitCollider)
+    {
+        // Trail
+        if (weaponSettings.bulletTrail != null)
+        {
+            TrailRenderer trail = Instantiate(weaponSettings.bulletTrail, bulletSpawnPoint.position, Quaternion.identity);
+            StartCoroutine(SpawnTrail(trail, endPoint, endNormal, hitCollider));
+        }
+
+        // Dégâts
+        if (hitCollider != null)
+            ApplyDamage(hitCollider);
+    }
+
+    private void ConsumeAmmoAndFinish(ref int shotsToFire)
+    {
+        currentMagazine--;
+        shotsToFire = Mathf.Min(shotsToFire, currentMagazine);
+    }
+
     private Ray GetCenterRay()
     {
         Camera cam = aimCamera != null ? aimCamera : Camera.main;
@@ -149,16 +223,14 @@ public class WeaponSystem : MonoBehaviour
         return new Ray(bulletSpawnPoint.position, bulletSpawnPoint.forward);
     }
 
-    private Vector3 ApplySpread(Vector3 baseDir)
+    // Spread appliqué autour de l’axe du canon
+    private Vector3 ApplySpreadFromMuzzle(Vector3 baseDir)
     {
-        if (!weaponSettings.addBulletSpread) return baseDir.normalized;
-
         Vector3 v = weaponSettings.bulletSpreadVaraiance;
-        Vector3 dir = baseDir + new Vector3(
-            Random.Range(-v.x, v.x),
-            Random.Range(-v.y, v.y),
-            Random.Range(-v.z, v.z)
-        );
+        Vector3 right = bulletSpawnPoint.right;
+        Vector3 up = bulletSpawnPoint.up;
+
+        Vector3 dir = baseDir + right * Random.Range(-v.x, v.x) + up * Random.Range(-v.y, v.y);
         return dir.normalized;
     }
 
@@ -170,7 +242,7 @@ public class WeaponSystem : MonoBehaviour
 
         while (t < 1f)
         {
-            trail.transform.position = Vector3.Lerp(start, hitPoint, t);
+            trail.transform.position = Vector3.Lerp(bulletSpawnPoint.position, hitPoint, t);
             t += Time.deltaTime / travelTime;
             yield return null;
         }
@@ -180,10 +252,6 @@ public class WeaponSystem : MonoBehaviour
         // Impact FX si on a touché un collider non-ennemi
         if (hitCollider != null && weaponSettings.ImpactParticleSystem != null && !hitCollider.CompareTag(enemyTag))
             Instantiate(weaponSettings.ImpactParticleSystem, hitPoint, Quaternion.LookRotation(hitNormal));
-
-        // Appliquer les dégâts à la fin du trail (si un collider a été touché)
-        if (hitCollider != null)
-            ApplyDamage(hitCollider);
 
         if (animator != null) animator.SetBool("isShooting", false);
         Destroy(trail.gameObject, trail.time);

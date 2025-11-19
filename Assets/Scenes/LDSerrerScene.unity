@@ -6190,7 +6190,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1211730982}
+  m_Mesh: {fileID: 1473590277}
 --- !u!33 &89337233
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -6637,7 +6637,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1473590277}
+  m_Mesh: {fileID: 959278887}
 --- !u!33 &119035885
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -7117,7 +7117,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 959278887}
+  m_Mesh: {fileID: 1960259077}
 --- !u!33 &120256229
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -9438,7 +9438,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1943029095}
+  m_Mesh: {fileID: 1211730982}
 --- !u!33 &232472007
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -22107,6 +22107,10 @@ PrefabInstance:
       propertyPath: weaponShake
       value: 
       objectReference: {fileID: 2090321866}
+    - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: weaponSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: c3876e400c078074d8c4b7800835f143, type: 2}
     - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: bulletSpawnPoint
       value: 
@@ -53631,7 +53635,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1943029095}
+  m_Mesh: {fileID: 1798297779}
 --- !u!33 &1869820361
 MeshFilter:
   m_ObjectHideFlags: 10
