@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73f0560723004024b9ed32e4785b641d, type: 3}
+  m_Name: Pistol
+  m_EditorClassIdentifier: 
+  shotDelay: 1
+  reloadTime: 2
+  shootingDistance: 50
+  shootTrailWidth: 0.5
+  bulletsPerShot: 1
+  magazineSize: 6
+  maxAmmo: 120
+  bulletDammage: 50
+  shakeAmount: 5
+  recoilAmount: 5
+  addBulletSpread: 1
+  isAutomatic: 0
+  bulletSpreadVaraiance: {x: 1, y: 1, z: 1}
+  weaponModel: {fileID: 1364368352059329568, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
+  muzzleFlash: {fileID: 7980029976762078213, guid: 1f58a1dea6bbd9347843e4935585e6a2, type: 3}
+  ImpactParticleSystem: {fileID: 7138884428354202179, guid: e36466f47c6d2464cbffa2864a5b0198, type: 3}
+  bulletTrail: {fileID: 4795970869987127494, guid: a527b787c415e734797cb5209dacaba1, type: 3}
+  shootSound: {fileID: 8300000, guid: 6447f4df62cc993448d168aff9a645ed, type: 3}

@@ -22226,7 +22226,7 @@ PrefabInstance:
     - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: weaponSettings
       value: 
-      objectReference: {fileID: 11400000, guid: c3876e400c078074d8c4b7800835f143, type: 2}
+      objectReference: {fileID: 11400000, guid: d26f4c83c96e2874fabe3ce7dcca72d2, type: 2}
     - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: bulletSpawnPoint
       value: 
