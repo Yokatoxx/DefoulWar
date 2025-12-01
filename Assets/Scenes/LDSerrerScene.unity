@@ -22231,6 +22231,10 @@ PrefabInstance:
       propertyPath: bulletSpawnPoint
       value: 
       objectReference: {fileID: 111639829}
+    - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: weaponReloadRotation
+      value: 
+      objectReference: {fileID: 2090321867}
     - target: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_Name
       value: FPS_Player
@@ -56927,6 +56931,49 @@ MonoBehaviour:
   shakeMagnitude: 0.2
   shakeUsePerlin: 1
   shakePerlinFreq: 15
+--- !u!114 &2090321867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2090321863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f8856e97478a64ba9a38f6f9fa1be1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localAxis: {x: -1, y: 0, z: 0}
+  rotationAngle: 360
+  rotationDuration: 0.35
+  easeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  startDelay: 0
+  returnToStart: 1
+  returnDuration: 0.05
+  preventOverlap: 1
 --- !u!1 &2095303789
 GameObject:
   m_ObjectHideFlags: 0
@@ -57493,6 +57540,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1364368352059329568, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2090321866}
+    - targetCorrespondingSourceObject: {fileID: 1364368352059329568, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2090321867}
   m_SourcePrefab: {fileID: 100100000, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

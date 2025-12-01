@@ -19,6 +19,7 @@ public class WeaponSystem : MonoBehaviour
     [SerializeField] private string enemyTag = "Enemy";
     [SerializeField] private Animator animator; // auto-récup si null
     [SerializeField] private WeaponShake weaponShake; // AJOUT: shake d’arme
+    [SerializeField] private WeaponReloaderMovement weaponReloadRotation; // AJOUT: rotation reload d’arme
 
     [Header("Damage Zones")]
     [SerializeField]
@@ -269,6 +270,7 @@ public class WeaponSystem : MonoBehaviour
         if (currentReserve <= 0) return;
 
         isReloading = true;
+        if (weaponReloadRotation != null) weaponReloadRotation.TriggerRotateOnEmpty();
         if (animator != null) animator.SetBool("isReloading", true);
         Invoke(nameof(FinishReload), weaponSettings.reloadTime);
     }
