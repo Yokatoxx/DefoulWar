@@ -41,10 +41,18 @@ namespace FPS
         [SerializeField] private float groundDistance = 0.4f;
         [SerializeField] private LayerMask groundMask;
 
+        [Header("External Momentum")]
+        [SerializeField, Tooltip("Facteur de dissipation appliqué au momentum externe (0 = sans dissipation).")]
+        private float externalMomentumDamping = 12f;
+        [SerializeField, Tooltip("Durée pendant laquelle la composante verticale du momentum est conservée même si le joueur est au sol.")]
+        private float externalMomentumGroundGrace = 0.08f;
+
         private CharacterController controller;
         private Vector3 velocity;
         private Vector3 moveDirection = Vector3.zero;
         private Vector3 jumpMomentum = Vector3.zero;
+        private Vector3 externalMomentum = Vector3.zero;
+        private float externalMomentumGroundTimer;
         private bool isGrounded;
         private float coyoteTimeCounter;
 
@@ -61,8 +69,8 @@ namespace FPS
         // Méthode pour appliquer un momentum externe (utilisée par le dash)
         public void ApplyExternalMomentum(Vector3 momentum)
         {
-            jumpMomentum = momentum;
-            // S'assurer que le joueur garde ce momentum
+            externalMomentum = momentum;
+            externalMomentumGroundTimer = externalMomentumGroundGrace;
             moveSpeed = Mathf.Max(moveSpeed, momentum.magnitude);
         }
 
@@ -181,8 +189,8 @@ namespace FPS
                     controller.Move(new Vector3(moveDirection.x, 0, moveDirection.z) * Time.deltaTime);
                 }
             }
-            
-            // Appliquer la gravité
+
+            ProcessExternalMomentum();
             velocity.y += gravity * gravityMultiplier * Time.deltaTime;
             controller.Move(new Vector3(0, velocity.y, 0) * Time.deltaTime);
         }
@@ -213,6 +221,32 @@ namespace FPS
             {
                 velocity.y = -2f;
             }
+        }
+
+        private void ProcessExternalMomentum()
+        {
+            if (externalMomentum.sqrMagnitude <= 1e-4f)
+                return;
+
+            if (externalMomentumGroundTimer > 0f)
+                externalMomentumGroundTimer -= Time.deltaTime;
+
+            if (isGrounded && externalMomentumGroundTimer <= 0f && externalMomentum.y > 0f)
+                externalMomentum.y = 0f;
+
+            controller.Move(externalMomentum * Time.deltaTime);
+
+            float damping = externalMomentumDamping;
+            if (isGrounded && externalMomentumGroundTimer <= 0f)
+                damping *= 1.5f;
+
+            if (damping > 0f)
+            {
+                externalMomentum = Vector3.MoveTowards(externalMomentum, Vector3.zero, damping * Time.deltaTime);
+            }
+
+            if (isGrounded && externalMomentumGroundTimer <= 0f && Mathf.Abs(externalMomentum.y) < 0.01f)
+                externalMomentum.y = 0f;
         }
 
         public CharacterController Controller => controller;

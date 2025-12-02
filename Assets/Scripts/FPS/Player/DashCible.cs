@@ -34,6 +34,20 @@ public class DashCible : MonoBehaviour
     [SerializeField] private CharacterController characterController;
     [SerializeField] private FPSMovement fpsMovement;
 
+    [System.Serializable]
+    private class BounceConfig
+    {
+        public Vector3 direction = new Vector3(0f, 0.85f, -0.35f);
+        public bool directionIsLocal = true;
+        [Min(0f)] public float force = 18f;
+    }
+
+    [Header("Rebond")]
+    [SerializeField, Tooltip("Paramètres utilisés lorsque le joueur est au sol au moment de l’impact.")]
+    private BounceConfig groundBounce = new BounceConfig { direction = new Vector3(0f, 0.75f, -0.45f), directionIsLocal = true, force = 16f };
+    [SerializeField, Tooltip("Paramètres utilisés lorsque le joueur est en l’air au moment de l’impact.")]
+    private BounceConfig airBounce = new BounceConfig { direction = new Vector3(0f, 1f, -0.25f), directionIsLocal = true, force = 20f };
+
     public bool isDashing;
     private bool chainActive;
     private int remainingChains;
@@ -238,6 +252,7 @@ public class DashCible : MonoBehaviour
         if (applied)
         {
             ApplyOrRefreshSlowMo();
+            ApplyBounceImpulse(dirToTarget);
         }
 
         isDashing = false;
@@ -315,6 +330,48 @@ public class DashCible : MonoBehaviour
                 break;
             }
         }
+    }
+
+    private void ApplyBounceImpulse(Vector3 dashDirection)
+    {
+        BounceConfig config = GetCurrentBounceConfig();
+        if (config == null || config.force <= 0f)
+            return;
+
+        Vector3 dir = ResolveBounceDirection(dashDirection, config);
+        if (dir.sqrMagnitude <= 1e-4f)
+            return;
+
+        Vector3 momentum = dir.normalized * config.force;
+
+        if (fpsMovement != null)
+        {
+            fpsMovement.ApplyExternalMomentum(momentum);
+        }
+        else if (characterController != null)
+        {
+            characterController.Move(momentum * Time.deltaTime);
+        }
+        else
+        {
+            transform.position += momentum * Time.deltaTime;
+        }
+    }
+
+    private BounceConfig GetCurrentBounceConfig()
+    {
+        bool grounded = fpsMovement != null && fpsMovement.IsGrounded;
+        return grounded ? groundBounce : airBounce;
+    }
+
+    private Vector3 ResolveBounceDirection(Vector3 fallbackDashDirection, BounceConfig config)
+    {
+        Vector3 dir = config.directionIsLocal ? transform.TransformDirection(config.direction) : config.direction;
+        if (dir.sqrMagnitude <= 1e-4f)
+            dir = -fallbackDashDirection;
+        if (dir.sqrMagnitude <= 1e-4f)
+            return Vector3.up;
+        return dir.normalized;
     }
 }
 }
