@@ -7390,8 +7390,6 @@ MonoBehaviour:
   waveCompleteText: {fileID: 1808356769}
   crosshair: {fileID: 862241288}
   playerHealth: {fileID: 0}
-  weaponController: {fileID: 0}
-  projectileWeaponController: {fileID: 0}
   waveManager: {fileID: 2142988282}
 --- !u!114 &550816886
 MonoBehaviour:
@@ -7556,10 +7554,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killAllKey: 287
-  armorLevelUpKey: 288
-  armorResetKey: 289
   showButtons: 1
-  armorDeltaPerPress: 1
 --- !u!4 &579920125
 Transform:
   m_ObjectHideFlags: 0
@@ -9258,7 +9253,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -13863,7 +13859,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -15573,7 +15570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 412194921}
-  dashPlayer: {fileID: 1588617909}
+  dashPlayer: {fileID: 0}
   followPosition: 1
   followRotation: 1
   positionOffset: {x: 0, y: 0, z: 0}
@@ -16827,17 +16824,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1914151711}
   m_LocalEulerAnglesHint: {x: 0, y: -270, z: 90}
---- !u!114 &1588617909 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8707421386175084620, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-  m_PrefabInstance: {fileID: 1350077217051207126}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abae424d8e92498d9b8bf7c95b18e083, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1590743690
 GameObject:
   m_ObjectHideFlags: 0
@@ -17467,7 +17453,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:

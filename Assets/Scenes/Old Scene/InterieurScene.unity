@@ -4620,7 +4620,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -7250,8 +7251,6 @@ MonoBehaviour:
   waveCompleteText: {fileID: 204619850}
   crosshair: {fileID: 1723551983}
   playerHealth: {fileID: 846638791}
-  weaponController: {fileID: 0}
-  projectileWeaponController: {fileID: 846638790}
   waveManager: {fileID: 0}
 --- !u!114 &392519322
 MonoBehaviour:
@@ -12742,7 +12741,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -17934,10 +17934,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killAllKey: 287
-  armorLevelUpKey: 288
-  armorResetKey: 289
   showButtons: 1
-  armorDeltaPerPress: 1
 --- !u!1 &714770106
 GameObject:
   m_ObjectHideFlags: 0
@@ -21283,17 +21280,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!114 &846638790 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2801732676686258852, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-  m_PrefabInstance: {fileID: 496014192}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aa01fa35b1b406ba5f5ba9baea07030, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &846638791 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7205156207043545737, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
@@ -36399,7 +36385,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
