@@ -22235,6 +22235,26 @@ PrefabInstance:
       propertyPath: weaponReloadRotation
       value: 
       objectReference: {fileID: 2090321867}
+    - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: bobVerticalAmplitude
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: bobHorizontalAmplitude
+      value: 0.09
+      objectReference: {fileID: 0}
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: moveSpeed
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: sprintSpeed
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: increaseSpeedFactor
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_Name
       value: FPS_Player
