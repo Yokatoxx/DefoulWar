@@ -19,6 +19,7 @@
       <option value="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <option value="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <option value="711e78cd-a212-4c91-b26f-c3b96d7541f5" />
+      <option value="7494be5f-fbde-40d3-b119-52ab436b7cd6" />
       <option value="7bb11d94-e779-47d8-affa-8eece5f7b5ad" />
       <option value="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
       <option value="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
@@ -174,6 +175,19 @@
           <value>
             <set>
               <option value="7cec00fb-860b-44cf-bd08-1f988403d8a3" />
+            </set>
+          </value>
+        </entry>
+        <entry key="7494be5f-fbde-40d3-b119-52ab436b7cd6">
+          <value>
+            <set>
+              <option value="0ecbf78e-4b7c-4c58-b09a-9bf18b54a7d2" />
+              <option value="8cb9ccd9-1427-4498-882b-4eeaff09c1a8" />
+              <option value="2d324e86-c668-418c-94c7-dfa87c127006" />
+              <option value="19c15255-240a-4009-9c08-c2475a70cc13" />
+              <option value="2377a48f-c4cb-4c21-8b68-c4bca5d99d01" />
+              <option value="31bbbf9d-acd4-4f58-8060-b743377d7f5c" />
+              <option value="ede56cd0-4460-46ff-84ef-b8710db51903" />
             </set>
           </value>
         </entry>
@@ -359,15 +373,17 @@
       <entry key="5242eb31-9eec-4e7b-a4a6-8b68fd3e714b" />
       <entry key="5b3e7ee2-3c6d-4e68-8711-47c8ec5dec11" />
       <entry key="711e78cd-a212-4c91-b26f-c3b96d7541f5" />
+      <entry key="7494be5f-fbde-40d3-b119-52ab436b7cd6">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" />
+        </set>
+      </entry>
       <entry key="7bb11d94-e779-47d8-affa-8eece5f7b5ad" />
       <entry key="7cedbc0b-a2e2-4763-b45d-84524a48d7af" />
       <entry key="8e6ae34e-0ee7-4c7a-8fd3-1db54346f169" />
       <entry key="90c93295-7ff7-44dd-bc63-9777d360cbb2" />
-      <entry key="91c794e3-84b0-4fd4-8a95-bb35c22168ce">
-        <set>
-          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" />
-        </set>
-      </entry>
+      <entry key="91c794e3-84b0-4fd4-8a95-bb35c22168ce" />
       <entry key="96da3e4b-fd4b-494b-9250-e41fc1c4fdfe" />
       <entry key="9b716e55-1f12-42ef-9f57-4fc18316937f" />
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
