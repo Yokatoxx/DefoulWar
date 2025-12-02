@@ -32,8 +32,10 @@
       <option value="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <option value="bd6066b6-66f7-497c-ad3f-341ec49d2090" />
       <option value="c080dcdd-d73c-4ca6-9ed8-3f7213f0265a" />
+      <option value="c10a0472-4495-43ac-af3d-da74915e7cc1" />
       <option value="c267a988-d614-4b0f-bbf7-f88132b67369" />
       <option value="c385f004-16f2-4ca7-92db-56f732837536" />
+      <option value="c5c4dab1-60d0-49d2-baf3-0e73b2566b1f" />
       <option value="c869d8d7-9641-490a-99dd-7a65ab2243f9" />
       <option value="cddea399-0ccd-45bc-9587-22a29f83cbb7" />
       <option value="ceb67802-ff22-4707-868e-ed5fd02abcf5" />
@@ -298,6 +300,13 @@
             </set>
           </value>
         </entry>
+        <entry key="c10a0472-4495-43ac-af3d-da74915e7cc1">
+          <value>
+            <set>
+              <option value="a9974490-ddf2-4758-8c6c-814b69f9d089" />
+            </set>
+          </value>
+        </entry>
         <entry key="c267a988-d614-4b0f-bbf7-f88132b67369">
           <value>
             <set>
@@ -311,6 +320,13 @@
           <value>
             <set>
               <option value="2a0925ff-ecd3-408c-9f20-deb131bebddf" />
+            </set>
+          </value>
+        </entry>
+        <entry key="c5c4dab1-60d0-49d2-baf3-0e73b2566b1f">
+          <value>
+            <set>
+              <option value="7d3f4141-ef41-412f-b98e-0c5fb184d740" />
             </set>
           </value>
         </entry>
@@ -431,6 +447,11 @@
         <set>
           <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Data/DashBounceConfigSO.cs" />
           <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" />
+        </set>
+      </entry>
+      <entry key="c10a0472-4495-43ac-af3d-da74915e7cc1">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Death.cs" />
         </set>
       </entry>
       <entry key="c267a988-d614-4b0f-bbf7-f88132b67369" />
