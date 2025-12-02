@@ -3,375 +3,366 @@ using UnityEngine;
 
 namespace FPS
 {
-public class DashCible : MonoBehaviour
-{
-    [Header("Ciblage")]
-    [SerializeField]
-    private Camera aimCamera;
-    [SerializeField] private LayerMask enemyMask = ~0;
-    [SerializeField] private LayerMask obstacleMask = ~0;
-    [SerializeField] private float maxAimAngle = 30f;
-
-    [Header("Dash Ciblé Settings")]
-    [SerializeField] private int countDash = 3;
-    [SerializeField] private float slowMoTime = 0.75f;
-    [SerializeField] private float slowMoScale = 0.2f;
-    [SerializeField] private float distanceDash = 25f;
-    [SerializeField] private float cooldown = 1.5f;
-    [SerializeField]
-    private float dashDamage = 9999f;
-
-    [Header("Déplacement")]
-    [SerializeField] private float dashTravelTime = 0.08f;
-    [SerializeField] private float capsuleRadius = 0.4f;
-    [SerializeField] private float stopOffset = 1.0f;
-
-    [Header("Input")]
-    [SerializeField] private KeyCode activationKey = KeyCode.Q;
-
-    [Header("Références Joueur")]
-    [SerializeField] private FPSPlayerController playerController;
-    [SerializeField] private CharacterController characterController;
-    [SerializeField] private FPSMovement fpsMovement;
-
-    [System.Serializable]
-    private class BounceConfig
+    public class DashCible : MonoBehaviour
     {
-        public Vector3 direction = new Vector3(0f, 0.85f, -0.35f);
-        public bool directionIsLocal = true;
-        [Min(0f)] public float force = 18f;
-    }
+        [Header("Ciblage")]
+        [SerializeField] private Camera aimCamera;
 
-    [Header("Rebond")]
-    [SerializeField, Tooltip("Paramètres utilisés lorsque le joueur est au sol au moment de l’impact.")]
-    private BounceConfig groundBounce = new BounceConfig { direction = new Vector3(0f, 0.75f, -0.45f), directionIsLocal = true, force = 16f };
-    [SerializeField, Tooltip("Paramètres utilisés lorsque le joueur est en l’air au moment de l’impact.")]
-    private BounceConfig airBounce = new BounceConfig { direction = new Vector3(0f, 1f, -0.25f), directionIsLocal = true, force = 20f };
+        [Header("Définition du Dash")]
+        [SerializeField] private DashDefinition dashDefinition;
+        [SerializeField] private BounceDefinition groundBounce;
+        [SerializeField] private BounceDefinition airBounce;
 
-    public bool isDashing;
-    private bool chainActive;
-    private int remainingChains;
-    private float nextAvailableTime;
-    private float slowMoEndUnscaled;
-    public bool slowMoApplied;
-    private float previousTimeScale = 1f;
-    private bool pathElectricStunned;
+        [Header("Input")]
+        [SerializeField] private KeyCode activationKey = KeyCode.Q;
 
-    private static readonly Collider[] OverlapBuffer = new Collider[16];
+        [Header("Références Joueur")]
+        [SerializeField] private FPSPlayerController playerController;
+        [SerializeField] private CharacterController characterController;
+        [SerializeField] private FPSMovement fpsMovement;
 
-    private void Awake()
-    {
-        if (playerController == null)
-            playerController = GetComponent<FPSPlayerController>();
-        if (characterController == null && playerController != null)
-            characterController = playerController.Controller;
-        if (fpsMovement == null)
-            fpsMovement = GetComponent<FPSMovement>();
-        if (aimCamera == null)
-            aimCamera = Camera.main;
-    }
+        public bool isDashing;
+        private bool chainActive;
+        private int remainingChains;
+        private float nextAvailableTime;
+        private float slowMoEndUnscaled;
+        public bool slowMoApplied;
+        private float previousTimeScale = 1f;
+        private bool pathElectricStunned;
 
-    private void Update()
-    {
-        if (slowMoApplied && Time.unscaledTime >= slowMoEndUnscaled)
+        private static readonly Collider[] OverlapBuffer = new Collider[16];
+
+        private DashDefinition Config => dashDefinition;
+        private LayerMask EnemyMask => Config?.enemyMask ?? ~0;
+        private LayerMask ObstacleMask => Config?.obstacleMask ?? ~0;
+        private float MaxAimAngle => Mathf.Max(0f, Config?.maxAimAngle ?? 30f);
+        private int ConfigCountDash => Mathf.Max(1, Config?.countDash ?? 3);
+        private float ConfigSlowMoTime => Mathf.Max(0.01f, Config?.slowMoTime ?? 0.75f);
+        private float ConfigSlowMoScale => Mathf.Clamp(Config?.slowMoScale ?? 0.2f, 0.01f, 1f);
+        private float ConfigDistanceDash => Mathf.Max(0.5f, Config?.distanceDash ?? 25f);
+        private float ConfigCooldown => Mathf.Max(0f, Config?.cooldown ?? 1.5f);
+        private float ConfigDashDamage => Mathf.Max(0f, Config?.dashDamage ?? 9999f);
+        private float ConfigDashTravelTime => Mathf.Max(0.01f, Config?.dashTravelTime ?? 0.08f);
+        private float ConfigCapsuleRadius => Mathf.Max(0f, Config?.capsuleRadius ?? 0.4f);
+        private float ConfigStopOffset => Mathf.Max(0f, Config?.stopOffset ?? 1f);
+        private BounceDefinition CurrentBounce
         {
-            ClearSlowMo();
-            if (!isDashing && chainActive)
+            get
             {
-                EndChain();
+                bool grounded = fpsMovement == null || fpsMovement.IsGrounded;
+                if (grounded)
+                    return groundBounce ?? airBounce;
+                return airBounce ?? groundBounce;
             }
         }
 
-        if (Input.GetKeyDown(activationKey))
+        private void Awake()
         {
-            TryTriggerOrChain();
+            if (playerController == null)
+                playerController = GetComponent<FPSPlayerController>();
+            if (characterController == null && playerController != null)
+                characterController = playerController.Controller;
+            if (fpsMovement == null)
+                fpsMovement = GetComponent<FPSMovement>();
+            if (aimCamera == null)
+                aimCamera = Camera.main;
         }
-    }
 
-    private void TryTriggerOrChain()
-    {
-        if (isDashing) return;
-
-        if (!chainActive)
+        private void Update()
         {
-            if (Time.time < nextAvailableTime) return;
-            remainingChains = Mathf.Max(1, countDash);
-            chainActive = true;
-        }
-        else
-        {
-            if (!slowMoApplied || remainingChains <= 0)
+            if (slowMoApplied && Time.unscaledTime >= slowMoEndUnscaled)
             {
+                ClearSlowMo();
+                if (!isDashing && chainActive)
+                {
+                    EndChain();
+                }
+            }
+
+            if (Input.GetKeyDown(activationKey))
+            {
+                TryTriggerOrChain();
+            }
+        }
+
+        private void TryTriggerOrChain()
+        {
+            if (isDashing) return;
+
+            if (!chainActive)
+            {
+                if (Time.time < nextAvailableTime) return;
+                remainingChains = ConfigCountDash;
+                chainActive = true;
+            }
+            else
+            {
+                if (!slowMoApplied || remainingChains <= 0)
+                {
+                    return;
+                }
+            }
+
+            var target = AcquireTarget();
+            if (target == null)
+            {
+                if (chainActive)
+                {
+                    ClearSlowMo();
+                    EndChain();
+                }
                 return;
             }
+
+            remainingChains = Mathf.Max(0, remainingChains - 1);
+            StartCoroutine(DoTargetDash(target));
         }
 
-        var target = AcquireTarget();
-        if (target == null)
+        private EnemyHealth AcquireTarget()
         {
-            if (chainActive)
+            if (aimCamera == null) return null;
+
+            Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            if (Physics.Raycast(ray, out RaycastHit hit, ConfigDistanceDash, EnemyMask, QueryTriggerInteraction.Ignore))
             {
-                ClearSlowMo();
-                EndChain();
+                var eh = hit.collider.GetComponentInParent<EnemyHealth>() ?? hit.collider.GetComponent<EnemyHealth>();
+                if (eh != null && !eh.IsDead)
+                {
+                    if (!IsObstructed(aimCamera.transform.position, eh.transform.position))
+                        return eh;
+                }
             }
-            return;
-        }
 
-        remainingChains = Mathf.Max(0, remainingChains - 1);
-        StartCoroutine(DoTargetDash(target));
-    }
+            var all = FindObjectsByType<EnemyHealth>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            EnemyHealth best = null;
+            float bestScore = float.MaxValue;
+            Vector3 camPos = aimCamera.transform.position;
+            Vector3 camFwd = aimCamera.transform.forward;
 
-    private EnemyHealth AcquireTarget()
-    {
-        if (aimCamera == null) return null;
-
-        Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        if (Physics.Raycast(ray, out RaycastHit hit, distanceDash, enemyMask, QueryTriggerInteraction.Ignore))
-        {
-            var eh = hit.collider.GetComponentInParent<EnemyHealth>() ?? hit.collider.GetComponent<EnemyHealth>();
-            if (eh != null && !eh.IsDead)
+            foreach (var eh in all)
             {
-                if (!IsObstructed(aimCamera.transform.position, eh.transform.position))
-                    return eh;
+                if (eh == null || eh.IsDead) continue;
+                Vector3 to = eh.transform.position - camPos;
+                float dist = to.magnitude;
+                if (dist > ConfigDistanceDash) continue;
+                Vector3 dir = to / (dist + 1e-5f);
+                float angle = Mathf.Acos(Mathf.Clamp(Vector3.Dot(camFwd, dir), -1f, 1f)) * Mathf.Rad2Deg;
+                if (angle > MaxAimAngle) continue;
+                if (IsObstructed(camPos, eh.transform.position)) continue;
+                float score = angle * 2f + dist * 0.2f;
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    best = eh;
+                }
             }
+
+            return best;
         }
 
-        var all = FindObjectsByType<EnemyHealth>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        EnemyHealth best = null;
-        float bestScore = float.MaxValue;
-        Vector3 camPos = aimCamera.transform.position;
-        Vector3 camFwd = aimCamera.transform.forward;
-
-        foreach (var eh in all)
+        private bool IsObstructed(Vector3 from, Vector3 to)
         {
-            if (eh == null || eh.IsDead) continue;
-            Vector3 to = eh.transform.position - camPos;
-            float dist = to.magnitude;
-            if (dist > distanceDash) continue;
-            Vector3 dir = to / (dist + 1e-5f);
-            float angle = Mathf.Acos(Mathf.Clamp(Vector3.Dot(camFwd, dir), -1f, 1f)) * Mathf.Rad2Deg;
-            if (angle > maxAimAngle) continue;
-            if (IsObstructed(camPos, eh.transform.position)) continue;
-            float score = angle * 2f + dist * 0.2f;
-            if (score < bestScore)
+            Vector3 dir = to - from;
+            float dist = dir.magnitude;
+            if (dist <= 0.01f) return false;
+            return Physics.Raycast(from, dir.normalized, dist - 0.1f, ObstacleMask, QueryTriggerInteraction.Ignore);
+        }
+
+        private IEnumerator DoTargetDash(EnemyHealth target)
+        {
+            isDashing = true;
+            pathElectricStunned = false;
+
+            Vector3 start = transform.position;
+            Vector3 targetPos = target.transform.position;
+            Vector3 dirToTarget = (targetPos - start).normalized;
+            float distToTarget = Vector3.Distance(start, targetPos);
+
+            float stopDist = Mathf.Clamp(ConfigStopOffset, 0f, Mathf.Max(0f, distToTarget - 0.1f));
+            Vector3 end = targetPos - dirToTarget * stopDist;
+
+            Vector3 top = start + Vector3.up * 1.5f;
+            Vector3 bottom = start + Vector3.up * 0.2f;
+            Vector3 moveDir = (end - start);
+            float moveLen = moveDir.magnitude;
+            if (moveLen > 0.01f)
             {
-                bestScore = score;
-                best = eh;
+                if (Physics.CapsuleCast(top, bottom, ConfigCapsuleRadius, moveDir.normalized, out RaycastHit hit, moveLen, ObstacleMask, QueryTriggerInteraction.Ignore))
+                {
+                    end = hit.point - moveDir.normalized * 0.2f;
+                }
             }
-        }
 
-        return best;
-    }
-
-    private bool IsObstructed(Vector3 from, Vector3 to)
-    {
-        Vector3 dir = to - from;
-        float dist = dir.magnitude;
-        if (dist <= 0.01f) return false;
-        return Physics.Raycast(from, dir.normalized, dist - 0.1f, obstacleMask, QueryTriggerInteraction.Ignore);
-    }
-
-    private IEnumerator DoTargetDash(EnemyHealth target)
-    {
-        isDashing = true;
-        pathElectricStunned = false;
-
-        Vector3 start = transform.position;
-        Vector3 targetPos = target.transform.position;
-        Vector3 dirToTarget = (targetPos - start).normalized;
-        float distToTarget = Vector3.Distance(start, targetPos);
-
-        float stopDist = Mathf.Clamp(stopOffset, 0f, Mathf.Max(0f, distToTarget - 0.1f));
-        Vector3 end = targetPos - dirToTarget * stopDist;
-
-        Vector3 top = start + Vector3.up * 1.5f;
-        Vector3 bottom = start + Vector3.up * 0.2f;
-        Vector3 moveDir = (end - start);
-        float moveLen = moveDir.magnitude;
-        if (moveLen > 0.01f)
-        {
-            if (Physics.CapsuleCast(top, bottom, capsuleRadius, moveDir.normalized, out RaycastHit hit, moveLen, obstacleMask, QueryTriggerInteraction.Ignore))
+            if (fpsMovement != null)
             {
-                end = hit.point - moveDir.normalized * 0.2f;
+                fpsMovement.SetSpeedToMax();
             }
-        }
 
-        if (fpsMovement != null)
-        {
-            fpsMovement.SetSpeedToMax();
-        }
+            float t0 = Time.unscaledTime;
+            float dur = Mathf.Max(0.01f, ConfigDashTravelTime);
+            Vector3 prev = start;
 
-        float t0 = Time.unscaledTime;
-        float dur = Mathf.Max(0.01f, dashTravelTime);
-        Vector3 prev = start;
+            while (Time.unscaledTime - t0 < dur)
+            {
+                float u = (Time.unscaledTime - t0) / dur;
+                Vector3 pos = Vector3.Lerp(start, end, u);
+                Vector3 delta = pos - prev;
+                if (characterController != null)
+                    characterController.Move(delta);
+                else
+                    transform.position = pos;
+                prev = pos;
 
-        while (Time.unscaledTime - t0 < dur)
-        {
-            float u = (Time.unscaledTime - t0) / dur;
-            Vector3 pos = Vector3.Lerp(start, end, u);
-            Vector3 delta = pos - prev;
+                TryStunElectricOnPath(pos);
+
+                yield return null;
+            }
+            Vector3 finalDelta = end - prev;
             if (characterController != null)
-                characterController.Move(delta);
+                characterController.Move(finalDelta);
             else
-                transform.position = pos;
-            prev = pos;
+                transform.position = end;
 
-            TryStunElectricOnPath(pos);
-
-            yield return null;
-        }
-        Vector3 finalDelta = end - prev;
-        if (characterController != null)
-            characterController.Move(finalDelta);
-        else
-            transform.position = end;
-
-        var electric = target.GetComponent<Ennemies.Effect.ElectricEnnemis>();
-        if (electric != null)
-        {
-            var playerStun = GetComponent<PlayerStunAutoFire>();
-            if (playerStun == null) playerStun = gameObject.AddComponent<PlayerStunAutoFire>();
-            if (electric.OverrideAutoFireInterval)
-                playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
-            else
-                playerStun.ApplyStun(electric.StunDuration);
-
-            if (electric.ResistToDash)
-            {
-                isDashing = false;
-                ClearSlowMo();
-                EndChain();
-                yield break;
-            }
-        }
-
-        var hitCol = target.GetComponentInChildren<Collider>();
-        var dmg = new DamageInfo(amount: dashDamage, zoneName: "Dash", type: DamageType.Dash, hitPoint: target.transform.position, hitNormal: -dirToTarget, attacker: transform, hitCollider: hitCol);
-        bool applied = target.TryApplyDamage(dmg);
-
-        if (applied)
-        {
-            ApplyOrRefreshSlowMo();
-            ApplyBounceImpulse(dirToTarget);
-        }
-
-        isDashing = false;
-
-        if (remainingChains <= 0)
-        {
-            if (!slowMoApplied)
-            {
-                EndChain();
-            }
-        }
-    }
-
-    private void ApplyOrRefreshSlowMo()
-    {
-        slowMoEndUnscaled = Time.unscaledTime + Mathf.Max(0.01f, slowMoTime);
-        if (!slowMoApplied)
-        {
-            previousTimeScale = Time.timeScale;
-            Time.timeScale = Mathf.Clamp(slowMoScale, 0.01f, 1f);
-            Time.fixedDeltaTime = 0.02f * Time.timeScale;
-            slowMoApplied = true;
-        }
-    }
-
-    private void ClearSlowMo()
-    {
-        if (!slowMoApplied) return;
-        Time.timeScale = previousTimeScale;
-        Time.fixedDeltaTime = 0.02f * Time.timeScale;
-        slowMoApplied = false;
-    }
-
-    private void EndChain()
-    {
-        chainActive = false;
-        remainingChains = 0;
-        nextAvailableTime = Time.time + Mathf.Max(0f, cooldown);
-    }
-
-    private void OnDisable()
-    {
-        if (slowMoApplied) ClearSlowMo();
-    }
-
-    private void OnDestroy()
-    {
-        if (slowMoApplied) ClearSlowMo();
-    }
-
-    public int CountDash { get => countDash; set => countDash = Mathf.Max(1, value); }
-    public float SlowMoTime { get => slowMoTime; set => slowMoTime = Mathf.Max(0.01f, value); }
-    public float DistanceDash { get => distanceDash; set => distanceDash = Mathf.Max(0.5f, value); }
-    public float Cooldown { get => cooldown; set => cooldown = Mathf.Max(0f, value); }
-
-    private void TryStunElectricOnPath(Vector3 currentPos)
-    {
-        if (pathElectricStunned) return;
-        Vector3 top = currentPos + Vector3.up * 1.5f;
-        Vector3 bottom = currentPos + Vector3.up * 0.2f;
-        int count = Physics.OverlapCapsuleNonAlloc(top, bottom, capsuleRadius, OverlapBuffer, enemyMask, QueryTriggerInteraction.Ignore);
-        for (int i = 0; i < count; i++)
-        {
-            var col = OverlapBuffer[i];
-            if (col == null) continue;
-            var electric = col.GetComponentInParent<Ennemies.Effect.ElectricEnnemis>() ?? col.GetComponent<Ennemies.Effect.ElectricEnnemis>();
+            var electric = target.GetComponent<Ennemies.Effect.ElectricEnnemis>();
             if (electric != null)
             {
-                var playerStun = GetComponent<PlayerStunAutoFire>() ?? gameObject.AddComponent<PlayerStunAutoFire>();
+                var playerStun = GetComponent<PlayerStunAutoFire>();
+                if (playerStun == null) playerStun = gameObject.AddComponent<PlayerStunAutoFire>();
                 if (electric.OverrideAutoFireInterval)
                     playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
                 else
                     playerStun.ApplyStun(electric.StunDuration);
-                pathElectricStunned = true;
-                break;
+
+                if (electric.ResistToDash)
+                {
+                    isDashing = false;
+                    ClearSlowMo();
+                    EndChain();
+                    yield break;
+                }
+            }
+
+            var hitCol = target.GetComponentInChildren<Collider>();
+            var dmg = new DamageInfo(amount: ConfigDashDamage, zoneName: "Dash", type: DamageType.Dash, hitPoint: target.transform.position, hitNormal: -dirToTarget, attacker: transform, hitCollider: hitCol);
+            bool applied = target.TryApplyDamage(dmg);
+
+            if (applied)
+            {
+                ApplyOrRefreshSlowMo();
+                ApplyBounceImpulse(dirToTarget);
+            }
+
+            isDashing = false;
+
+            if (remainingChains <= 0)
+            {
+                if (!slowMoApplied)
+                {
+                    EndChain();
+                }
             }
         }
-    }
 
-    private void ApplyBounceImpulse(Vector3 dashDirection)
-    {
-        BounceConfig config = GetCurrentBounceConfig();
-        if (config == null || config.force <= 0f)
-            return;
-
-        Vector3 dir = ResolveBounceDirection(dashDirection, config);
-        if (dir.sqrMagnitude <= 1e-4f)
-            return;
-
-        Vector3 momentum = dir.normalized * config.force;
-
-        if (fpsMovement != null)
+        private void ApplyOrRefreshSlowMo()
         {
-            fpsMovement.ApplyExternalMomentum(momentum);
+            slowMoEndUnscaled = Time.unscaledTime + ConfigSlowMoTime;
+            if (!slowMoApplied)
+            {
+                previousTimeScale = Time.timeScale;
+                Time.timeScale = ConfigSlowMoScale;
+                Time.fixedDeltaTime = 0.02f * Time.timeScale;
+                slowMoApplied = true;
+            }
         }
-        else if (characterController != null)
-        {
-            characterController.Move(momentum * Time.deltaTime);
-        }
-        else
-        {
-            transform.position += momentum * Time.deltaTime;
-        }
-    }
 
-    private BounceConfig GetCurrentBounceConfig()
-    {
-        bool grounded = fpsMovement != null && fpsMovement.IsGrounded;
-        return grounded ? groundBounce : airBounce;
-    }
+        private void ClearSlowMo()
+        {
+            if (!slowMoApplied) return;
+            Time.timeScale = previousTimeScale;
+            Time.fixedDeltaTime = 0.02f * Time.timeScale;
+            slowMoApplied = false;
+        }
 
-    private Vector3 ResolveBounceDirection(Vector3 fallbackDashDirection, BounceConfig config)
-    {
-        Vector3 dir = config.directionIsLocal ? transform.TransformDirection(config.direction) : config.direction;
-        if (dir.sqrMagnitude <= 1e-4f)
-            dir = -fallbackDashDirection;
-        if (dir.sqrMagnitude <= 1e-4f)
-            return Vector3.up;
-        return dir.normalized;
+        private void EndChain()
+        {
+            chainActive = false;
+            remainingChains = 0;
+            nextAvailableTime = Time.time + ConfigCooldown;
+        }
+
+        private void OnDisable()
+        {
+            if (slowMoApplied) ClearSlowMo();
+        }
+
+        private void OnDestroy()
+        {
+            if (slowMoApplied) ClearSlowMo();
+        }
+
+        public int CountDash => ConfigCountDash;
+        public float SlowMoTime => ConfigSlowMoTime;
+        public float DistanceDash => ConfigDistanceDash;
+        public float Cooldown => ConfigCooldown;
+
+        private void TryStunElectricOnPath(Vector3 currentPos)
+        {
+            if (pathElectricStunned) return;
+            Vector3 top = currentPos + Vector3.up * 1.5f;
+            Vector3 bottom = currentPos + Vector3.up * 0.2f;
+            int count = Physics.OverlapCapsuleNonAlloc(top, bottom, ConfigCapsuleRadius, OverlapBuffer, EnemyMask, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < count; i++)
+            {
+                var col = OverlapBuffer[i];
+                if (col == null) continue;
+                var electric = col.GetComponentInParent<Ennemies.Effect.ElectricEnnemis>() ?? col.GetComponent<Ennemies.Effect.ElectricEnnemis>();
+                if (electric != null)
+                {
+                    var playerStun = GetComponent<PlayerStunAutoFire>() ?? gameObject.AddComponent<PlayerStunAutoFire>();
+                    if (electric.OverrideAutoFireInterval)
+                        playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
+                    else
+                        playerStun.ApplyStun(electric.StunDuration);
+                    pathElectricStunned = true;
+                    break;
+                }
+            }
+        }
+
+        private void ApplyBounceImpulse(Vector3 dashDirection)
+        {
+            BounceDefinition config = CurrentBounce;
+            if (config == null || config.force <= 0f)
+                return;
+
+            Vector3 dir = ResolveBounceDirection(dashDirection, config);
+            if (dir.sqrMagnitude <= 1e-4f)
+                return;
+
+            Vector3 momentum = dir.normalized * config.force;
+
+            if (fpsMovement != null)
+            {
+                fpsMovement.ApplyExternalMomentum(momentum);
+            }
+            else if (characterController != null)
+            {
+                characterController.Move(momentum * Time.deltaTime);
+            }
+            else
+            {
+                transform.position += momentum * Time.deltaTime;
+            }
+        }
+
+        private Vector3 ResolveBounceDirection(Vector3 fallbackDashDirection, BounceDefinition config)
+        {
+            Vector3 dir = config.directionIsLocal ? transform.TransformDirection(config.direction) : config.direction;
+            if (dir.sqrMagnitude <= 1e-4f)
+                dir = -fallbackDashDirection;
+            if (dir.sqrMagnitude <= 1e-4f)
+                return Vector3.up;
+            return dir.normalized;
+        }
     }
-}
 }

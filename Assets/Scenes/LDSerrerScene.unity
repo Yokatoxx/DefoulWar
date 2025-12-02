@@ -22915,13 +22915,29 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 111639829}
     - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: airBounce
+      value: 
+      objectReference: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
+    - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: bounceForce
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: groundBounce
+      value: 
+      objectReference: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
+    - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: bounceDuration
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: dashDefinition
+      value: 
+      objectReference: {fileID: 11400000, guid: a52eadeeb91d02e4f929b40420cb8892, type: 2}
+    - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: airDashDefinition
+      value: 
+      objectReference: {fileID: 11400000, guid: a52eadeeb91d02e4f929b40420cb8892, type: 2}
     - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: customBounceDirection.x
       value: 10
