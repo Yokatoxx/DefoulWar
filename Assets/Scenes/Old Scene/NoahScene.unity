@@ -7020,8 +7020,6 @@ MonoBehaviour:
   waveCompleteText: {fileID: 1808356769}
   crosshair: {fileID: 862241288}
   playerHealth: {fileID: 943778872}
-  weaponController: {fileID: 0}
-  projectileWeaponController: {fileID: 943778871}
   waveManager: {fileID: 2142988282}
 --- !u!114 &550816886
 MonoBehaviour:
@@ -7186,10 +7184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killAllKey: 287
-  armorLevelUpKey: 288
-  armorResetKey: 289
   showButtons: 1
-  armorDeltaPerPress: 1
 --- !u!4 &579920125
 Transform:
   m_ObjectHideFlags: 0
@@ -9464,6 +9459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea2fd7c3991641a083d0e0107f502736, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  soundPlayer: {fileID: 0}
   maxHealth: 100
   currentHealth: 0
   enableRegen: 1
@@ -9541,6 +9537,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93d46500d1c547c5a27b9a6374a97aec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnSpeedChanged:
+    m_PersistentCalls:
+      m_Calls: []
   moveSpeed: 5
   sprintSpeed: 8
   jumpHeight: 2
@@ -9549,9 +9548,9 @@ MonoBehaviour:
   increaseSpeedFactor: 3
   speedLimit: 15
   coyoteTime: 0.15
-  speedDisplay: {fileID: 890343426}
   airControlFactor: 1
   preserveJumpMomentum: 0
+  jumpMomentumMultiplier: 1
   maxAirSpeed: 100
   groundCheck: {fileID: 2040315599}
   groundDistance: 0.4
@@ -9660,7 +9659,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   volume: {fileID: 832575518}
-  pillarDashSystem: {fileID: 943778884}
+  dashSystem: {fileID: 943778884}
   dashEffectLensIntensity: -0.7
   dashEffectDuration: 0.5
   dashBokehAperture: 0.4
@@ -19487,6 +19486,7 @@ MonoBehaviour:
   sprintFOV: 70
   jumpFOV: 50
   fovTransitionSpeed: 8
+  weaponCamera: {fileID: 0}
 --- !u!1 &1913109445
 GameObject:
   m_ObjectHideFlags: 0
