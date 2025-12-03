@@ -304,7 +304,11 @@ namespace FPS
         public float SlowMoTime => ConfigSlowMoTime;
         public float DistanceDash => ConfigDistanceDash;
         public float Cooldown => ConfigCooldown;
-
+        
+        public bool IsChainActive => chainActive;
+        public int RemainingChains => chainActive ? Mathf.Clamp(remainingChains, 0, ConfigCountDash) : ConfigCountDash;
+        public bool IsSlowMoActive => slowMoApplied;
+        
         private void TryStunElectricOnPath(Vector3 currentPos)
         {
             if (pathElectricStunned) return;
@@ -316,16 +320,16 @@ namespace FPS
                 var col = OverlapBuffer[i];
                 if (col == null) continue;
                 var electric = col.GetComponentInParent<Ennemies.Effect.ElectricEnnemis>() ?? col.GetComponent<Ennemies.Effect.ElectricEnnemis>();
-                if (electric != null)
-                {
-                    var playerStun = GetComponent<PlayerStunAutoFire>() ?? gameObject.AddComponent<PlayerStunAutoFire>();
-                    if (electric.OverrideAutoFireInterval)
-                        playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
-                    else
-                        playerStun.ApplyStun(electric.StunDuration);
-                    pathElectricStunned = true;
-                    break;
-                }
+                if (electric == null) continue;
+
+                var playerStun = GetComponent<PlayerStunAutoFire>() ?? gameObject.AddComponent<PlayerStunAutoFire>();
+                if (electric.OverrideAutoFireInterval)
+                    playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
+                else
+                    playerStun.ApplyStun(electric.StunDuration);
+
+                pathElectricStunned = true;
+                break;
             }
         }
 
@@ -366,3 +370,4 @@ namespace FPS
         }
     }
 }
+
