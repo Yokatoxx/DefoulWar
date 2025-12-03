@@ -33419,7 +33419,6 @@ MonoBehaviour:
   cooldownColor: {r: 1, g: 1, b: 1, a: 0}
   readyColor: {r: 0, g: 0.7143011, b: 1, a: 1}
   slowMoColor: {r: 1, g: 0.7047663, b: 0, a: 1}
-  transitionSpeed: 20
   showPercentageText: 0
   hideWhenReady: 0
 --- !u!225 &1026782367

@@ -308,6 +308,7 @@ namespace FPS
         public bool IsChainActive => chainActive;
         public int RemainingChains => chainActive ? Mathf.Clamp(remainingChains, 0, ConfigCountDash) : ConfigCountDash;
         public bool IsSlowMoActive => slowMoApplied;
+        public bool IsCooldownReady => Time.time >= nextAvailableTime;
         
         private void TryStunElectricOnPath(Vector3 currentPos)
         {
@@ -370,4 +371,3 @@ namespace FPS
         }
     }
 }
-
