@@ -25,6 +25,9 @@ namespace FPS
         [SerializeField, Tooltip("Couleur lorsqu'un slow-mo est actif")]
         private Color slowMoColor;
         
+        [SerializeField, Tooltip("Durée de l'animation de transition")]
+        private float transitionSpeed = 5f;
+        
         [SerializeField, Tooltip("Afficher le texte de pourcentage")]
         private bool showPercentageText = true;
         
@@ -32,6 +35,7 @@ namespace FPS
         private bool hideWhenReady = false;
 
         private CanvasGroup canvasGroup;
+        private readonly List<float> iconFillAmounts = new();
         private Color initialTextColor;
         private bool warnedAboutSlotShortage;
         
@@ -42,7 +46,9 @@ namespace FPS
             {
                 canvasGroup = gameObject.AddComponent<CanvasGroup>();
             }
-
+            
+            SyncFillBuffer();
+            
             if (showPercentageText && cooldownText == null)
             {
                 cooldownText = GetComponentInChildren<TMPro.TextMeshProUGUI>();
@@ -54,9 +60,22 @@ namespace FPS
             }
         }
         
+        private void SyncFillBuffer()
+        {
+            iconFillAmounts.Clear();
+            for (int i = 0; i < dashIcons.Count; i++)
+            {
+                iconFillAmounts.Add(0f);
+            }
+        }
+        
         private void Update()
         {
             if (dashCible == null || dashIcons.Count == 0) return;
+            if (iconFillAmounts.Count != dashIcons.Count)
+            {
+                SyncFillBuffer();
+            }
             
             int totalCharges = Mathf.Max(1, dashCible.CountDash);
             int availableCharges = dashCible.IsChainActive ? Mathf.Clamp(dashCible.RemainingChains, 0, totalCharges) : totalCharges;
@@ -89,14 +108,15 @@ namespace FPS
                 if (!active) continue;
                 
                 float targetFill = i < availableCharges ? 1f : 0f;
-                icon.fillAmount = targetFill;
-                if (isSlowMo && targetFill > 0f)
+                iconFillAmounts[i] = Mathf.Lerp(iconFillAmounts[i], targetFill, Time.deltaTime * transitionSpeed);
+                icon.fillAmount = iconFillAmounts[i];
+                if (isSlowMo)
                 {
                     icon.color = slowMoColor;
                 }
                 else
                 {
-                    icon.color = targetFill >= 1f ? readyColor : cooldownColor;
+                    icon.color = iconFillAmounts[i] >= 0.999f ? readyColor : cooldownColor;
                 }
             }
         }
@@ -107,7 +127,7 @@ namespace FPS
         
             float percent = totalCharges > 0 ? (availableCharges / (float)totalCharges) * 100f : 0f;
             cooldownText.text = $"{Mathf.RoundToInt(percent)}%";
-            cooldownText.color = isSlowMo && availableCharges > 0 ? slowMoColor : initialTextColor;
+            cooldownText.color = isSlowMo ? slowMoColor : initialTextColor;
         }
         
         private void UpdateVisibility(int availableCharges, int totalCharges)
@@ -119,7 +139,8 @@ namespace FPS
             }
         
             bool allReady = availableCharges >= totalCharges;
-            canvasGroup.alpha = allReady ? 0f : 1f;
+            float targetAlpha = allReady ? 0f : 1f;
+            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, targetAlpha, Time.deltaTime * transitionSpeed);
         }
         
         public void SetDashCible(DashCible cible)
