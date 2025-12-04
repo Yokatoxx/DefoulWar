@@ -148,9 +148,9 @@ namespace FPS
             for (int i = 0; i < count; i++)
             {
                 var col = TargetOverlapBuffer[i];
-                if (col == null) continue;
                 
-                var eh = col.GetComponentInParent<EnemyHealth>() ?? col.GetComponent<EnemyHealth>();
+                // GetComponentInParent also searches the component on the current object
+                var eh = col.GetComponentInParent<EnemyHealth>();
                 if (eh == null || eh.IsDead) continue;
                 
                 Vector3 to = eh.transform.position - camPos;
