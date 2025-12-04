@@ -29,6 +29,7 @@ namespace FPS
         public bool slowMoApplied;
         private float previousTimeScale = 1f;
         private bool pathElectricStunned;
+        private PlayerStunAutoFire cachedStunComponent;
 
         private static readonly Collider[] OverlapBuffer = new Collider[16];
 
@@ -66,6 +67,7 @@ namespace FPS
                 fpsMovement = GetComponent<FPSMovement>();
             if (aimCamera == null)
                 aimCamera = Camera.main;
+            cachedStunComponent = GetComponent<PlayerStunAutoFire>();
         }
 
         private void Update()
@@ -118,6 +120,8 @@ namespace FPS
             StartCoroutine(DoTargetDash(target));
         }
 
+        private static readonly Collider[] TargetOverlapBuffer = new Collider[64];
+        
         private EnemyHealth AcquireTarget()
         {
             if (aimCamera == null) return null;
@@ -133,15 +137,22 @@ namespace FPS
                 }
             }
 
-            var all = FindObjectsByType<EnemyHealth>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-            EnemyHealth best = null;
-            float bestScore = float.MaxValue;
+            // Use OverlapSphere to find nearby enemies instead of scanning all scene objects
             Vector3 camPos = aimCamera.transform.position;
             Vector3 camFwd = aimCamera.transform.forward;
+            int count = Physics.OverlapSphereNonAlloc(camPos, ConfigDistanceDash, TargetOverlapBuffer, EnemyMask, QueryTriggerInteraction.Ignore);
+            
+            EnemyHealth best = null;
+            float bestScore = float.MaxValue;
 
-            foreach (var eh in all)
+            for (int i = 0; i < count; i++)
             {
+                var col = TargetOverlapBuffer[i];
+                if (col == null) continue;
+                
+                var eh = col.GetComponentInParent<EnemyHealth>() ?? col.GetComponent<EnemyHealth>();
                 if (eh == null || eh.IsDead) continue;
+                
                 Vector3 to = eh.transform.position - camPos;
                 float dist = to.magnitude;
                 if (dist > ConfigDistanceDash) continue;
@@ -226,12 +237,11 @@ namespace FPS
             var electric = target.GetComponent<Ennemies.Effect.ElectricEnnemis>();
             if (electric != null)
             {
-                var playerStun = GetComponent<PlayerStunAutoFire>();
-                if (playerStun == null) playerStun = gameObject.AddComponent<PlayerStunAutoFire>();
+                EnsureStunComponent();
                 if (electric.OverrideAutoFireInterval)
-                    playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
+                    cachedStunComponent.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
                 else
-                    playerStun.ApplyStun(electric.StunDuration);
+                    cachedStunComponent.ApplyStun(electric.StunDuration);
 
                 if (electric.ResistToDash)
                 {
@@ -322,14 +332,24 @@ namespace FPS
                 var electric = col.GetComponentInParent<Ennemies.Effect.ElectricEnnemis>() ?? col.GetComponent<Ennemies.Effect.ElectricEnnemis>();
                 if (electric == null) continue;
 
-                var playerStun = GetComponent<PlayerStunAutoFire>() ?? gameObject.AddComponent<PlayerStunAutoFire>();
+                EnsureStunComponent();
                 if (electric.OverrideAutoFireInterval)
-                    playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
+                    cachedStunComponent.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
                 else
-                    playerStun.ApplyStun(electric.StunDuration);
+                    cachedStunComponent.ApplyStun(electric.StunDuration);
 
                 pathElectricStunned = true;
                 break;
+            }
+        }
+
+        private void EnsureStunComponent()
+        {
+            if (cachedStunComponent == null)
+            {
+                cachedStunComponent = GetComponent<PlayerStunAutoFire>();
+                if (cachedStunComponent == null)
+                    cachedStunComponent = gameObject.AddComponent<PlayerStunAutoFire>();
             }
         }
 

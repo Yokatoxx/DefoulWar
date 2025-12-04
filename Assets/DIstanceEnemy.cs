@@ -16,10 +16,16 @@ public class DistanceEnemy : MonoBehaviour
     
 
     private float timer;
+    private Transform playerTransform;
 
     private void Awake()
     {
-       
+        // Cache player reference at startup
+        var playerHealth = FindFirstObjectByType<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerTransform = playerHealth.transform;
+        }
     }
 
     // Update is called once per frame
@@ -35,12 +41,13 @@ public class DistanceEnemy : MonoBehaviour
 
     private void ShootToPlayer()
     {
-        Transform _playerTransform = FindFirstObjectByType<PlayerHealth>().gameObject.transform;
+        if (playerTransform == null) return;
+        
         GameObject _bullet = Instantiate(projectilePrefab);
         _bullet.transform.position = shootPosition.position;
-        Vector3 dir= _playerTransform.position - transform.position;
+        Vector3 dir = playerTransform.position - transform.position;
         Rigidbody _rb = _bullet.GetComponent<Rigidbody>();
         _rb.AddForce(dir.normalized * speed, ForceMode.Impulse);
-        Destroy(_bullet,bulletDuration);
+        Destroy(_bullet, bulletDuration);
     }
 }

@@ -12,12 +12,14 @@ namespace FPS
         private FPSMovement movement;
         private FPSMouseLook mouseLook;
         private FPSCameraEffects cameraEffects;
+        private PlayerStunAutoFire stunComponent;
 
         private void Awake()
         {
             inputHandler = GetComponent<FPSInputHandler>();
             movement = GetComponent<FPSMovement>();
             mouseLook = GetComponent<FPSMouseLook>();
+            stunComponent = GetComponent<PlayerStunAutoFire>();
             
             if (mouseLook.CameraTransform != null)
             {
@@ -41,8 +43,12 @@ namespace FPS
             bool leanRight = inputHandler.LeanRightPressed;
 
             // Si le joueur est stun, neutraliser déplacement et actions mais laisser la caméra
-            var stun = GetComponent<PlayerStunAutoFire>();
-            if (stun != null && stun.IsStunned)
+            // Note: stunComponent may be added dynamically, so refresh if null
+            if (stunComponent == null)
+            {
+                stunComponent = GetComponent<PlayerStunAutoFire>();
+            }
+            if (stunComponent != null && stunComponent.IsStunned)
             {
                 moveInput = Vector2.zero;
                 jump = false;

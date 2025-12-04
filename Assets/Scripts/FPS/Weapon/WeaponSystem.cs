@@ -42,6 +42,9 @@ public class WeaponSystem : MonoBehaviour
     [SerializeField] private CrosshairAnim crosshair;
 
     private Animator animator;
+    
+    // Cached zone multipliers to avoid rebuilding dictionary on every shot
+    private Dictionary<string, float> cachedZoneMultipliers;
 
     private void Awake()
     {
@@ -56,6 +59,9 @@ public class WeaponSystem : MonoBehaviour
 
         // Auto-find du crosshair si non assigné
         if (crosshair == null) crosshair = FindAnyObjectByType<CrosshairAnim>();
+        
+        // Cache zone multipliers at startup
+        cachedZoneMultipliers = BuildZoneMultiplierDict();
     }
 
     private void Update()
@@ -201,8 +207,7 @@ public class WeaponSystem : MonoBehaviour
         var hitZone = hitCollider.GetComponent<HitZone>();
         if (hitZone != null)
         {
-            var multipliers = BuildZoneMultiplierDict();
-            if (multipliers.TryGetValue(hitZone.ZoneName, out float mult))
+            if (cachedZoneMultipliers.TryGetValue(hitZone.ZoneName, out float mult))
             {
                 finalDamage *= mult;
             }

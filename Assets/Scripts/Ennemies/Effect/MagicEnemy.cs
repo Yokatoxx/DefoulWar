@@ -49,6 +49,7 @@ namespace Ennemies.Effect
         private EnemyHealth health;
         private float lastReflectTime = -999f;
         private GameObject cachedBulletPrefab;
+        private PlayerHealth cachedPlayer;
         
         private void Awake()
         {
@@ -57,6 +58,9 @@ namespace Ennemies.Effect
             {
                 health.OnDeath.AddListener(OnDeath);
             }
+            
+            // Cache player reference at startup
+            cachedPlayer = FindFirstObjectByType<PlayerHealth>();
         }
         
         private void Start()
@@ -113,16 +117,15 @@ namespace Ennemies.Effect
                 }
                 lastReflectTime = Time.time;
                 
-                var player = FindFirstObjectByType<PlayerHealth>();
-                if (player != null)
+                if (cachedPlayer != null)
                 {
                     if (useHitscanReflect)
                     {
-                        ReflectHitscan(player);
+                        ReflectHitscan(cachedPlayer);
                     }
                     else
                     {
-                        CreateMagicBullet(player.transform.position);
+                        CreateMagicBullet(cachedPlayer.transform.position);
                     }
                     // Effet visuel à l'impact si fourni
                     if (reflectEffectPrefab != null)
@@ -197,16 +200,15 @@ namespace Ennemies.Effect
         // Soigne le joueur
         private void HealPlayer()
         {
-            var player = FindFirstObjectByType<PlayerHealth>();
-            if (player != null)
+            if (cachedPlayer != null)
             {
-                player.Heal(healAmount);
+                cachedPlayer.Heal(healAmount);
                 Debug.Log($"[MagicEnemy] Le joueur a récupéré {healAmount} PV !");
                 
                 // Créer l'effet visuel de soin sur le joueur
                 if (healEffectPrefab != null)
                 {
-                    CreateHealEffect(player.transform.position);
+                    CreateHealEffect(cachedPlayer.transform.position);
                 }
             }
         }

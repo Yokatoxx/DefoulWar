@@ -29,6 +29,7 @@ namespace FPS
         private Transform player;
         private EnemyHealth enemyHealth;
         private float lastAttackTime;
+        private EnemyScreenDetector screenDetector;
 
         public enum EnemyState
         {
@@ -50,6 +51,9 @@ namespace FPS
             {
                 player = playerObj.transform;
             }
+            
+            // Cache screen detector reference
+            screenDetector = FindFirstObjectByType<EnemyScreenDetector>();
             
             agent.speed = patrolSpeed;
         }
@@ -122,10 +126,9 @@ namespace FPS
                     Debug.Log($"Enemy attacked player for {attackDamage} damage!");
                 }
             }
-            var indicator = FindObjectOfType<EnemyScreenDetector>();
-            if (indicator != null)
+            if (screenDetector != null)
             {
-                indicator.RegisterHit(transform, attackDamage);
+                screenDetector.RegisterHit(transform, attackDamage);
             }
         }
         
