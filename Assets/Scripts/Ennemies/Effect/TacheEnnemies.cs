@@ -256,13 +256,16 @@ namespace Ennemies.Effect
         {
             if (_tacheCanvas != null) return;
 
-            var existing = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None)
-                .FirstOrDefault(c => c != null && c.name == "TacheOverlayCanvas");
-            if (existing != null)
+            // Use GameObject.Find instead of iterating all Canvas objects with LINQ
+            var existingGO = GameObject.Find("TacheOverlayCanvas");
+            if (existingGO != null)
             {
-                _tacheCanvas = existing;
-                _tacheCanvas.sortingOrder = _overlaySortingOrder;
-                return;
+                _tacheCanvas = existingGO.GetComponent<Canvas>();
+                if (_tacheCanvas != null)
+                {
+                    _tacheCanvas.sortingOrder = _overlaySortingOrder;
+                    return;
+                }
             }
 
             GameObject go = new GameObject("TacheOverlayCanvas");

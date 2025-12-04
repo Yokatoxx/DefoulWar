@@ -88,6 +88,7 @@ namespace FPS
         private Vector3 lastDashPosition;
         private readonly HashSet<GameObject> _hitThisDash = new HashSet<GameObject>();
         private static readonly RaycastHit[] _hitBuffer = new RaycastHit[32];
+        private PlayerStunAutoFire cachedStunComponent;
         
         private void Start()
         {
@@ -125,6 +126,7 @@ namespace FPS
             }
 
             characterController = playerController.Controller;
+            cachedStunComponent = GetComponent<PlayerStunAutoFire>();
         }
         
         private void Update()
@@ -142,8 +144,12 @@ namespace FPS
             }
             
             // Empêcher le dash pendant un stun
-            var stunComp = GetComponent<PlayerStunAutoFire>();
-            bool isStunned = stunComp != null && stunComp.IsStunned;
+            // Note: stunComponent may be added dynamically, so refresh if null
+            if (cachedStunComponent == null)
+            {
+                cachedStunComponent = GetComponent<PlayerStunAutoFire>();
+            }
+            bool isStunned = cachedStunComponent != null && cachedStunComponent.IsStunned;
             
             // Gestion du dash
             if (isDashing)
@@ -214,12 +220,16 @@ namespace FPS
                     var electric = h.collider.GetComponentInParent<Ennemies.Effect.ElectricEnnemis>() ?? h.collider.GetComponent<Ennemies.Effect.ElectricEnnemis>();
                     if (electric != null)
                     {
-                        var playerStun = GetComponent<PlayerStunAutoFire>();
-                        if (playerStun == null) playerStun = gameObject.AddComponent<PlayerStunAutoFire>();
+                        if (cachedStunComponent == null) 
+                        {
+                            cachedStunComponent = GetComponent<PlayerStunAutoFire>();
+                            if (cachedStunComponent == null)
+                                cachedStunComponent = gameObject.AddComponent<PlayerStunAutoFire>();
+                        }
                         if (electric.OverrideAutoFireInterval)
-                            playerStun.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
+                            cachedStunComponent.ApplyStun(electric.StunDuration, electric.StunAutoFireInterval);
                         else
-                            playerStun.ApplyStun(electric.StunDuration);
+                            cachedStunComponent.ApplyStun(electric.StunDuration);
                         
                         // Arrêter le dash immédiatement à cause du stun électrique
                         EndDash();
