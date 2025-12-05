@@ -125,12 +125,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zoneName: Body
   baseDamageMultiplier: 1
-  hasArmor: 0
-  armorLevel: 0
-  armorDamageReduction: 0
-  level1Color: {r: 0, g: 0, b: 1, a: 1}
-  level2Color: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-  level3Color: {r: 1, g: 0.5, b: 0, a: 1}
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
 --- !u!1 &525026324071530389
@@ -162,7 +156,7 @@ Transform:
   m_GameObject: {fileID: 525026324071530389}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.893, z: 0}
+  m_LocalPosition: {x: -0.471, y: 1.055, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -256,12 +250,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zoneName: Head
   baseDamageMultiplier: 2
-  hasArmor: 0
-  armorLevel: 0
-  armorDamageReduction: 0
-  level1Color: {r: 0, g: 0, b: 1, a: 1}
-  level2Color: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-  level3Color: {r: 1, g: 0.5, b: 0, a: 1}
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
 --- !u!1 &1807755940922956229
@@ -276,7 +264,7 @@ GameObject:
   - component: {fileID: 6744729750470337342}
   - component: {fileID: 1424048076781185940}
   - component: {fileID: 4807056319870603770}
-  - component: {fileID: 2284100924158128847}
+  - component: {fileID: 564636307132464817}
   m_Layer: 7
   m_Name: Enemy 1
   m_TagString: Enemy
@@ -353,7 +341,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1807755940922956229}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b35c933fe4a04fd7a4d569ff6a317dc8, type: 3}
   m_Name: 
@@ -368,7 +356,7 @@ MonoBehaviour:
     m_Bits: 0
   attackDamage: 10
   attackCooldown: 1.5
---- !u!114 &2284100924158128847
+--- !u!114 &564636307132464817
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -377,9 +365,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1807755940922956229}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcf69e0504ee4ebba7ecb22c0cb47008, type: 3}
+  m_Script: {fileID: 11500000, guid: 06c56eae9ac4bdf44abb1bcfde75fd4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: ecb01ae4634071443b77983998498bae, type: 2}
+  waypointPath: {fileID: 0}
+  shootPoint: {fileID: 0}
+  showDebugGizmos: 1
 --- !u!1 &7277404602049207658
 GameObject:
   m_ObjectHideFlags: 0

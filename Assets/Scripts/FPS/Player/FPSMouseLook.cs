@@ -18,8 +18,9 @@ namespace FPS
         [SerializeField] private float leanInputAngle = 20f;
         [SerializeField] private float leanSpeed = 8f;
 
-        private float verticalRotation = 0f;
-        private float currentLean = 0f;
+        private float verticalRotation;
+        private float currentLean;
+        private float yaw;
 
         private void Awake()
         {
@@ -38,13 +39,18 @@ namespace FPS
             
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            
+            // Initialiser avec la rotation actuelle
+            yaw = transform.eulerAngles.y;
+            verticalRotation = 0f;
         }
 
         public void Look(Vector2 lookInput, Vector2 moveInput, bool leanLeft, bool leanRight)
         {
-            // Rotation horizontale (corps du joueur)
+            // Rotation horizontale (corps du joueur) - appliquée directement au transform
             float mouseX = lookInput.x * mouseSensitivity;
-            transform.Rotate(Vector3.up * mouseX);
+            yaw += mouseX;
+            transform.rotation = Quaternion.Euler(0f, yaw, 0f);
             
             // Rotation verticale (caméra)
             float mouseY = lookInput.y * mouseSensitivity;

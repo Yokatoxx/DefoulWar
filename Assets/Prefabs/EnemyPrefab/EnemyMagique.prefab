@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -3158992528684757622}
   - component: {fileID: 2145429180474956741}
   - component: {fileID: 7108234100319031770}
+  - component: {fileID: 8000465441468370388}
   m_Layer: 7
   m_Name: EnemyMagique
   m_TagString: Enemy
@@ -38,6 +39,7 @@ Transform:
   - {fileID: 1094369121560445654}
   - {fileID: 6596681278480451813}
   - {fileID: 9125597042352771045}
+  - {fileID: 5979755068541550699}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &1654310326663819305
@@ -47,7 +49,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 160580225223210161}
-  m_Enabled: 0
+  m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
@@ -74,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16bb0ed92c0240aa9cddb09695e8ee2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 20
   currentHealth: 0
   spawnInvulnerabilityDuration: 0
   spawnInvulnerableAllDamage: 0
@@ -91,7 +93,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 160580225223210161}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b35c933fe4a04fd7a4d569ff6a317dc8, type: 3}
   m_Name: 
@@ -165,6 +167,22 @@ MonoBehaviour:
   trailWidth: 1
   firePoint: {fileID: 2657800489959688396}
   upOffset: 1.5
+--- !u!114 &8000465441468370388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06c56eae9ac4bdf44abb1bcfde75fd4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 8006954f8abb81747bfe0e362c984bbb, type: 2}
+  waypointPath: {fileID: 0}
+  shootPoint: {fileID: 5979755068541550699}
+  showDebugGizmos: 1
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
@@ -194,7 +212,7 @@ Transform:
   m_GameObject: {fileID: 463622794186511725}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.858, z: 0}
+  m_LocalPosition: {x: 0, y: 1.084, z: 0.486}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -340,6 +358,37 @@ MonoBehaviour:
   hideWhenFull: 1
   fillColor: {r: 0.2, g: 0.9, b: 0.2, a: 1}
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.6}
+--- !u!1 &6280732317196064694
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5979755068541550699}
+  m_Layer: 7
+  m_Name: Shootpoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5979755068541550699
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6280732317196064694}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.0114918, z: 0.8876343}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2657800489959688396}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7108478021694863082
 GameObject:
   m_ObjectHideFlags: 0
