@@ -7,7 +7,7 @@ public class Death : MonoBehaviour
     [SerializeField] private Transform spawnRoot;
 
     private PlayerHealth playerHealth;
-    private CharacterController characterController;
+    private Rigidbody rb;
     private Vector3 spawnPosition;
     private Quaternion spawnRotation;
 
@@ -15,7 +15,7 @@ public class Death : MonoBehaviour
     void Awake()
     {
         playerHealth = GetComponent<PlayerHealth>();
-        characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
         spawnRoot = spawnRoot != null ? spawnRoot : transform;
     }
 
@@ -61,17 +61,19 @@ public class Death : MonoBehaviour
 
     private void RespawnPlayer()
     {
-        bool controllerInitiallyEnabled = characterController != null && characterController.enabled;
-        if (characterController != null)
+        if (rb != null)
         {
-            characterController.enabled = false;
+            // Reset velocity before teleporting
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            
+            // Teleport using Rigidbody
+            rb.position = spawnPosition;
+            rb.rotation = spawnRotation;
         }
-
-        transform.SetPositionAndRotation(spawnPosition, spawnRotation);
-
-        if (controllerInitiallyEnabled)
+        else
         {
-            characterController.enabled = true;
+            transform.SetPositionAndRotation(spawnPosition, spawnRotation);
         }
     }
 }

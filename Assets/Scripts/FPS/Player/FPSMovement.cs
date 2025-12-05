@@ -1,11 +1,11 @@
 using UnityEngine;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace FPS
 {
-    /// Gère le mouvement du joueur
-    [RequireComponent(typeof(CharacterController))]
+    /// Gère le mouvement du joueur avec Rigidbody
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(CapsuleCollider))]
     public class FPSMovement : MonoBehaviour
     {
         [Header("Events")]
@@ -17,6 +17,7 @@ namespace FPS
         [SerializeField] private float jumpHeight = 1.5f;
         [SerializeField] private float gravity = -9.81f;
         [SerializeField] private float gravityMultiplier = 2f;
+        [SerializeField] private float maxFallSpeed = -20f;
         [SerializeField] private float increaseSpeedFactor = 25f;
         [SerializeField] private float speedLimit = 20f;
         
@@ -47,7 +48,8 @@ namespace FPS
         [SerializeField, Tooltip("Durée pendant laquelle la composante verticale du momentum est conservée même si le joueur est au sol.")]
         private float externalMomentumGroundGrace = 0.08f;
 
-        private CharacterController controller;
+        private Rigidbody rb;
+        private CapsuleCollider capsuleCollider;
         private Vector3 velocity;
         private Vector3 moveDirection = Vector3.zero;
         private Vector3 jumpMomentum = Vector3.zero;
@@ -55,6 +57,14 @@ namespace FPS
         private float externalMomentumGroundTimer;
         private bool isGrounded;
         private float coyoteTimeCounter;
+
+        // Variables pour stocker les inputs entre Update et FixedUpdate
+        private Vector2 inputMove;
+        private bool inputSprint;
+        private bool jumpRequested;
+        
+        // Flag pour désactiver le mouvement normal (pendant le dash)
+        private bool movementDisabled;
 
         public bool IsGrounded => isGrounded;
         public bool IsMoving { get; private set; }
@@ -73,10 +83,51 @@ namespace FPS
             externalMomentumGroundTimer = externalMomentumGroundGrace;
             moveSpeed = Mathf.Max(moveSpeed, momentum.magnitude);
         }
+        
+        // Désactiver le mouvement normal (pendant le dash)
+        public void DisableMovement()
+        {
+            movementDisabled = true;
+            velocity.y = 0f; // Reset la gravité
+            Debug.Log("[FPSMovement] Mouvement désactivé");
+        }
+        
+        // Réactiver le mouvement normal (après le dash)
+        public void EnableMovement()
+        {
+            if (movementDisabled)
+            {
+                Debug.Log("[FPSMovement] Mouvement réactivé");
+            }
+            movementDisabled = false;
+        }
+        
+        // Propriété pour vérifier si le mouvement est désactivé
+        public bool IsMovementDisabled => movementDisabled;
 
         private void Awake()
         {
-            controller = GetComponent<CharacterController>();
+            rb = GetComponent<Rigidbody>();
+            capsuleCollider = GetComponent<CapsuleCollider>();
+
+            // Configuration du Rigidbody pour un contrôle FPS
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            rb.constraints = RigidbodyConstraints.FreezeRotation; // Freeze toutes les rotations
+            rb.useGravity = false; // On gère la gravité manuellement
+            rb.linearDamping = 0f; // Pas de résistance au mouvement
+            rb.angularDamping = 0f;
+            
+            // Créer un PhysicMaterial sans friction pour éviter le ralentissement sur les surfaces
+            PhysicsMaterial frictionlessMat = new PhysicsMaterial("PlayerNoFriction")
+            {
+                dynamicFriction = 0f,
+                staticFriction = 0f,
+                frictionCombine = PhysicsMaterialCombine.Minimum,
+                bounciness = 0f,
+                bounceCombine = PhysicsMaterialCombine.Minimum
+            };
+            capsuleCollider.material = frictionlessMat;
 
             defaultMoveSpeed = moveSpeed;
         }
@@ -87,7 +138,10 @@ namespace FPS
             HandleGroundCheck();
         }
 
-        // Cette méthode sera appelée par le PlayerController
+        private void FixedUpdate()
+        {
+            ApplyMovement();
+        }
 
         private void IncreaseSpeed()
         {
@@ -115,15 +169,28 @@ namespace FPS
             }
         }
 
+        // Cette méthode sera appelée par le PlayerController (dans Update)
         public void Move(Vector2 input, bool sprint, bool jump)
         {
+            inputMove = input;
+            inputSprint = sprint;
+            if (jump) jumpRequested = true;
+        }
+
+        private void ApplyMovement()
+        {
+            // Ne pas appliquer le mouvement normal si désactivé (pendant le dash)
+            if (movementDisabled) return;
+            
             // Calculer la direction de mouvement
-            Vector3 desired = (transform.right * input.x + transform.forward * input.y);
+            Vector3 desired = (transform.right * inputMove.x + transform.forward * inputMove.y);
             float desiredMag = desired.magnitude;
             if (desiredMag > 1f) desired /= desiredMag;
             
-            CurrentSpeed = sprint ? sprintSpeed : moveSpeed;
+            CurrentSpeed = inputSprint ? sprintSpeed : moveSpeed;
             IsMoving = desired.sqrMagnitude > 0.01f;
+
+            Vector3 horizontalVelocity = Vector3.zero;
 
             if (isGrounded)
             {
@@ -133,28 +200,11 @@ namespace FPS
                 // Mouvement au sol
                 if (desired.sqrMagnitude > 0f)
                 {
-                    controller.Move(desired * (CurrentSpeed * Time.deltaTime));
+                    horizontalVelocity = desired * CurrentSpeed;
                 }
 
                 // Saut
-                if (jump)
-                {
-                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity); //
-                    
-                    // Capturer le momentum actuel pour le préserver en l'air
-                    if (preserveJumpMomentum && desired.sqrMagnitude > 0f)
-                    {
-                        jumpMomentum = desired * CurrentSpeed * jumpMomentumMultiplier;
-                    }
-                    
-                    // Consommer le coyote time
-                    coyoteTimeCounter = 0f;
-                }
-            }
-            else
-            {
-                // Permettre le saut pendant le coyote time
-                if (jump && coyoteTimeCounter > 0f)
+                if (jumpRequested)
                 {
                     velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
                     
@@ -166,60 +216,131 @@ namespace FPS
                     
                     // Consommer le coyote time
                     coyoteTimeCounter = 0f;
+                    jumpRequested = false;
+                }
+            }
+            else
+            {
+                // Permettre le saut pendant le coyote time
+                if (jumpRequested && coyoteTimeCounter > 0f)
+                {
+                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                    
+                    // Capturer le momentum actuel pour le préserver en l'air
+                    if (preserveJumpMomentum && desired.sqrMagnitude > 0f)
+                    {
+                        jumpMomentum = desired * CurrentSpeed * jumpMomentumMultiplier;
+                    }
+                    
+                    // Consommer le coyote time
+                    coyoteTimeCounter = 0f;
+                    jumpRequested = false;
                 }
                 
                 // En l'air
                 if (preserveJumpMomentum && jumpMomentum.sqrMagnitude > 0f)
                 {
                     // Appliquer le momentum capturé au moment du saut
-                    controller.Move(jumpMomentum * Time.deltaTime);
+                    horizontalVelocity = jumpMomentum;
                     
                     // Permettre un contrôle limité en l'air en PLUS du momentum
                     if (desired.sqrMagnitude > 0f)
                     {
-                        controller.Move(desired * (CurrentSpeed * airControlFactor * Time.deltaTime));
+                        horizontalVelocity += desired * CurrentSpeed * airControlFactor;
                     }
                 }
                 else
                 {
-                    Vector3 airMove = desired * CurrentSpeed * airControlFactor;
-                    moveDirection.x = Mathf.Lerp(moveDirection.x, airMove.x, airControlFactor);
-                    moveDirection.z = Mathf.Lerp(moveDirection.z, airMove.z, airControlFactor);
-                    
-                    controller.Move(new Vector3(moveDirection.x, 0, moveDirection.z) * Time.deltaTime);
+                    // Mouvement aérien sans momentum préservé
+                    horizontalVelocity = desired * CurrentSpeed * airControlFactor;
                 }
             }
 
+            // Reset jump request si pas utilisé
+            jumpRequested = false;
+
+            // Traiter le momentum externe
             ProcessExternalMomentum();
-            velocity.y += gravity * gravityMultiplier * Time.deltaTime;
-            controller.Move(new Vector3(0, velocity.y, 0) * Time.deltaTime);
+            horizontalVelocity += new Vector3(externalMomentum.x, 0, externalMomentum.z);
+
+            // Appliquer la gravité seulement en l'air
+            if (!isGrounded)
+            {
+                velocity.y += gravity * gravityMultiplier * Time.fixedDeltaTime;
+                
+                // Limiter la vitesse de chute
+                if (velocity.y < maxFallSpeed)
+                {
+                    velocity.y = maxFallSpeed;
+                }
+            }
+            
+            // Ajouter le momentum vertical externe
+            float verticalVelocity = velocity.y + externalMomentum.y;
+
+            // Appliquer la vélocité au Rigidbody (les collisions seront gérées automatiquement)
+            rb.linearVelocity = new Vector3(horizontalVelocity.x, verticalVelocity, horizontalVelocity.z);
         }
 
         private void HandleGroundCheck()
         {
-            if (groundCheck != null && groundMask != 0)
+            bool wasGrounded = isGrounded;
+            
+            // Créer un masque qui exclut le layer du joueur
+            int playerLayer = gameObject.layer;
+            int excludePlayerMask = ~(1 << playerLayer);
+            
+            if (groundCheck != null)
             {
-                isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+                // Utiliser groundMask si défini, sinon détecter tout sauf le joueur
+                if (groundMask != 0)
+                {
+                    isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+                }
+                else
+                {
+                    // Détecter tous les colliders sauf le joueur et les triggers
+                    isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, excludePlayerMask, QueryTriggerInteraction.Ignore);
+                }
             }
             else
             {
-                isGrounded = controller.isGrounded;
+                // Fallback: raycast vers le bas depuis le bas du collider
+                float rayLength = groundDistance + 0.1f;
+                Vector3 rayOrigin = transform.position + Vector3.up * 0.1f;
+                
+                if (groundMask != 0)
+                {
+                    isGrounded = Physics.Raycast(rayOrigin, Vector3.down, rayLength, groundMask);
+                }
+                else
+                {
+                    // Détecter tous les colliders sauf le joueur et les triggers
+                    isGrounded = Physics.Raycast(rayOrigin, Vector3.down, rayLength, excludePlayerMask, QueryTriggerInteraction.Ignore);
+                }
             }
 
             // Gérer le coyote time
             if (isGrounded)
             {
                 coyoteTimeCounter = coyoteTime;
+                
+                // Réinitialiser la vélocité verticale au sol
+                if (velocity.y < 0)
+                {
+                    velocity.y = 0f;
+                }
             }
             else
             {
                 coyoteTimeCounter -= Time.deltaTime;
-            }
-
-            // Réinitialiser la vélocité verticale au sol
-            if (isGrounded && velocity.y < 0)
-            {
-                velocity.y = -2f;
+                
+                // Si on vient de quitter le sol naturellement (sans sauter), 
+                // commencer avec une vélocité verticale nulle pour une chute progressive
+                if (wasGrounded && velocity.y <= 0)
+                {
+                    velocity.y = 0f;
+                }
             }
         }
 
@@ -229,12 +350,10 @@ namespace FPS
                 return;
 
             if (externalMomentumGroundTimer > 0f)
-                externalMomentumGroundTimer -= Time.deltaTime;
+                externalMomentumGroundTimer -= Time.fixedDeltaTime;
 
             if (isGrounded && externalMomentumGroundTimer <= 0f && externalMomentum.y > 0f)
                 externalMomentum.y = 0f;
-
-            controller.Move(externalMomentum * Time.deltaTime);
 
             float damping = externalMomentumDamping;
             if (isGrounded && externalMomentumGroundTimer <= 0f)
@@ -242,13 +361,16 @@ namespace FPS
 
             if (damping > 0f)
             {
-                externalMomentum = Vector3.MoveTowards(externalMomentum, Vector3.zero, damping * Time.deltaTime);
+                externalMomentum = Vector3.MoveTowards(externalMomentum, Vector3.zero, damping * Time.fixedDeltaTime);
             }
 
             if (isGrounded && externalMomentumGroundTimer <= 0f && Mathf.Abs(externalMomentum.y) < 0.01f)
                 externalMomentum.y = 0f;
         }
 
-        public CharacterController Controller => controller;
+        /// <summary>
+        /// Accès au Rigidbody pour les systèmes externes (Dash, etc.)
+        /// </summary>
+        public Rigidbody Rb => rb;
     }
 }

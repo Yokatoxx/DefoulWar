@@ -75,6 +75,6 @@ namespace FPS
 
         // Propriétés publiques pour compatibilité avec les autres systèmes
         public Transform CameraTransform => mouseLook.CameraTransform;
-        public CharacterController Controller => movement.Controller;
+        public Rigidbody Rb => movement.Rb;
     }
 }

@@ -18,7 +18,7 @@ namespace FPS
 
         [Header("Références Joueur")]
         [SerializeField] private FPSPlayerController playerController;
-        [SerializeField] private CharacterController characterController;
+        [SerializeField] private Rigidbody rb;
         [SerializeField] private FPSMovement fpsMovement;
         private PlayerHealth playerHealth;
 
@@ -30,6 +30,7 @@ namespace FPS
         public bool slowMoApplied;
         private float previousTimeScale = 1f;
         private bool pathElectricStunned;
+        private float dashStartTime; // Pour détecter les dashs bloqués
 
         private static readonly Collider[] OverlapBuffer = new Collider[16];
 
@@ -61,10 +62,11 @@ namespace FPS
         {
             if (playerController == null)
                 playerController = GetComponent<FPSPlayerController>();
-            if (characterController == null && playerController != null)
-                characterController = playerController.Controller;
             if (fpsMovement == null)
                 fpsMovement = GetComponent<FPSMovement>();
+            // Obtenir le Rigidbody directement pour éviter les problèmes d'ordre d'exécution
+            if (rb == null)
+                rb = GetComponent<Rigidbody>();
             if (aimCamera == null)
                 aimCamera = Camera.main;
             playerHealth = GetComponent<PlayerHealth>();
@@ -72,6 +74,14 @@ namespace FPS
 
         private void Update()
         {
+            // Sécurité: détecter si le dash est bloqué (plus de 2 secondes)
+            if (isDashing && Time.unscaledTime - dashStartTime > 2f)
+            {
+                Debug.LogWarning("[DashCible] Dash bloqué depuis plus de 2s! Réinitialisation forcée.");
+                FinalizeDash();
+                if (chainActive) EndChain();
+            }
+            
             if (slowMoApplied && Time.unscaledTime >= slowMoEndUnscaled)
             {
                 ClearSlowMo();
@@ -89,20 +99,45 @@ namespace FPS
 
         private void TryTriggerOrChain()
         {
-            if (isDashing) return;
+            // Vérifier si le mouvement est bloqué (bug potentiel)
+            if (fpsMovement != null && fpsMovement.IsMovementDisabled && !isDashing)
+            {
+                Debug.LogWarning("[DashCible] Mouvement était désactivé alors qu'on ne dashait pas! Réactivation forcée.");
+                fpsMovement.EnableMovement();
+            }
+            
+            if (isDashing)
+            {
+                Debug.Log("[DashCible] Dash bloqué: déjà en train de dasher");
+                return;
+            }
+
+            // Si la chaîne est active mais le slow-mo a expiré et le cooldown est terminé,
+            // on peut recommencer une nouvelle chaîne
+            if (chainActive && !slowMoApplied && Time.time >= nextAvailableTime)
+            {
+                Debug.Log("[DashCible] Chaîne précédente expirée, reset pour nouvelle chaîne");
+                chainActive = false;
+            }
 
             bool isFirstDash = !chainActive;
 
             if (!chainActive)
             {
-                if (Time.time < nextAvailableTime) return;
+                if (Time.time < nextAvailableTime)
+                {
+                    Debug.Log($"[DashCible] Dash bloqué: cooldown actif ({nextAvailableTime - Time.time:F2}s restant)");
+                    return;
+                }
                 remainingChains = ConfigCountDash;
                 chainActive = true;
+                Debug.Log($"[DashCible] Nouvelle chaîne démarrée, {remainingChains} dashs disponibles");
             }
             else
             {
                 if (!slowMoApplied || remainingChains <= 0)
                 {
+                    Debug.Log($"[DashCible] Dash bloqué: slowMo={slowMoApplied}, remainingChains={remainingChains}");
                     return;
                 }
             }
@@ -110,6 +145,7 @@ namespace FPS
             var target = AcquireTarget();
             if (target == null)
             {
+                Debug.Log("[DashCible] Pas de cible trouvée");
                 // Pas de cible trouvée
                 if (isFirstDash)
                 {
@@ -178,7 +214,9 @@ namespace FPS
 
         private IEnumerator DoTargetDash(EnemyHealth target)
         {
+            Debug.Log($"[DashCible] DoTargetDash démarré vers {target.name}");
             isDashing = true;
+            dashStartTime = Time.unscaledTime;
             pathElectricStunned = false;
 
             Vector3 start = transform.position;
@@ -186,12 +224,14 @@ namespace FPS
             Vector3 dirToTarget = (targetPos - start).normalized;
             float distToTarget = Vector3.Distance(start, targetPos);
 
+            // Calculer la position d'arrêt devant l'ennemi
             float stopDist = Mathf.Clamp(ConfigStopOffset, 0f, Mathf.Max(0f, distToTarget - 0.1f));
             Vector3 end = targetPos - dirToTarget * stopDist;
 
             if (fpsMovement != null)
             {
                 fpsMovement.SetSpeedToMax();
+                fpsMovement.DisableMovement();
             }
 
             float t0 = Time.unscaledTime;
@@ -200,25 +240,58 @@ namespace FPS
 
             while (Time.unscaledTime - t0 < dur)
             {
+                // Vérifier si la cible existe encore
+                if (target == null)
+                {
+                    Debug.Log("[DashCible] Cible détruite pendant le dash");
+                    break;
+                }
+                
                 // Recalculer la destination en temps réel (l'ennemi peut bouger)
                 targetPos = target.transform.position;
+                
+                // Recalculer la direction depuis la position de DEPART (pas la position actuelle)
+                // pour maintenir une trajectoire cohérente
                 dirToTarget = (targetPos - start).normalized;
-                stopDist = Mathf.Clamp(ConfigStopOffset, 0f, Mathf.Max(0f, Vector3.Distance(start, targetPos) - 0.1f));
+                
+                // Recalculer la distance totale et la position d'arrêt
+                float currentDistToTarget = Vector3.Distance(start, targetPos);
+                stopDist = Mathf.Clamp(ConfigStopOffset, 0f, Mathf.Max(0f, currentDistToTarget - 0.1f));
                 end = targetPos - dirToTarget * stopDist;
 
                 float u = (Time.unscaledTime - t0) / dur;
                 Vector3 desiredPos = Vector3.Lerp(start, end, u);
+                
+                // Vérifier si on a dépassé la position d'arrêt
+                float distToEnd = Vector3.Distance(transform.position, end);
+                float distFromStartToEnd = Vector3.Distance(start, end);
+                float progressToEnd = 1f - (distToEnd / Mathf.Max(0.01f, distFromStartToEnd));
+                
+                // Si on est très proche ou on a dépassé, arrêter (mais vérifier les collisions d'abord)
+                if (distToEnd < 0.5f || progressToEnd > 0.95f)
+                {
+                    // Vérifier s'il y a un obstacle entre nous et la position finale
+                    Vector3 finalDelta = end - transform.position;
+                    Vector3 safeFinalPos = GetSafePosition(transform.position, finalDelta);
+                    
+                    if (rb != null)
+                        rb.MovePosition(safeFinalPos);
+                    else
+                        transform.position = safeFinalPos;
+                    break;
+                }
+                
                 Vector3 delta = desiredPos - prev;
 
-                // Appliquer le mouvement avec sliding sur les obstacles
-                if (characterController != null && delta.sqrMagnitude > 0.0001f)
+                // Appliquer le mouvement avec vérification de collision
+                if (delta.sqrMagnitude > 0.0001f)
                 {
-                    delta = SlideMove(prev, delta);
-                    characterController.Move(delta);
-                }
-                else if (delta.sqrMagnitude > 0.0001f)
-                {
-                    transform.position = desiredPos;
+                    Vector3 safePos = GetSafePosition(prev, delta);
+                    
+                    if (rb != null)
+                        rb.MovePosition(safePos);
+                    else
+                        transform.position = safePos;
                 }
 
                 prev = transform.position;
@@ -228,21 +301,36 @@ namespace FPS
                 yield return null;
             }
 
-            // Mouvement final vers la destination
-            Vector3 finalDelta = end - transform.position;
-            if (characterController != null && finalDelta.sqrMagnitude > 0.0001f)
+            // Mouvement final vers la destination (seulement si on n'est pas déjà arrivé)
+            float finalDistToEnd = Vector3.Distance(transform.position, end);
+            if (finalDistToEnd > 0.1f && finalDistToEnd < 3f)
             {
-                finalDelta = SlideMove(transform.position, finalDelta);
-                characterController.Move(finalDelta);
+                Vector3 finalDelta = end - transform.position;
+                if (finalDelta.sqrMagnitude > 0.0001f)
+                {
+                    Vector3 safeEndPos = GetSafePosition(transform.position, finalDelta);
+                    
+                    if (rb != null)
+                        rb.MovePosition(safeEndPos);
+                    else
+                        transform.position = safeEndPos;
+                }
             }
-            else if (finalDelta.sqrMagnitude > 0.0001f)
+
+            // Vérifier si la cible existe encore avant de continuer
+            if (target == null)
             {
-                transform.position = end;
+                Debug.Log("[DashCible] Cible détruite, fin du dash sans dégâts");
+                FinalizeDash();
+                yield break;
             }
 
             // Vérifier si on est assez proche de l'ennemi pour appliquer les dégâts
             float finalDistance = Vector3.Distance(transform.position, target.transform.position);
-            bool reachedTarget = finalDistance <= ConfigStopOffset + 1f;
+            // Augmenter la tolérance pour s'assurer que le dash compte comme réussi
+            bool reachedTarget = finalDistance <= ConfigStopOffset + 3f;
+            
+            Debug.Log($"[DashCible] Distance finale: {finalDistance:F2}, StopOffset: {ConfigStopOffset:F2}, reachedTarget: {reachedTarget}");
 
             var electric = target.GetComponent<Ennemies.Effect.ElectricEnnemis>();
             if (electric != null)
@@ -256,7 +344,7 @@ namespace FPS
 
                 if (electric.ResistToDash)
                 {
-                    isDashing = false;
+                    FinalizeDash();
                     ClearSlowMo();
                     EndChain();
                     yield break;
@@ -264,7 +352,7 @@ namespace FPS
             }
 
             // Appliquer les dégâts seulement si on a atteint la cible
-            if (reachedTarget)
+            if (reachedTarget && target != null)
             {
                 var hitCol = target.GetComponentInChildren<Collider>();
                 var dmg = new DamageInfo(amount: ConfigDashDamage, zoneName: "Dash", type: DamageType.Dash, hitPoint: target.transform.position, hitNormal: -dirToTarget, attacker: transform, hitCollider: hitCol);
@@ -277,7 +365,7 @@ namespace FPS
                 }
             }
 
-            isDashing = false;
+            FinalizeDash();
 
             if (remainingChains <= 0)
             {
@@ -286,6 +374,35 @@ namespace FPS
                     EndChain();
                 }
             }
+        }
+
+        /// <summary>
+        /// Retourne une position sûre en vérifiant les collisions entre la position actuelle et la destination.
+        /// Exclut les ennemis pour permettre de dasher à travers eux.
+        /// </summary>
+        private Vector3 GetSafePosition(Vector3 fromPos, Vector3 delta)
+        {
+            if (delta.sqrMagnitude < 0.0001f)
+                return fromPos;
+            
+            float moveLen = delta.magnitude;
+            Vector3 moveDir = delta.normalized;
+            
+            // Utiliser un SphereCast pour détecter les obstacles (SANS les ennemis)
+            float radius = ConfigCapsuleRadius > 0 ? ConfigCapsuleRadius : 0.4f;
+            
+            // Exclure les ennemis du masque de collision pour le dash
+            LayerMask collisionMask = ObstacleMask & ~EnemyMask;
+            
+            if (Physics.SphereCast(fromPos + Vector3.up * 0.5f, radius, moveDir, out RaycastHit hit, moveLen, collisionMask, QueryTriggerInteraction.Ignore))
+            {
+                // On a touché un obstacle (pas un ennemi), s'arrêter juste avant
+                float safeDistance = Mathf.Max(0f, hit.distance - 0.1f);
+                return fromPos + moveDir * safeDistance;
+            }
+            
+            // Pas d'obstacle, on peut aller à la destination
+            return fromPos + delta;
         }
 
         /// <summary>
@@ -338,6 +455,21 @@ namespace FPS
             return totalMove;
         }
 
+        /// <summary>
+        /// Finalise le dash en réactivant le mouvement et en mettant à jour les flags
+        /// </summary>
+        private void FinalizeDash()
+        {
+            isDashing = false;
+            Debug.Log($"[DashCible] Dash finalisé, remainingChains={remainingChains}, slowMoApplied={slowMoApplied}");
+            
+            // Réactiver le mouvement normal
+            if (fpsMovement != null)
+            {
+                fpsMovement.EnableMovement();
+            }
+        }
+
         private void ApplyOrRefreshSlowMo()
         {
             slowMoEndUnscaled = Time.unscaledTime + ConfigSlowMoTime;
@@ -356,6 +488,12 @@ namespace FPS
             Time.timeScale = previousTimeScale;
             Time.fixedDeltaTime = 0.02f * Time.timeScale;
             slowMoApplied = false;
+            
+            // S'assurer que le mouvement est réactivé si on n'est plus en train de dasher
+            if (!isDashing && fpsMovement != null)
+            {
+                fpsMovement.EnableMovement();
+            }
         }
 
         private void EndChain()
@@ -363,16 +501,24 @@ namespace FPS
             chainActive = false;
             remainingChains = 0;
             nextAvailableTime = Time.time + ConfigCooldown;
+            
+            // S'assurer que le mouvement est réactivé
+            if (fpsMovement != null)
+            {
+                fpsMovement.EnableMovement();
+            }
         }
 
         private void OnDisable()
         {
             if (slowMoApplied) ClearSlowMo();
+            if (fpsMovement != null) fpsMovement.EnableMovement();
         }
 
         private void OnDestroy()
         {
             if (slowMoApplied) ClearSlowMo();
+            if (fpsMovement != null) fpsMovement.EnableMovement();
         }
 
         public int CountDash => ConfigCountDash;
@@ -432,9 +578,9 @@ namespace FPS
             {
                 fpsMovement.ApplyExternalMomentum(momentum);
             }
-            else if (characterController != null)
+            else if (rb != null)
             {
-                characterController.Move(momentum * Time.deltaTime);
+                rb.MovePosition(rb.position + momentum * Time.deltaTime);
             }
             else
             {

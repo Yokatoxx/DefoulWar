@@ -4,6 +4,7 @@
     <option name="migrationStatus" value="IN_PROGRESS" />
     <option name="pendingSessionIds">
       <option value="1783dbf4-9853-4b4d-a7b9-9e421bacc439" />
+      <option value="18428a84-7cc2-482a-ad60-ffc710917f3b" />
       <option value="1b0908c6-9992-4868-89c9-16cf74d37dfd" />
       <option value="207ca17a-20f1-4239-b252-30db422e9bd2" />
       <option value="20c9c51b-c869-4736-a779-06d9aa46d146" />
@@ -62,6 +63,35 @@
           <value>
             <set>
               <option value="a29d19e8-c13a-4cff-8e6b-c60daabd9512" />
+            </set>
+          </value>
+        </entry>
+        <entry key="18428a84-7cc2-482a-ad60-ffc710917f3b">
+          <value>
+            <set>
+              <option value="f042308b-5f23-4b2c-80cc-2cfffc15cc4b" />
+              <option value="a1b7dc39-26d0-4c0a-8966-e61de5a8c024" />
+              <option value="6b6eb424-cc13-4ece-85db-f046134d3ea2" />
+              <option value="8eabbdc3-e4b2-4d36-8e9f-d532d8ad7933" />
+              <option value="48c2491d-2246-46a9-81ac-c477f2649bc3" />
+              <option value="828483ad-c000-4ed0-b755-d381c7be4382" />
+              <option value="b648b3df-93df-44b7-a627-166b25ed5b5e" />
+              <option value="1b63737d-2f1f-4ea5-8bb7-f5780c43c143" />
+              <option value="228e83f8-fb97-4c75-ab2f-5076a0ef5325" />
+              <option value="22a821b5-3385-4e38-8f7b-d3b10c841b32" />
+              <option value="002a6ab2-191c-4999-9958-c1de860922fc" />
+              <option value="22cead59-627e-4494-855a-3ec87e0f4e32" />
+              <option value="f7d357db-853f-4eba-a07e-2a335d576afe" />
+              <option value="58f103da-4c63-442a-85ed-270dd6b39df2" />
+              <option value="afac048e-36af-4429-ad59-031753171ea7" />
+              <option value="2b5b1cf1-e2fd-4067-956c-4dece7f5df51" />
+              <option value="8400236f-7fea-40f6-bb6d-f32bcef47d1c" />
+              <option value="16fb1b1d-69e5-4e34-9205-3d184446c1bb" />
+              <option value="82f4d59c-71bb-4d88-b4af-f651681f2c80" />
+              <option value="cc5c62b6-d9b3-4be2-84b6-24f4f79483a7" />
+              <option value="7021e701-bd0a-4d05-882c-02a6364487ae" />
+              <option value="e36b056c-a6ad-46d6-b880-b08be54a9fb5" />
+              <option value="702f6037-425d-419f-b472-b283957a6a1f" />
             </set>
           </value>
         </entry>
@@ -518,6 +548,17 @@
     <pendingWorkingSetItems>
       <entry key="106598eb-1634-4a9c-8449-ea0aefba2adc" />
       <entry key="1783dbf4-9853-4b4d-a7b9-9e421bacc439" />
+      <entry key="18428a84-7cc2-482a-ad60-ffc710917f3b">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSPlayerController.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashSystem.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Death.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMouseLook.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PlayerHealth.cs" />
+        </set>
+      </entry>
       <entry key="1b0908c6-9992-4868-89c9-16cf74d37dfd" />
       <entry key="207ca17a-20f1-4239-b252-30db422e9bd2" />
       <entry key="20c9c51b-c869-4736-a779-06d9aa46d146" />

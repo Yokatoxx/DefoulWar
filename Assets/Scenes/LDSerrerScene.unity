@@ -7306,7 +7306,7 @@ GameObject:
   - component: {fileID: 143794308}
   - component: {fileID: 143794307}
   - component: {fileID: 143794306}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sol_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9767,7 +9767,7 @@ GameObject:
   - component: {fileID: 250208178}
   - component: {fileID: 250208177}
   - component: {fileID: 250208176}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22962,6 +22962,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1150092120711709536, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1758181676134923429, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: sound
       value: 
@@ -22986,6 +22990,14 @@ PrefabInstance:
       propertyPath: bulletSpawnPoint
       value: 
       objectReference: {fileID: 111639829}
+    - target: {fileID: 3261044043832076446, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_Height
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3261044043832076446, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_Center.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: airBounce
       value: 
@@ -23022,9 +23034,21 @@ PrefabInstance:
       propertyPath: customBounceDirection.z
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3725817409442096485, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 959
+      objectReference: {fileID: 0}
     - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: jumpFOV
       value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 4379777072623147912, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: groundMask.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4496668197879187442, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4622188377374526642, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_Name
@@ -23044,7 +23068,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8703966557384231457, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8703966557384231457, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: m_LocalPosition.z
@@ -48930,13 +48954,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1424048076781185940, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1807755940922956229, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
       propertyPath: m_Name
       value: Enemy 1
       objectReference: {fileID: 0}
     - target: {fileID: 1807755940922956229, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4807056319870603770, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
       propertyPath: m_Enabled

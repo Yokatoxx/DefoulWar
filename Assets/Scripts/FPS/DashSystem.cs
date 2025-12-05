@@ -79,7 +79,7 @@ namespace FPS
         private float dashTimer = 0f;
         private float cooldownTimer = 0f;
         
-        private CharacterController characterController;
+        private Rigidbody rb;
         
         private static System.Collections.Generic.HashSet<GameObject> enemiesKilledByDash = new System.Collections.Generic.HashSet<GameObject>();
         
@@ -124,7 +124,18 @@ namespace FPS
                 }
             }
 
-            characterController = playerController.Controller;
+            rb = fpsMovement != null ? fpsMovement.Rb : GetComponent<Rigidbody>();
+            
+            if (rb == null)
+            {
+                rb = GetComponent<Rigidbody>();
+                Debug.LogWarning("[DashSystem] Rigidbody obtenu directement car fpsMovement.Rb était null");
+            }
+            
+            if (rb == null)
+            {
+                Debug.LogError("[DashSystem] Rigidbody non trouvé! Le dash ne fonctionnera pas.");
+            }
         }
         
         private void Update()
@@ -167,7 +178,7 @@ namespace FPS
 
         private void FixedUpdate()
         {
-            if (!isDashing || characterController == null) return;
+            if (!isDashing || rb == null) return;
 
             // Vérifier les obstacles devant le joueur
             if (CheckObstacleCollision())
@@ -244,7 +255,7 @@ namespace FPS
             }
 
             lastDashPosition = nextPos;
-            characterController.Move(dashMovement);
+            rb.MovePosition(rb.position + dashMovement);
             Debug.DrawRay(transform.position, directionalDashDir * 3f, Color.cyan, 0.05f);
         }
 
@@ -274,10 +285,11 @@ namespace FPS
             
             currentDashCharge = 0f;
 
-            // Mettre la vitesse de mouvement au maximum
+            // Mettre la vitesse de mouvement au maximum et désactiver le mouvement normal
             if (fpsMovement != null)
             {
                 fpsMovement.SetSpeedToMax();
+                fpsMovement.DisableMovement();
             }
 
             // Init timers/état
@@ -352,11 +364,11 @@ namespace FPS
             }
             
             // Désactiver également le rigidbody pour éviter les interactions physiques
-            Rigidbody rb = enemy.GetComponent<Rigidbody>();
-            if (rb != null)
+            Rigidbody enemyRb = enemy.GetComponent<Rigidbody>();
+            if (enemyRb != null)
             {
-                rb.isKinematic = true;
-                rb.detectCollisions = false;
+                enemyRb.isKinematic = true;
+                enemyRb.detectCollisions = false;
             }
             
             Rigidbody[] childRbs = enemy.GetComponentsInChildren<Rigidbody>();
@@ -385,6 +397,12 @@ namespace FPS
         
         private void EndDash()
         {
+            // Réactiver le mouvement normal
+            if (fpsMovement != null)
+            {
+                fpsMovement.EnableMovement();
+            }
+            
             // Appliquer le momentum de sortie si activé
             if (conserveMomentum && fpsMovement != null)
             {
