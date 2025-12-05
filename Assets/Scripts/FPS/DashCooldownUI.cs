@@ -48,6 +48,7 @@ namespace FPS
         private Color initialTextColor;
         private bool warnedAboutSlotShortage;
         private float pulseTimer;
+        private bool wasCooldownActive;
         
         private void Awake()
         {
@@ -102,6 +103,8 @@ namespace FPS
             UpdateDashIcons(totalCharges, availableCharges, isSlowMo, isCooldown, cooldownProgress);
             UpdateCooldownText(availableCharges, totalCharges, isSlowMo, isCooldown, cooldownProgress);
             UpdateVisibility(availableCharges, totalCharges);
+            
+            wasCooldownActive = isCooldown;
         }
         
         private void UpdateDashIcons(int totalCharges, int availableCharges, bool isSlowMo, bool isCooldown, float cooldownProgress)
@@ -183,8 +186,15 @@ namespace FPS
                     targetColor = readyColor;
                 }
                 
-                // Animation fluide du remplissage
-                iconFillAmounts[i] = Mathf.Lerp(iconFillAmounts[i], targetFill, Time.unscaledDeltaTime * transitionSpeed);
+                // Snap instantané pendant le cooldown et à la fin du cooldown, animation fluide sinon
+                if (isCooldown || wasCooldownActive)
+                {
+                    iconFillAmounts[i] = targetFill;
+                }
+                else
+                {
+                    iconFillAmounts[i] = Mathf.Lerp(iconFillAmounts[i], targetFill, Time.unscaledDeltaTime * transitionSpeed);
+                }
                 icon.fillAmount = iconFillAmounts[i];
                 icon.color = targetColor;
                 
