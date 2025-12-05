@@ -22,10 +22,19 @@ namespace FPS
         private float timeSinceLastDamage;
         private bool isDead;
         private bool isInvulnerable;
+        private DashCible dashCible;
         
         private void Awake()
         {
             currentHealth = maxHealth;
+            // Chercher DashCible sur cet objet, dans les enfants, ou dans les parents
+            dashCible = GetComponent<DashCible>();
+            if (dashCible == null)
+                dashCible = GetComponentInChildren<DashCible>();
+            if (dashCible == null)
+                dashCible = GetComponentInParent<DashCible>();
+            if (dashCible == null)
+                dashCible = FindFirstObjectByType<DashCible>();
         }
         
         private void Update()
@@ -43,7 +52,9 @@ namespace FPS
         
         public void TakeDamage(float damage)
         {
+            // Ignorer les dégâts si mort, invulnérable, ou en train de dasher
             if (isDead || isInvulnerable) return;
+            if (dashCible != null && dashCible.isDashing) return;
 
             soundPlayer.PlayOneShot("OuchRoblox", 0.5f, Random.Range(0.9f, 1.1f));  
 

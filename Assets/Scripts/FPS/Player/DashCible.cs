@@ -171,17 +171,15 @@ namespace FPS
             Vector3 dir = to - from;
             float dist = dir.magnitude;
             if (dist <= 0.01f) return false;
-            return Physics.Raycast(from, dir.normalized, dist - 0.1f, ObstacleMask, QueryTriggerInteraction.Ignore);
+            // Utiliser uniquement ObstacleMask sans le layer des ennemis
+            LayerMask obstructionMask = ObstacleMask & ~EnemyMask;
+            return Physics.Raycast(from, dir.normalized, dist - 0.1f, obstructionMask, QueryTriggerInteraction.Ignore);
         }
 
         private IEnumerator DoTargetDash(EnemyHealth target)
         {
             isDashing = true;
             pathElectricStunned = false;
-
-            // Activer l'invulnérabilité pendant le dash
-            if (playerHealth != null)
-                playerHealth.SetInvulnerable(true);
 
             Vector3 start = transform.position;
             Vector3 targetPos = target.transform.position;
@@ -241,10 +239,6 @@ namespace FPS
             {
                 transform.position = end;
             }
-
-            // Désactiver l'invulnérabilité après le mouvement
-            if (playerHealth != null)
-                playerHealth.SetInvulnerable(false);
 
             // Vérifier si on est assez proche de l'ennemi pour appliquer les dégâts
             float finalDistance = Vector3.Distance(transform.position, target.transform.position);
