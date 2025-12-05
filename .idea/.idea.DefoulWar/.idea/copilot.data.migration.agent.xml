@@ -502,6 +502,10 @@
               <option value="8ec91237-1184-4341-a054-5528b91a87ca" />
               <option value="3a43d343-32f7-4821-9e80-33003ef5b8bf" />
               <option value="3e3b6088-0a60-45a5-8343-2effe9ebe532" />
+              <option value="249b8128-c106-4dba-a4bd-dfdc0b7a71ba" />
+              <option value="177133a3-1ac1-48ff-a114-aa9b67dc14ac" />
+              <option value="add5964b-1918-4157-aea0-8d9ecbba88ee" />
+              <option value="edb43cea-c6d1-4203-8533-96a39ca70efb" />
             </set>
           </value>
         </entry>
@@ -574,6 +578,12 @@
       <entry key="f0942681-0223-4301-8aca-6d3acd664b1c" />
       <entry key="f0ca7a07-7d4d-40c3-8058-d574206231b6" />
       <entry key="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
+      <entry key="ff7edcc1-800a-4ae6-b618-bfe0c8616ebe">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/PlayerHealth.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" />
+        </set>
+      </entry>
     </pendingWorkingSetItems>
   </component>
 </project>

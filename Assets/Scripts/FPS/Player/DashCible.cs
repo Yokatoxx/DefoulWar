@@ -20,6 +20,7 @@ namespace FPS
         [SerializeField] private FPSPlayerController playerController;
         [SerializeField] private CharacterController characterController;
         [SerializeField] private FPSMovement fpsMovement;
+        private PlayerHealth playerHealth;
 
         public bool isDashing;
         private bool chainActive;
@@ -66,6 +67,7 @@ namespace FPS
                 fpsMovement = GetComponent<FPSMovement>();
             if (aimCamera == null)
                 aimCamera = Camera.main;
+            playerHealth = GetComponent<PlayerHealth>();
         }
 
         private void Update()
@@ -89,6 +91,8 @@ namespace FPS
         {
             if (isDashing) return;
 
+            bool isFirstDash = !chainActive;
+
             if (!chainActive)
             {
                 if (Time.time < nextAvailableTime) return;
@@ -106,11 +110,13 @@ namespace FPS
             var target = AcquireTarget();
             if (target == null)
             {
-                if (chainActive)
+                // Pas de cible trouvée
+                if (isFirstDash)
                 {
-                    ClearSlowMo();
-                    EndChain();
+                    // Premier dash sans cible - annuler la chaîne
+                    chainActive = false;
                 }
+                // Sinon, ignorer le clic sans annuler la chaîne (le slow-mo continue)
                 return;
             }
 
@@ -173,6 +179,10 @@ namespace FPS
             isDashing = true;
             pathElectricStunned = false;
 
+            // Activer l'invulnérabilité pendant le dash
+            if (playerHealth != null)
+                playerHealth.SetInvulnerable(true);
+
             Vector3 start = transform.position;
             Vector3 targetPos = target.transform.position;
             Vector3 dirToTarget = (targetPos - start).normalized;
@@ -181,18 +191,6 @@ namespace FPS
             float stopDist = Mathf.Clamp(ConfigStopOffset, 0f, Mathf.Max(0f, distToTarget - 0.1f));
             Vector3 end = targetPos - dirToTarget * stopDist;
 
-            Vector3 top = start + Vector3.up * 1.5f;
-            Vector3 bottom = start + Vector3.up * 0.2f;
-            Vector3 moveDir = (end - start);
-            float moveLen = moveDir.magnitude;
-            if (moveLen > 0.01f)
-            {
-                if (Physics.CapsuleCast(top, bottom, ConfigCapsuleRadius, moveDir.normalized, out RaycastHit hit, moveLen, ObstacleMask, QueryTriggerInteraction.Ignore))
-                {
-                    end = hit.point - moveDir.normalized * 0.2f;
-                }
-            }
-
             if (fpsMovement != null)
             {
                 fpsMovement.SetSpeedToMax();
@@ -200,28 +198,57 @@ namespace FPS
 
             float t0 = Time.unscaledTime;
             float dur = Mathf.Max(0.01f, ConfigDashTravelTime);
-            Vector3 prev = start;
+            Vector3 prev = transform.position;
 
             while (Time.unscaledTime - t0 < dur)
             {
-                float u = (Time.unscaledTime - t0) / dur;
-                Vector3 pos = Vector3.Lerp(start, end, u);
-                Vector3 delta = pos - prev;
-                if (characterController != null)
-                    characterController.Move(delta);
-                else
-                    transform.position = pos;
-                prev = pos;
+                // Recalculer la destination en temps réel (l'ennemi peut bouger)
+                targetPos = target.transform.position;
+                dirToTarget = (targetPos - start).normalized;
+                stopDist = Mathf.Clamp(ConfigStopOffset, 0f, Mathf.Max(0f, Vector3.Distance(start, targetPos) - 0.1f));
+                end = targetPos - dirToTarget * stopDist;
 
-                TryStunElectricOnPath(pos);
+                float u = (Time.unscaledTime - t0) / dur;
+                Vector3 desiredPos = Vector3.Lerp(start, end, u);
+                Vector3 delta = desiredPos - prev;
+
+                // Appliquer le mouvement avec sliding sur les obstacles
+                if (characterController != null && delta.sqrMagnitude > 0.0001f)
+                {
+                    delta = SlideMove(prev, delta);
+                    characterController.Move(delta);
+                }
+                else if (delta.sqrMagnitude > 0.0001f)
+                {
+                    transform.position = desiredPos;
+                }
+
+                prev = transform.position;
+
+                TryStunElectricOnPath(prev);
 
                 yield return null;
             }
-            Vector3 finalDelta = end - prev;
-            if (characterController != null)
+
+            // Mouvement final vers la destination
+            Vector3 finalDelta = end - transform.position;
+            if (characterController != null && finalDelta.sqrMagnitude > 0.0001f)
+            {
+                finalDelta = SlideMove(transform.position, finalDelta);
                 characterController.Move(finalDelta);
-            else
+            }
+            else if (finalDelta.sqrMagnitude > 0.0001f)
+            {
                 transform.position = end;
+            }
+
+            // Désactiver l'invulnérabilité après le mouvement
+            if (playerHealth != null)
+                playerHealth.SetInvulnerable(false);
+
+            // Vérifier si on est assez proche de l'ennemi pour appliquer les dégâts
+            float finalDistance = Vector3.Distance(transform.position, target.transform.position);
+            bool reachedTarget = finalDistance <= ConfigStopOffset + 1f;
 
             var electric = target.GetComponent<Ennemies.Effect.ElectricEnnemis>();
             if (electric != null)
@@ -242,14 +269,18 @@ namespace FPS
                 }
             }
 
-            var hitCol = target.GetComponentInChildren<Collider>();
-            var dmg = new DamageInfo(amount: ConfigDashDamage, zoneName: "Dash", type: DamageType.Dash, hitPoint: target.transform.position, hitNormal: -dirToTarget, attacker: transform, hitCollider: hitCol);
-            bool applied = target.TryApplyDamage(dmg);
-
-            if (applied)
+            // Appliquer les dégâts seulement si on a atteint la cible
+            if (reachedTarget)
             {
-                ApplyOrRefreshSlowMo();
-                ApplyBounceImpulse(dirToTarget);
+                var hitCol = target.GetComponentInChildren<Collider>();
+                var dmg = new DamageInfo(amount: ConfigDashDamage, zoneName: "Dash", type: DamageType.Dash, hitPoint: target.transform.position, hitNormal: -dirToTarget, attacker: transform, hitCollider: hitCol);
+                bool applied = target.TryApplyDamage(dmg);
+
+                if (applied)
+                {
+                    ApplyOrRefreshSlowMo();
+                    ApplyBounceImpulse(dirToTarget);
+                }
             }
 
             isDashing = false;
@@ -261,6 +292,56 @@ namespace FPS
                     EndChain();
                 }
             }
+        }
+
+        /// <summary>
+        /// Calcule un vecteur de déplacement qui glisse le long des obstacles.
+        /// </summary>
+        private Vector3 SlideMove(Vector3 currentPos, Vector3 desiredDelta)
+        {
+            Vector3 totalMove = Vector3.zero;
+            Vector3 remainingMove = desiredDelta;
+            const int maxIterations = 3;
+
+            for (int i = 0; i < maxIterations; i++)
+            {
+                if (remainingMove.sqrMagnitude < 0.0001f)
+                    break;
+
+                float moveLen = remainingMove.magnitude;
+                Vector3 moveDir = remainingMove / moveLen;
+
+                Vector3 top = currentPos + totalMove + Vector3.up * 1.5f;
+                Vector3 bottom = currentPos + totalMove + Vector3.up * 0.2f;
+
+                if (Physics.CapsuleCast(top, bottom, ConfigCapsuleRadius, moveDir, out RaycastHit hit, moveLen, ObstacleMask, QueryTriggerInteraction.Ignore))
+                {
+                    // Avancer jusqu'au point de contact (avec une petite marge)
+                    float safeDistance = Mathf.Max(0f, hit.distance - 0.05f);
+                    Vector3 safeMove = moveDir * safeDistance;
+                    totalMove += safeMove;
+
+                    // Calculer le mouvement restant projeté sur le plan de l'obstacle (sliding)
+                    float leftoverDist = moveLen - hit.distance;
+                    if (leftoverDist > 0.01f)
+                    {
+                        Vector3 leftoverDir = moveDir * leftoverDist;
+                        remainingMove = Vector3.ProjectOnPlane(leftoverDir, hit.normal);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    // Pas d'obstacle, on peut avancer complètement
+                    totalMove += remainingMove;
+                    break;
+                }
+            }
+
+            return totalMove;
         }
 
         private void ApplyOrRefreshSlowMo()

@@ -21,6 +21,7 @@ namespace FPS
         
         private float timeSinceLastDamage;
         private bool isDead;
+        private bool isInvulnerable;
         
         private void Awake()
         {
@@ -42,7 +43,7 @@ namespace FPS
         
         public void TakeDamage(float damage)
         {
-            if (isDead) return;
+            if (isDead || isInvulnerable) return;
 
             soundPlayer.PlayOneShot("OuchRoblox", 0.5f, Random.Range(0.9f, 1.1f));  
 
@@ -84,5 +85,11 @@ namespace FPS
         public float MaxHealth => maxHealth;
         public float HealthPercentage => currentHealth / maxHealth;
         public bool IsDead => isDead;
+        public bool IsInvulnerable => isInvulnerable;
+
+        public void SetInvulnerable(bool invulnerable)
+        {
+            isInvulnerable = invulnerable;
+        }
     }
 }
