@@ -264,6 +264,7 @@ GameObject:
   - component: {fileID: 6744729750470337342}
   - component: {fileID: 1424048076781185940}
   - component: {fileID: 4807056319870603770}
+  - component: {fileID: 564636307132464817}
   m_Layer: 7
   m_Name: Enemy 1
   m_TagString: Enemy
@@ -340,7 +341,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1807755940922956229}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b35c933fe4a04fd7a4d569ff6a317dc8, type: 3}
   m_Name: 
@@ -355,6 +356,22 @@ MonoBehaviour:
     m_Bits: 0
   attackDamage: 10
   attackCooldown: 1.5
+--- !u!114 &564636307132464817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807755940922956229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06c56eae9ac4bdf44abb1bcfde75fd4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: ecb01ae4634071443b77983998498bae, type: 2}
+  waypointPath: {fileID: 0}
+  shootPoint: {fileID: 0}
+  showDebugGizmos: 1
 --- !u!1 &7277404602049207658
 GameObject:
   m_ObjectHideFlags: 0
