@@ -56965,7 +56965,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localAxis: {x: -1, y: 0, z: 0}
   rotationAngle: 360
-  rotationDuration: 0.35
+  rotationDuration: 0.4
   easeCurve:
     serializedVersion: 2
     m_Curve:
@@ -56978,6 +56978,24 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0
+    - serializedVersion: 3
+      time: 0.571024
+      value: 0.39522123
+      inSlope: 1.2472125
+      outSlope: 1.2472125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.08562393
+      outWeight: 1
+    - serializedVersion: 3
+      time: 0.7448769
+      value: 0.7598189
+      inSlope: 2.7515824
+      outSlope: 2.7515824
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 1
@@ -57494,6 +57512,10 @@ PrefabInstance:
     - target: {fileID: 1918107123851469354, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
       propertyPath: positionSmoothSpeed
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1918107123851469354, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
+      propertyPath: rotationSmoothSpeed
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 2796565092686009855, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
       propertyPath: m_LocalPosition.x
