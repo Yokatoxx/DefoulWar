@@ -33,6 +33,7 @@
       <option value="a0229d76-9af2-43e2-b6a1-25bee4c936f8" />
       <option value="a779c500-59ba-4ca7-b785-bdfa8b44028b" />
       <option value="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
+      <option value="b7f01bf5-e2f8-4d58-873b-60130c16f3df" />
       <option value="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <option value="bd6066b6-66f7-497c-ad3f-341ec49d2090" />
       <option value="c080dcdd-d73c-4ca6-9ed8-3f7213f0265a" />
@@ -53,6 +54,7 @@
       <option value="f0ca7a07-7d4d-40c3-8058-d574206231b6" />
       <option value="fc24fddd-802d-4bfd-a6ea-b79dae472c31" />
       <option value="fce4fee5-425b-430b-84e9-87a7ae92faa5" />
+      <option value="ff7edcc1-800a-4ae6-b618-bfe0c8616ebe" />
     </option>
     <option name="pendingTurns">
       <map>
@@ -322,6 +324,16 @@
             </set>
           </value>
         </entry>
+        <entry key="b7f01bf5-e2f8-4d58-873b-60130c16f3df">
+          <value>
+            <set>
+              <option value="9c172fde-686c-49a4-979a-99a119b974fb" />
+              <option value="59385a8b-e309-4f17-bfb1-f05d4c190688" />
+              <option value="aef9a730-3b71-4e4f-b897-5d691f25be35" />
+              <option value="ae66a15a-0c13-4185-83e3-0901386f491f" />
+            </set>
+          </value>
+        </entry>
         <entry key="bb250ac1-5021-49ef-8322-9776164bc8b5">
           <value>
             <set>
@@ -484,6 +496,15 @@
             </set>
           </value>
         </entry>
+        <entry key="ff7edcc1-800a-4ae6-b618-bfe0c8616ebe">
+          <value>
+            <set>
+              <option value="8ec91237-1184-4341-a054-5528b91a87ca" />
+              <option value="3a43d343-32f7-4821-9e80-33003ef5b8bf" />
+              <option value="3e3b6088-0a60-45a5-8343-2effe9ebe532" />
+            </set>
+          </value>
+        </entry>
       </map>
     </option>
     <pendingWorkingSetItems>
@@ -529,6 +550,12 @@
       </entry>
       <entry key="a9168e5d-f1a4-4875-ac4a-916c9c279a0b" />
       <entry key="b29f6e5d-5777-4be7-8acf-0f4af0d439e3" />
+      <entry key="b7f01bf5-e2f8-4d58-873b-60130c16f3df">
+        <set>
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" />
+          <option value="file://$PROJECT_DIR$/Assets/Scripts/FPS/DashCooldownUI.cs" />
+        </set>
+      </entry>
       <entry key="bb250ac1-5021-49ef-8322-9776164bc8b5" />
       <entry key="bd6066b6-66f7-497c-ad3f-341ec49d2090" />
       <entry key="c080dcdd-d73c-4ca6-9ed8-3f7213f0265a" />

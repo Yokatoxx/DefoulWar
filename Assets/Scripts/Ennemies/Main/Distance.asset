@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6039615d1c9d4be4a3e406654f1343d9, type: 3}
   m_Name: Distance
   m_EditorClassIdentifier: 
-  behaviorType: 1
+  behaviorType: 0
   detectionRange: 15
   requireLineOfSight: 1
   obstacleLayer:
@@ -21,16 +21,18 @@ MonoBehaviour:
   eyeHeight: 1.5
   chaseSpeed: 3.5
   patrolSpeed: 2
-  keepDistance: 8
+  keepDistance: 15.2
   distanceTolerance: 1
   patrolRadius: 20
   waypointWaitTime: 1
-  attackType: 0
+  attackType: 1
   attackDamage: 10
   attackCooldown: 1.5
-  attackRange: 2
-  isHitscan: 0
+  attackRange: 20.8
+  isHitscan: 1
   bulletPrefab: {fileID: 0}
   bulletSpeed: 20
   bulletLifetime: 5
+  bulletTrailPrefab: {fileID: 4795970869987127494, guid: a527b787c415e734797cb5209dacaba1, type: 3}
+  trailDuration: 0.1
   rotationSpeed: 5

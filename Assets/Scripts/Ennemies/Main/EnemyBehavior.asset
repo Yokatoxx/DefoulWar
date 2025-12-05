@@ -12,10 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6039615d1c9d4be4a3e406654f1343d9, type: 3}
   m_Name: EnemyBehavior
   m_EditorClassIdentifier: 
-  behaviorType: 1
+  behaviorType: 2
   detectionRange: 15
+  requireLineOfSight: 1
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  eyeHeight: 1.5
   chaseSpeed: 3.5
-  patrolSpeed: 2
+  patrolSpeed: 4
   keepDistance: 8
   distanceTolerance: 1
   patrolRadius: 20
@@ -24,8 +29,10 @@ MonoBehaviour:
   attackDamage: 10
   attackCooldown: 1.5
   attackRange: 2
-  isHitscan: 0
+  isHitscan: 1
   bulletPrefab: {fileID: 0}
   bulletSpeed: 20
   bulletLifetime: 5
+  bulletTrailPrefab: {fileID: 0}
+  trailDuration: 0.5
   rotationSpeed: 5

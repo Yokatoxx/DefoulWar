@@ -5,27 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ChaserBehavior.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ChaserBehavior.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/DistanceBehavior.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/DistanceBehavior.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/IEnemyBehavior.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/IEnemyBehavior.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ZonePatrolBehavior.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ZonePatrolBehavior.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/EnemyAttackHandler.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/EnemyAttackHandler.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Settings.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Settings/EnemyBehaviorSettings.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Settings/EnemyBehaviorSettings.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/WaypointPath.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/WaypointPath.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ENEMY_BEHAVIOR_GUIDE.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/copilotDiffState.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.probuilder/Settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/DashCooldownUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/DashCooldownUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/DashCible.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -163,7 +146,7 @@
       <workItem from="1764148945496" duration="1374000" />
       <workItem from="1764937412213" duration="199000" />
       <workItem from="1764938714986" duration="88000" />
-      <workItem from="1764938824998" duration="4225000" />
+      <workItem from="1764938824998" duration="6443000" />
     </task>
     <servers />
   </component>

@@ -309,6 +309,14 @@ namespace FPS
         public int RemainingChains => chainActive ? Mathf.Clamp(remainingChains, 0, ConfigCountDash) : ConfigCountDash;
         public bool IsSlowMoActive => slowMoApplied;
         
+        /// <summary>True si le cooldown global est en cours (après la fin du slow-mo)</summary>
+        public bool IsCooldownActive => !chainActive && Time.time < nextAvailableTime;
+        
+        /// <summary>Progression du cooldown de 0 (début) à 1 (terminé)</summary>
+        public float CooldownProgress => IsCooldownActive 
+            ? 1f - ((nextAvailableTime - Time.time) / ConfigCooldown) 
+            : 1f;
+        
         private void TryStunElectricOnPath(Vector3 currentPos)
         {
             if (pathElectricStunned) return;
