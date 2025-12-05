@@ -36,6 +36,14 @@ namespace FPS
         [SerializeField, Tooltip("Vitesse de la pulsation pendant le slow-mo")]
         private float pulseSpeed = 4f;
         
+        [Header("Pop Effect (Recharge)")]
+        [SerializeField, Tooltip("Intensité du pop quand une bulle se remplit complètement (0.2 à 0.5 recommandé)")]
+        [Range(0f, 1f)]
+        private float popIntensity = 0.3f;
+        
+        [SerializeField, Tooltip("Durée de l'animation de pop en secondes")]
+        private float popDuration = 0.2f;
+        
         [SerializeField, Tooltip("Afficher le texte de pourcentage")]
         private bool showPercentageText = true;
         
@@ -45,6 +53,8 @@ namespace FPS
         private CanvasGroup canvasGroup;
         private readonly List<float> iconFillAmounts = new();
         private readonly List<Vector3> iconOriginalScales = new();
+        private readonly List<float> iconPopTimers = new();
+        private readonly List<bool> iconWasFilled = new();
         private Color initialTextColor;
         private bool warnedAboutSlotShortage;
         private float pulseTimer;
@@ -75,9 +85,13 @@ namespace FPS
         {
             iconFillAmounts.Clear();
             iconOriginalScales.Clear();
+            iconPopTimers.Clear();
+            iconWasFilled.Clear();
             for (int i = 0; i < dashIcons.Count; i++)
             {
                 iconFillAmounts.Add(0f);
+                iconPopTimers.Add(0f);
+                iconWasFilled.Add(false);
                 if (dashIcons[i] != null)
                     iconOriginalScales.Add(dashIcons[i].transform.localScale);
                 else
@@ -198,10 +212,35 @@ namespace FPS
                 icon.fillAmount = iconFillAmounts[i];
                 icon.color = targetColor;
                 
-                // Application de l'effet de pulsation (scale)
+                // Détection du remplissage complet pour déclencher le pop
+                bool isFilled = iconFillAmounts[i] >= 0.999f;
+                if (isFilled && !iconWasFilled[i] && (isCooldown || wasCooldownActive))
+                {
+                    // Déclencher l'animation de pop
+                    iconPopTimers[i] = popDuration;
+                }
+                iconWasFilled[i] = isFilled;
+                
+                // Mise à jour du timer de pop
+                if (iconPopTimers[i] > 0f)
+                {
+                    iconPopTimers[i] -= Time.unscaledDeltaTime;
+                }
+                
+                // Calcul du scale final avec pulsation et/ou pop
+                float popScale = 1f;
+                if (iconPopTimers[i] > 0f)
+                {
+                    // Animation de pop : scale up puis retour à la normale
+                    float popProgress = 1f - (iconPopTimers[i] / popDuration);
+                    // Courbe de pop : monte vite puis redescend doucement
+                    popScale = 1f + popIntensity * Mathf.Sin(popProgress * Mathf.PI);
+                }
+                
+                // Application de l'effet de pulsation et pop (scale)
                 if (i < iconOriginalScales.Count)
                 {
-                    icon.transform.localScale = iconOriginalScales[i] * pulseScale;
+                    icon.transform.localScale = iconOriginalScales[i] * pulseScale * popScale;
                 }
             }
         }
