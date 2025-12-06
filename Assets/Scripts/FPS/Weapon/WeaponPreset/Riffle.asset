@@ -24,7 +24,7 @@ MonoBehaviour:
   recoilAmount: 0
   addBulletSpread: 1
   isAutomatic: 1
-  bulletSpreadVaraiance: {x: 0.005, y: 0.02, z: 0.06}
+  bulletSpreadVaraiance: {x: 1, y: 1, z: 1}
   weaponModel: {fileID: 1364368352059329568, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
   muzzleFlash: {fileID: 7980029976762078213, guid: 1f58a1dea6bbd9347843e4935585e6a2, type: 3}
   ImpactParticleSystem: {fileID: 7138884428354202179, guid: e36466f47c6d2464cbffa2864a5b0198, type: 3}

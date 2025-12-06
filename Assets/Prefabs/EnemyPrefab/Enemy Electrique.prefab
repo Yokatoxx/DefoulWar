@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2689582501457834611}
   - component: {fileID: -3158992528684757622}
   - component: {fileID: -8977643811127216630}
+  - component: {fileID: 9159008837239357016}
   m_Layer: 7
   m_Name: Enemy Electrique
   m_TagString: Enemy
@@ -145,6 +146,22 @@ MonoBehaviour:
   effectDuration: 0.5
   dischargeCooldown: 0.2
   resistToDash: 1
+--- !u!114 &9159008837239357016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06c56eae9ac4bdf44abb1bcfde75fd4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 4fed8d948b75f3f439dbbc13506b989d, type: 2}
+  waypointPath: {fileID: 0}
+  shootPoint: {fileID: 0}
+  showDebugGizmos: 1
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0

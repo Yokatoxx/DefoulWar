@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6412d75f255f4bfebd2a1ad091f0c9c3, type: 3}
-  m_Name: Base
+  m_Name: 6Count10damage
   m_EditorClassIdentifier: 
   enemyMask:
     serializedVersion: 2
@@ -23,7 +23,7 @@ MonoBehaviour:
   slowMoTime: 0.75
   slowMoScale: 0.2
   distanceDash: 25
-  cooldown: 5
+  cooldown: 2
   dashDamage: 10
   dashTravelTime: 0.08
   capsuleRadius: 0.4
