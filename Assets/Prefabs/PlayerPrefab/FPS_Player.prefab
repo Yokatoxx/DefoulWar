@@ -71,7 +71,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8703966557384231457}
-  - component: {fileID: 1150092120711709536}
+  - component: {fileID: 3469333960817140672}
   - component: {fileID: 1442011852720692160}
   - component: {fileID: 8291640835560598057}
   - component: {fileID: 4379777072623147912}
@@ -81,8 +81,8 @@ GameObject:
   - component: {fileID: 6005410421240447297}
   - component: {fileID: 9097555686013398260}
   - component: {fileID: 2920386777163252129}
-  - component: {fileID: 1758181676134923429}
-  - component: {fileID: 3469333960817140672}
+  - component: {fileID: 4496668197879187442}
+  - component: {fileID: 3261044043832076446}
   m_Layer: 3
   m_Name: FPS_Player
   m_TagString: Player
@@ -107,31 +107,28 @@ Transform:
   - {fileID: 7268629367177999115}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!143 &1150092120711709536
-CharacterController:
+--- !u!114 &3469333960817140672
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4622188377374526642}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d614e6ab84d4eef44aecfc75d8424ef4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aimCamera: {fileID: 3725817409442096485}
+  dashDefinition: {fileID: 0}
+  groundBounce: {fileID: 0}
+  airBounce: {fileID: 0}
+  activationKey: 324
+  playerController: {fileID: 2084425902901004486}
+  rb: {fileID: 0}
+  fpsMovement: {fileID: 4379777072623147912}
+  isDashing: 0
+  slowMoApplied: 0
 --- !u!114 &1442011852720692160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -184,6 +181,7 @@ MonoBehaviour:
   jumpHeight: 4
   gravity: -9.81
   gravityMultiplier: 2
+  maxFallSpeed: -20
   increaseSpeedFactor: 6
   speedLimit: 15
   coyoteTime: 0.15
@@ -196,6 +194,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 0
+  externalMomentumDamping: 12
+  externalMomentumGroundGrace: 0.08
 --- !u!114 &2084425902901004486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   volume: {fileID: 0}
-  dashSystem: {fileID: 1758181676134923429}
+  dashSystem: {fileID: 0}
   dashEffectLensIntensity: -0.7
   dashEffectDuration: 0.5
   dashBokehAperture: 0.4
@@ -308,10 +308,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponSettings: {fileID: 11400000, guid: c3876e400c078074d8c4b7800835f143, type: 2}
   weaponShake: {fileID: 0}
-  soundPlayer: {fileID: 0}
   enemyTag: Enemy
   textAmmo: {fileID: 0}
-  looseAmmo: 0
   bulletSpawnPoint: {fileID: 0}
   weapon: {fileID: 0}
   aimCamera: {fileID: 3725817409442096485}
@@ -323,100 +321,57 @@ MonoBehaviour:
     multiplier: 1
   - zoneName: Head
     multiplier: 2
---- !u!114 &1758181676134923429
-MonoBehaviour:
+  crosshair: {fileID: 0}
+--- !u!54 &4496668197879187442
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4622188377374526642}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0fb7718f9dde5c439df123bfc4d1902, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dashSpeed: 25
-  dashDuration: 0.4
-  dashSpeedCurve:
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
     serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0.3
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  autoRegenerate: 1
-  dashCooldown: 1.5
-  enemiesRequiredForFullCharge: 3
-  currentDashCharge: 1
-  dashHitRadius: 1
-  dashDamage: 9999
-  enemyMask:
+    m_Bits: 0
+  m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 128
-  maxCollisionAngle: 15
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  obstacleCheckDistance: 1.5
-  dashFOV: 90
-  fovTransitionSpeed: 15
-  conserveMomentum: 1
-  momentumRetention: 0.3
-  playerController: {fileID: 2084425902901004486}
-  fpsMovement: {fileID: 4379777072623147912}
-  cameraTransform: {fileID: 1403591587188792743}
-  sound: {fileID: 0}
-  isDashing: 0
---- !u!114 &3469333960817140672
-MonoBehaviour:
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!136 &3261044043832076446
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4622188377374526642}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d614e6ab84d4eef44aecfc75d8424ef4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  aimCamera: {fileID: 3725817409442096485}
-  enemyMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  maxAimAngle: 30
-  countDash: 3
-  slowMoTime: 0.75
-  slowMoScale: 0.2
-  distanceDash: 25
-  cooldown: 1.5
-  dashDamage: 9999
-  dashTravelTime: 0.08
-  capsuleRadius: 0.4
-  stopOffset: 1
-  activationKey: 324
-  playerController: {fileID: 2084425902901004486}
-  characterController: {fileID: 1150092120711709536}
-  fpsMovement: {fileID: 4379777072623147912}
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4673607940017463061
 GameObject:
   m_ObjectHideFlags: 0

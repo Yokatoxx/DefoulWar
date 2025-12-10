@@ -31,6 +31,8 @@ namespace FPS
         private float previousTimeScale = 1f;
         private bool pathElectricStunned;
         private float dashStartTime; // Pour détecter les dashs bloqués
+        private Coroutine bounceCoroutine; // Coroutine de rebond active
+        private bool hitStopActive; // Flag pour le hitstop en cours
 
         private static readonly Collider[] OverlapBuffer = new Collider[16];
 
@@ -47,6 +49,8 @@ namespace FPS
         private float ConfigDashTravelTime => Mathf.Max(0.01f, Config?.dashTravelTime ?? 0.08f);
         private float ConfigCapsuleRadius => Mathf.Max(0f, Config?.capsuleRadius ?? 0.4f);
         private float ConfigStopOffset => Mathf.Max(0f, Config?.stopOffset ?? 1f);
+        private float ConfigHitStopDuration => Mathf.Max(0f, Config?.hitStopUnscaledDuration ?? 0f);
+        private bool ConfigHitStopFreezeTime => Config?.hitStopFreezeTime ?? true;
         private BounceDefinition CurrentBounce
         {
             get
@@ -82,6 +86,7 @@ namespace FPS
                 if (chainActive) EndChain();
             }
             
+            // Sécurité: si le slow-mo est actif mais le temps a expiré, le désactiver
             if (slowMoApplied && Time.unscaledTime >= slowMoEndUnscaled)
             {
                 ClearSlowMo();
@@ -89,6 +94,14 @@ namespace FPS
                 {
                     EndChain();
                 }
+            }
+            
+            // Sécurité supplémentaire: si Time.timeScale est anormalement bas sans slow-mo actif, restaurer
+            if (!slowMoApplied && !hitStopActive && !isDashing && Time.timeScale < 0.5f)
+            {
+                Debug.LogWarning($"[DashCible] TimeScale anormal ({Time.timeScale}) sans slow-mo actif! Restauration à 1.");
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = 0.02f;
             }
 
             if (Input.GetKeyDown(activationKey))
@@ -360,8 +373,14 @@ namespace FPS
 
                 if (applied)
                 {
+                    // Hitstop en temps réel AVANT le slow-mo
+                    if (ConfigHitStopDuration > 0f)
+                    {
+                        yield return StartCoroutine(HitStopRealtime(ConfigHitStopDuration, ConfigHitStopFreezeTime));
+                    }
+                    
                     ApplyOrRefreshSlowMo();
-                    ApplyBounceImpulse(dirToTarget);
+                    StartBounceImpulse(dirToTarget);
                 }
             }
 
@@ -475,19 +494,30 @@ namespace FPS
             slowMoEndUnscaled = Time.unscaledTime + ConfigSlowMoTime;
             if (!slowMoApplied)
             {
-                previousTimeScale = Time.timeScale;
+                // S'assurer qu'on sauvegarde la bonne valeur (pas le hitstop)
+                previousTimeScale = (Time.timeScale <= 0.01f) ? 1f : Time.timeScale;
                 Time.timeScale = ConfigSlowMoScale;
                 Time.fixedDeltaTime = 0.02f * Time.timeScale;
                 slowMoApplied = true;
+                Debug.Log($"[DashCible] SlowMo appliqué: timeScale={ConfigSlowMoScale}, previousTimeScale={previousTimeScale}, durée={ConfigSlowMoTime}s");
+            }
+            else
+            {
+                Debug.Log($"[DashCible] SlowMo rafraîchi: nouvelle fin dans {ConfigSlowMoTime}s");
             }
         }
 
         private void ClearSlowMo()
         {
             if (!slowMoApplied) return;
-            Time.timeScale = previousTimeScale;
+            
+            // S'assurer qu'on restaure une valeur valide
+            float targetTimeScale = (previousTimeScale <= 0.01f) ? 1f : previousTimeScale;
+            Time.timeScale = targetTimeScale;
             Time.fixedDeltaTime = 0.02f * Time.timeScale;
             slowMoApplied = false;
+            
+            Debug.Log($"[DashCible] SlowMo terminé: timeScale restauré à {targetTimeScale}");
             
             // S'assurer que le mouvement est réactivé si on n'est plus en train de dasher
             if (!isDashing && fpsMovement != null)
@@ -511,12 +541,40 @@ namespace FPS
 
         private void OnDisable()
         {
+            // Arrêter les coroutines en cours
+            if (bounceCoroutine != null)
+            {
+                StopCoroutine(bounceCoroutine);
+                bounceCoroutine = null;
+            }
+            
+            // Restaurer le temps si hitstop ou slow-mo actif
+            if (hitStopActive || slowMoApplied)
+            {
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = 0.02f;
+                hitStopActive = false;
+            }
             if (slowMoApplied) ClearSlowMo();
             if (fpsMovement != null) fpsMovement.EnableMovement();
         }
 
         private void OnDestroy()
         {
+            // Arrêter les coroutines en cours
+            if (bounceCoroutine != null)
+            {
+                StopCoroutine(bounceCoroutine);
+                bounceCoroutine = null;
+            }
+            
+            // Restaurer le temps si hitstop ou slow-mo actif
+            if (hitStopActive || slowMoApplied)
+            {
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = 0.02f;
+                hitStopActive = false;
+            }
             if (slowMoApplied) ClearSlowMo();
             if (fpsMovement != null) fpsMovement.EnableMovement();
         }
@@ -562,25 +620,122 @@ namespace FPS
             }
         }
 
-        private void ApplyBounceImpulse(Vector3 dashDirection)
+        /// <summary>
+        /// Applique un hitstop en temps réel (pause du jeu) avant de continuer.
+        /// </summary>
+        private IEnumerator HitStopRealtime(float unscaledDuration, bool freezeTime)
         {
-            BounceDefinition config = CurrentBounce;
+            if (unscaledDuration <= 0f)
+                yield break;
+
+            hitStopActive = true;
+            
+            // Sauvegarder l'état actuel du temps (s'assurer que c'est une valeur valide)
+            float savedTimeScale = (Time.timeScale <= 0.01f) ? 1f : Time.timeScale;
+            float savedFixedDeltaTime = Time.fixedDeltaTime;
+
+            // Appliquer le freeze
+            Time.timeScale = freezeTime ? 0f : 0.01f;
+            Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+            // Attendre en temps réel
+            yield return new WaitForSecondsRealtime(unscaledDuration);
+
+            // Restaurer l'état du temps (sauf si slow-mo est déjà appliqué, ce qui sera géré après)
+            if (!slowMoApplied)
+            {
+                Time.timeScale = savedTimeScale;
+                Time.fixedDeltaTime = 0.02f * savedTimeScale;
+            }
+            else
+            {
+                // Le slow-mo est déjà appliqué, restaurer sa valeur
+                float targetTimeScale = (previousTimeScale <= 0.01f) ? 1f : previousTimeScale;
+                Time.timeScale = ConfigSlowMoScale;
+                Time.fixedDeltaTime = 0.02f * ConfigSlowMoScale;
+            }
+
+            hitStopActive = false;
+        }
+
+        /// <summary>
+        /// Démarre la coroutine de rebond avec courbe.
+        /// </summary>
+        private void StartBounceImpulse(Vector3 dashDirection)
+        {
+            if (bounceCoroutine != null)
+            {
+                StopCoroutine(bounceCoroutine);
+            }
+            bounceCoroutine = StartCoroutine(ApplyBounceImpulseOverTime(dashDirection, CurrentBounce));
+        }
+
+        /// <summary>
+        /// Applique l'impulsion de rebond sur une durée, pilotée par une courbe.
+        /// La courbe contrôle la vitesse du rebond à chaque instant (Y=1 = vitesse max, Y=0 = pas de mouvement).
+        /// </summary>
+        private IEnumerator ApplyBounceImpulseOverTime(Vector3 dashDirection, BounceDefinition config)
+        {
             if (config == null || config.force <= 0f)
-                return;
+            {
+                bounceCoroutine = null;
+                yield break;
+            }
 
             Vector3 dir = ResolveBounceDirection(dashDirection, config);
             if (dir.sqrMagnitude <= 1e-4f)
-                return;
+            {
+                bounceCoroutine = null;
+                yield break;
+            }
 
-            Vector3 momentum = dir.normalized * config.force;
+            // Si pas de durée ou pas de courbe, appliquer instantanément (comportement legacy)
+            if (config.duration <= 0f || config.forceOverTime == null)
+            {
+                Vector3 instantImpulse = dir.normalized * config.force;
+                ApplyMomentum(instantImpulse);
+                bounceCoroutine = null;
+                yield break;
+            }
 
+            // Application sur la durée avec la courbe
+            // La courbe définit le multiplicateur de vitesse à chaque instant
+            float elapsed = 0f;
+            float duration = config.duration;
+            Vector3 direction = dir.normalized;
+
+            while (elapsed < duration)
+            {
+                // Calculer le facteur de la courbe (temps normalisé 0-1)
+                float t = elapsed / duration;
+                float curveValue = config.forceOverTime.Evaluate(t);
+
+                // La courbe contrôle directement la vitesse à cet instant
+                // force = vitesse de base, curveValue = multiplicateur de cette vitesse
+                Vector3 velocity = direction * (config.force * curveValue);
+                
+                // Appliquer comme momentum (le système de momentum gère le déplacement)
+                ApplyMomentum(velocity);
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            bounceCoroutine = null;
+        }
+
+        /// <summary>
+        /// Applique un momentum au joueur via fpsMovement ou fallback rb.
+        /// </summary>
+        private void ApplyMomentum(Vector3 momentum)
+        {
             if (fpsMovement != null)
             {
                 fpsMovement.ApplyExternalMomentum(momentum);
             }
             else if (rb != null)
             {
-                rb.MovePosition(rb.position + momentum * Time.deltaTime);
+                rb.AddForce(momentum, ForceMode.VelocityChange);
             }
             else
             {

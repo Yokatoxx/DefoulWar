@@ -28,3 +28,8 @@ MonoBehaviour:
   dashTravelTime: 0.08
   capsuleRadius: 0.4
   stopOffset: 1
+  hitStopUnscaledDuration: 0.1
+  hitStopFreezeTime: 1
+  knockbackForce: 10
+  knockbackDuration: 0.5
+  knockbackAffectsYAxis: 0
