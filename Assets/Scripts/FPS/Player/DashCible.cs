@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Utils;
 
 namespace FPS
 {
@@ -15,6 +16,17 @@ namespace FPS
 
         [Header("Input")]
         [SerializeField] private KeyCode activationKey = KeyCode.Q;
+
+        [Header("Target Outline")]
+        [Tooltip("Couleur de l'outline affiché sur l'ennemi visé")]
+        [SerializeField] private Color targetOutlineColor = Color.yellow;
+        
+        [Tooltip("Épaisseur de l'outline (0-10)")]
+        [Range(0f, 10f)]
+        [SerializeField] private float targetOutlineWidth = 2f;
+        
+        [Tooltip("Afficher l'outline pendant le slow-mo même si le cooldown n'est pas prêt")]
+        [SerializeField] private bool showOutlineDuringSlowMo = true;
 
         [Header("Références Joueur")]
         [SerializeField] private FPSPlayerController playerController;
@@ -33,6 +45,10 @@ namespace FPS
         private float dashStartTime; // Pour détecter les dashs bloqués
         private Coroutine bounceCoroutine; // Coroutine de rebond active
         private bool hitStopActive; // Flag pour le hitstop en cours
+        
+        // Outline de la cible visée
+        private TargetOutline currentAimedOutline;
+        private EnemyHealth currentAimedTarget;
 
         private static readonly Collider[] OverlapBuffer = new Collider[16];
 
@@ -108,6 +124,135 @@ namespace FPS
             {
                 TryTriggerOrChain();
             }
+            
+            // Mettre à jour l'outline de la cible visée
+            UpdateAimHighlight();
+        }
+        
+        /// <summary>
+        /// Met à jour l'outline de la cible visée.
+        /// L'outline est affiché uniquement si:
+        /// - Le joueur vise un ennemi ET
+        /// - (Le dash est prêt (pas en cooldown) OU le slow-mo est actif)
+        /// </summary>
+        private void UpdateAimHighlight()
+        {
+            // Chercher la cible actuellement visée
+            EnemyHealth aimed = GetAimedEnemy();
+            
+            // Vérifier si on peut afficher l'outline
+            bool canShowOutline = !IsCooldownActive || (slowMoApplied && showOutlineDuringSlowMo);
+            
+            // Si la cible a changé
+            if (aimed != currentAimedTarget)
+            {
+                // Cacher l'outline de l'ancienne cible
+                if (currentAimedOutline != null)
+                {
+                    currentAimedOutline.Hide();
+                    currentAimedOutline = null;
+                }
+                
+                currentAimedTarget = aimed;
+                
+                // Afficher l'outline sur la nouvelle cible si les conditions sont remplies
+                if (aimed != null && canShowOutline)
+                {
+                    currentAimedOutline = aimed.GetComponent<TargetOutline>();
+                    if (currentAimedOutline == null)
+                        currentAimedOutline = aimed.GetComponentInChildren<TargetOutline>();
+                    
+                    if (currentAimedOutline != null)
+                    {
+                        currentAimedOutline.Show(targetOutlineColor, targetOutlineWidth);
+                    }
+                }
+            }
+            else if (aimed != null)
+            {
+                // Même cible, mais vérifier si l'état d'affichage doit changer
+                if (canShowOutline)
+                {
+                    // On peut afficher, s'assurer que l'outline est visible
+                    if (currentAimedOutline == null)
+                    {
+                        currentAimedOutline = aimed.GetComponent<TargetOutline>();
+                        if (currentAimedOutline == null)
+                            currentAimedOutline = aimed.GetComponentInChildren<TargetOutline>();
+                    }
+                    
+                    if (currentAimedOutline != null && !currentAimedOutline.IsShowing)
+                    {
+                        currentAimedOutline.Show(targetOutlineColor, targetOutlineWidth);
+                    }
+                }
+                else
+                {
+                    // On ne peut plus afficher, cacher l'outline
+                    if (currentAimedOutline != null && currentAimedOutline.IsShowing)
+                    {
+                        currentAimedOutline.Hide();
+                    }
+                }
+            }
+            else
+            {
+                // Pas de cible visée, s'assurer que l'outline est caché
+                if (currentAimedOutline != null)
+                {
+                    currentAimedOutline.Hide();
+                    currentAimedOutline = null;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Retourne l'ennemi actuellement visé par la caméra (sans déclencher de dash).
+        /// Logique similaire à AcquireTarget() mais sans les effets de bord.
+        /// </summary>
+        private EnemyHealth GetAimedEnemy()
+        {
+            if (aimCamera == null) return null;
+
+            Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            
+            // D'abord vérifier le raycast direct
+            if (Physics.Raycast(ray, out RaycastHit hit, ConfigDistanceDash, EnemyMask, QueryTriggerInteraction.Ignore))
+            {
+                var eh = hit.collider.GetComponentInParent<EnemyHealth>() ?? hit.collider.GetComponent<EnemyHealth>();
+                if (eh != null && !eh.IsDead)
+                {
+                    if (!IsObstructed(aimCamera.transform.position, eh.transform.position))
+                        return eh;
+                }
+            }
+
+            // Sinon chercher le meilleur ennemi dans le cône de visée
+            var all = FindObjectsByType<EnemyHealth>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            EnemyHealth best = null;
+            float bestScore = float.MaxValue;
+            Vector3 camPos = aimCamera.transform.position;
+            Vector3 camFwd = aimCamera.transform.forward;
+
+            foreach (var eh in all)
+            {
+                if (eh == null || eh.IsDead) continue;
+                Vector3 to = eh.transform.position - camPos;
+                float dist = to.magnitude;
+                if (dist > ConfigDistanceDash) continue;
+                Vector3 dir = to / (dist + 1e-5f);
+                float angle = Mathf.Acos(Mathf.Clamp(Vector3.Dot(camFwd, dir), -1f, 1f)) * Mathf.Rad2Deg;
+                if (angle > MaxAimAngle) continue;
+                if (IsObstructed(camPos, eh.transform.position)) continue;
+                float score = angle * 2f + dist * 0.2f;
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    best = eh;
+                }
+            }
+
+            return best;
         }
 
         private void TryTriggerOrChain()
@@ -557,6 +702,14 @@ namespace FPS
             }
             if (slowMoApplied) ClearSlowMo();
             if (fpsMovement != null) fpsMovement.EnableMovement();
+            
+            // Cacher l'outline de la cible visée
+            if (currentAimedOutline != null)
+            {
+                currentAimedOutline.Hide();
+                currentAimedOutline = null;
+            }
+            currentAimedTarget = null;
         }
 
         private void OnDestroy()
@@ -577,6 +730,14 @@ namespace FPS
             }
             if (slowMoApplied) ClearSlowMo();
             if (fpsMovement != null) fpsMovement.EnableMovement();
+            
+            // Cacher l'outline de la cible visée
+            if (currentAimedOutline != null)
+            {
+                currentAimedOutline.Hide();
+                currentAimedOutline = null;
+            }
+            currentAimedTarget = null;
         }
 
         public int CountDash => ConfigCountDash;

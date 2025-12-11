@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 9159008837239357016}
   - component: {fileID: 187447163467983752}
   - component: {fileID: 1619272842727892379}
+  - component: {fileID: 7316351646241182328}
   m_Layer: 7
   m_Name: Enemy Electrique
   m_TagString: Enemy
@@ -208,6 +209,18 @@ MonoBehaviour:
   particleOffset: {x: 0, y: 0.5, z: 0}
   impactSound: {fileID: 0}
   impactVolume: 0.8
+--- !u!114 &7316351646241182328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a6396c44267481183db83553bd89f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0

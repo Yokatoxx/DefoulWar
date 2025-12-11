@@ -267,6 +267,8 @@ GameObject:
   - component: {fileID: 564636307132464817}
   - component: {fileID: 8385366485219347258}
   - component: {fileID: 2812734757657167979}
+  - component: {fileID: 8939385370173567722}
+  - component: {fileID: 7994179154030387157}
   m_Layer: 7
   m_Name: Enemy 1
   m_TagString: Enemy
@@ -418,6 +420,36 @@ MonoBehaviour:
   particleOffset: {x: 0, y: 0.5, z: 0}
   impactSound: {fileID: 0}
   impactVolume: 0.8
+--- !u!114 &8939385370173567722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807755940922956229}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
+--- !u!114 &7994179154030387157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807755940922956229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a6396c44267481183db83553bd89f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7277404602049207658
 GameObject:
   m_ObjectHideFlags: 0
