@@ -1,34 +1,42 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
-
-public class Enemies : MonoBehaviour 
+[System.Serializable]
+public class EnemyWaveSetter
 {
     public GameObject enemyPrefab;
-    public int nbEnnemies;
+    public int count = 1;
 }
 
-[CreateAssetMenu(fileName = "ArenaSetter", menuName = "REDACTED_PROJECT_NAME/Arena/ArenaSetter", order = 1)]
+[CreateAssetMenu(fileName = "ArenaWave", menuName = "REDACTED_PROJECT_NAME/Arena/ArenaWave", order = 1)]
+public class ArenaWave : ScriptableObject
+{
+    public List<EnemyWaveSetter> batches = new List<EnemyWaveSetter>();
+}
+
+[CreateAssetMenu(fileName = "ArenaSetter", menuName = "REDACTED_PROJECT_NAME/Arena/ArenaSetter", order = 0)]
 public class ArenaSetter : ScriptableObject
 {
-    public List<Transform> spawnerPoints;
-    public List<GameObject> ennemiesPrefabs;
-    public DoorArena door;
-    public bool waveStarted = false;
+    public int totalWaves = 1;
+    public List<ArenaWave> waves = new List<ArenaWave>();
 
-    [SerializeField] private float delaySpawnBetweenEnemies = 0.5f;
+    public List<Transform> spawnPoints = new List<Transform>();
+
+    public float delayBetweenEnemies = 0.35f;
+
+    public bool waitForWaveClear = true;
+
+    public DoorArena door;
+
+    [HideInInspector]
+    public bool waveStarted = false;
 
     public void TriggerWave()
     {
         waveStarted = true;
-        door.isOpen = false;
-    }
-
-
-
-    private void RandomEnemySelector()
-    {
-        
+        if (door != null)
+        {
+            door.isOpen = false;
+        }
     }
 }
