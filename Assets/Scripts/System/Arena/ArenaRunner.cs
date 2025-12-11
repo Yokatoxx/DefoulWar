@@ -1,27 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FPS; // pour EnemyHealth
 
 public class ArenaRunner : MonoBehaviour
 {
     [Header("Config")]
     [SerializeField] private ArenaSetter arena;
 
-    [Header("Runtime")]
-    [SerializeField, Tooltip("Activer le log debug.")]
-    private bool debugLogs = false;
+    [Header("Debug")]
+    [SerializeField] private bool debugLogs = false;
 
-    private int currentWaveIndex = 0;
-    private readonly List<GameObject> aliveEnemies = new List<GameObject>();
+    private int currentWaveIndex;
     private bool running;
+    private readonly List<GameObject> alive = new();
+    private readonly Dictionary<string, SpawnPointGroup> groupsById = new();
 
-    private void Start()
+    private void Awake()
     {
         if (arena == null)
         {
+            Debug.LogError("[ArenaRunner] ArenaSetter non assigné.");
             enabled = false;
             return;
         }
+        IndexSpawnGroupsInScene();
+    }
+
+    private void IndexSpawnGroupsInScene()
+    {
+        groupsById.Clear();
+        var groups = FindObjectsOfType<SpawnPointGroup>(true);
+        foreach (var g in groups)
+        {
+            if (string.IsNullOrEmpty(g.groupId)) continue;
+            groupsById[g.groupId] = g;
+        }
+        if (debugLogs) Debug.Log($"[ArenaRunner] Groupes indexés: {groupsById.Count}");
     }
 
     public void TriggerArena()
@@ -39,19 +54,14 @@ public class ArenaRunner : MonoBehaviour
 
         for (; currentWaveIndex < wavesToPlay; currentWaveIndex++)
         {
-            ArenaWave wave = arena.waves[currentWaveIndex];
-            if (debugLogs) Debug.Log($"[ArenaRunner] Lancement vague {currentWaveIndex + 1}/{wavesToPlay}");
-
-            yield return StartCoroutine(SpawnWave(wave));
+            var wave = arena.waves[currentWaveIndex];
+            if (debugLogs) Debug.Log($"[ArenaRunner] Vague {currentWaveIndex + 1}/{wavesToPlay}");
+            yield return SpawnWave(wave);
 
             if (arena.waitForWaveClear)
-            {
-                // Attendre que tous les ennemis de la vague soient morts/retirés
-                yield return StartCoroutine(WaitWaveClear());
-            }
+                yield return WaitWaveClear();
         }
 
-        // Fin d'arène: ouvrir la porte
         if (arena.door != null) arena.door.isOpen = true;
         running = false;
         if (debugLogs) Debug.Log("[ArenaRunner] Arène terminée.");
@@ -59,24 +69,23 @@ public class ArenaRunner : MonoBehaviour
 
     private IEnumerator SpawnWave(ArenaWave wave)
     {
-        if (wave == null || wave.batches == null || wave.batches.Count == 0)
-            yield break;
+        if (wave == null || wave.batches == null) yield break;
 
         foreach (var batch in wave.batches)
         {
-            if (batch == null || batch.enemyPrefab == null || batch.count <= 0)
-                continue;
+            if (batch == null || batch.enemyPrefab == null || batch.count <= 0) continue;
 
+            var group = ResolveGroup(batch.spawnGroupId);
             for (int i = 0; i < batch.count; i++)
             {
-                Transform spawn = PickSpawnPoint();
+                Transform spawn = group?.GetRandom();
                 if (spawn == null)
                 {
-                    Debug.LogWarning("[ArenaRunner] Aucun spawn point disponible.");
+                    Debug.LogWarning($"[ArenaRunner] Aucun point de spawn valide pour groupe '{batch.spawnGroupId}'.");
                     yield break;
                 }
 
-                GameObject enemy = Instantiate(batch.enemyPrefab, spawn.position, spawn.rotation);
+                var enemy = Instantiate(batch.enemyPrefab, spawn.position, spawn.rotation);
                 RegisterEnemy(enemy);
 
                 if (arena.delayBetweenEnemies > 0f)
@@ -85,45 +94,38 @@ public class ArenaRunner : MonoBehaviour
         }
     }
 
-    private IEnumerator WaitWaveClear()
+    private SpawnPointGroup ResolveGroup(string id)
     {
-        // Nettoyer nulls (cas destruction)
-        aliveEnemies.RemoveAll(e => e == null);
+        if (!string.IsNullOrEmpty(id) && groupsById.TryGetValue(id, out var g))
+            return g;
 
-        while (aliveEnemies.Count > 0)
-        {
-            // Purger les morts chaque frame
-            aliveEnemies.RemoveAll(e => e == null || !e.activeInHierarchy);
-            yield return null;
-        }
-
-        if (debugLogs) Debug.Log("[ArenaRunner] Vague nettoyée.");
+        // Fallback: premier groupe trouvé dans la scène
+        foreach (var kv in groupsById) return kv.Value;
+        return null;
     }
 
-    private Transform PickSpawnPoint()
+    private IEnumerator WaitWaveClear()
     {
-        var spawns = arena.spawnPoints;
-        if (spawns == null || spawns.Count == 0) return null;
-        int idx = Random.Range(0, spawns.Count);
-        return spawns[idx];
+        alive.RemoveAll(e => e == null);
+        while (alive.Count > 0)
+        {
+            alive.RemoveAll(e => e == null || !e.activeInHierarchy);
+            yield return null;
+        }
+        if (debugLogs) Debug.Log("[ArenaRunner] Vague nettoyée.");
     }
 
     private void RegisterEnemy(GameObject enemy)
     {
-        aliveEnemies.Add(enemy);
+        alive.Add(enemy);
 
-        // Si l'ennemi possède EnemyHealth, désinscrire automatiquement à la mort
-        var health = enemy.GetComponentInChildren<FPS.EnemyHealth>();
+        var health = enemy.GetComponentInChildren<EnemyHealth>();
         if (health != null)
         {
             health.OnDeath.AddListener(() =>
             {
-                aliveEnemies.Remove(enemy);
+                alive.Remove(enemy);
             });
-        }
-        else
-        {
-            // Fallback: on laisse la purge via WaitWaveClear (activeInHierarchy / null)
         }
     }
 }
