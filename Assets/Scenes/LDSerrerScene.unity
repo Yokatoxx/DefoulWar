@@ -27982,10 +27982,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 564636307132464817, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
-      propertyPath: shootPoint
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 564636307132464817, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
       propertyPath: waypointPath
       value: 
       objectReference: {fileID: 201307745}
