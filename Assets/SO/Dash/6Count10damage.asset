@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 128
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  maxAimAngle: 30
+    m_Bits: 1024
+  maxAimAngle: 2
   countDash: 6
   slowMoTime: 0.75
   slowMoScale: 0.2

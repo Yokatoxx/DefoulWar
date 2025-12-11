@@ -28,6 +28,19 @@ namespace FPS
         [Tooltip("Afficher l'outline pendant le slow-mo même si le cooldown n'est pas prêt")]
         [SerializeField] private bool showOutlineDuringSlowMo = true;
 
+        [Header("Contournement d'obstacles")]
+        [Tooltip("Angle maximum pour tenter de contourner un obstacle (degrés)")]
+        [Range(15f, 90f)]
+        [SerializeField] private float steerMaxAngle = 45f;
+        
+        [Tooltip("Nombre d'échantillons latéraux pour contourner (2-8)")]
+        [Range(2, 8)]
+        [SerializeField] private int steerSamples = 4;
+        
+        [Tooltip("Progrès minimum acceptable pour accepter une trajectoire détournée (0-1)")]
+        [Range(0.1f, 0.9f)]
+        [SerializeField] private float minAcceptableProgress = 0.25f;
+
         [Header("Références Joueur")]
         [SerializeField] private FPSPlayerController playerController;
         [SerializeField] private Rigidbody rb;
@@ -542,6 +555,7 @@ namespace FPS
 
         /// <summary>
         /// Retourne une position sûre en vérifiant les collisions entre la position actuelle et la destination.
+        /// Tente de contourner les petits obstacles via sliding puis échantillonnage latéral.
         /// Exclut les ennemis pour permettre de dasher à travers eux.
         /// </summary>
         private Vector3 GetSafePosition(Vector3 fromPos, Vector3 delta)
@@ -558,21 +572,90 @@ namespace FPS
             // Exclure les ennemis du masque de collision pour le dash
             LayerMask collisionMask = ObstacleMask & ~EnemyMask;
             
-            if (Physics.SphereCast(fromPos + Vector3.up * 0.5f, radius, moveDir, out RaycastHit hit, moveLen, collisionMask, QueryTriggerInteraction.Ignore))
+            // Test initial : pas d'obstacle ?
+            if (!Physics.SphereCast(fromPos + Vector3.up * 0.5f, radius, moveDir, out RaycastHit hit, moveLen, collisionMask, QueryTriggerInteraction.Ignore))
             {
-                // On a touché un obstacle (pas un ennemi), s'arrêter juste avant
-                float safeDistance = Mathf.Max(0f, hit.distance - 0.1f);
-                return fromPos + moveDir * safeDistance;
+                // Pas d'obstacle, on peut aller à la destination
+                return fromPos + delta;
             }
             
-            // Pas d'obstacle, on peut aller à la destination
-            return fromPos + delta;
+            // === PHASE 1 : Tenter le sliding ===
+            Vector3 slideResult = SlideMoveWithMask(fromPos, delta, collisionMask);
+            float slideProgress = slideResult.magnitude / moveLen;
+            
+            // Si le sliding permet un progrès suffisant, l'utiliser
+            if (slideProgress >= minAcceptableProgress)
+            {
+                return fromPos + slideResult;
+            }
+            
+            // === PHASE 2 : Échantillonnage latéral ===
+            Vector3 bestMove = slideResult;
+            float bestScore = slideProgress;
+            
+            // Générer des directions alternatives (rotations autour de l'axe Y)
+            for (int i = 0; i < steerSamples; i++)
+            {
+                // Calculer l'angle pour cet échantillon (-maxAngle à +maxAngle)
+                float t = (float)(i + 1) / (steerSamples + 1);
+                float angle = Mathf.Lerp(-steerMaxAngle, steerMaxAngle, t);
+                
+                // Rotation autour de l'axe Y
+                Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
+                Vector3 altDir = rotation * moveDir;
+                Vector3 altDelta = altDir * moveLen;
+                
+                // Tester cette direction alternative
+                if (!Physics.SphereCast(fromPos + Vector3.up * 0.5f, radius, altDir, out RaycastHit altHit, moveLen, collisionMask, QueryTriggerInteraction.Ignore))
+                {
+                    // Pas d'obstacle dans cette direction !
+                    // Calculer un score basé sur la déviation angulaire (moins de déviation = meilleur)
+                    float deviation = Mathf.Abs(angle) / steerMaxAngle;
+                    float score = 1f - (deviation * 0.3f); // Légère pénalité pour déviation
+                    
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestMove = altDelta;
+                    }
+                }
+                else
+                {
+                    // Il y a un obstacle mais peut-être plus loin
+                    float altProgress = altHit.distance / moveLen;
+                    if (altProgress > bestScore)
+                    {
+                        bestScore = altProgress;
+                        bestMove = altDir * Mathf.Max(0f, altHit.distance - 0.1f);
+                    }
+                }
+            }
+            
+            // Si on a trouvé une meilleure trajectoire, l'utiliser
+            if (bestScore >= minAcceptableProgress)
+            {
+                return fromPos + bestMove;
+            }
+            
+            // === FALLBACK : Arrêt classique devant l'obstacle ===
+            float safeDistance = Mathf.Max(0f, hit.distance - 0.1f);
+            return fromPos + moveDir * safeDistance;
         }
 
         /// <summary>
         /// Calcule un vecteur de déplacement qui glisse le long des obstacles.
+        /// Utilise le masque d'obstacles par défaut (incluant potentiellement les ennemis).
         /// </summary>
         private Vector3 SlideMove(Vector3 currentPos, Vector3 desiredDelta)
+        {
+            return SlideMoveWithMask(currentPos, desiredDelta, ObstacleMask);
+        }
+
+        /// <summary>
+        /// Calcule un vecteur de déplacement qui glisse le long des obstacles.
+        /// Utilise un masque de collision personnalisé.
+        /// </summary>
+        private Vector3 SlideMoveWithMask(Vector3 currentPos, Vector3 desiredDelta, LayerMask collisionMask)
         {
             Vector3 totalMove = Vector3.zero;
             Vector3 remainingMove = desiredDelta;
@@ -589,7 +672,7 @@ namespace FPS
                 Vector3 top = currentPos + totalMove + Vector3.up * 1.5f;
                 Vector3 bottom = currentPos + totalMove + Vector3.up * 0.2f;
 
-                if (Physics.CapsuleCast(top, bottom, ConfigCapsuleRadius, moveDir, out RaycastHit hit, moveLen, ObstacleMask, QueryTriggerInteraction.Ignore))
+                if (Physics.CapsuleCast(top, bottom, ConfigCapsuleRadius, moveDir, out RaycastHit hit, moveLen, collisionMask, QueryTriggerInteraction.Ignore))
                 {
                     // Avancer jusqu'au point de contact (avec une petite marge)
                     float safeDistance = Mathf.Max(0f, hit.distance - 0.05f);
