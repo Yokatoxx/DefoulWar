@@ -51332,7 +51332,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1742160242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51345,7 +51345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a714c9d6377b7d446819b6f64e880778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arenaRunner: {fileID: 0}
+  arena: {fileID: 2121211091}
 --- !u!65 &1742160243
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -58548,6 +58548,7 @@ MonoBehaviour:
   - {fileID: 989682896}
   - {fileID: 1650549113}
   - {fileID: 301503042}
+  manualMode: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

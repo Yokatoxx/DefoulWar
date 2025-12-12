@@ -17,17 +17,47 @@ public class WaveSpawner : MonoBehaviour
     private int waveIndex = 0;
     private int aliveCount = 0;
 
-    private bool waitingForStartDelay = true;
+    private bool waitingForStartDelay = false; // ne pas démarrer automatiquement
     private bool waitingForClear = false;
 
     private bool stopSpawning = false;
 
     private void Awake()
     {
-        currentWave = waves[waveIndex];
-        nextWaveStartTime = Time.time + Mathf.Max(0f, currentWave.TimeBeforeThisWave);
-        waitingForStartDelay = true;
+        // Préparer la première vague sans la lancer
+        if (waves != null && waves.Length > 0)
+        {
+            waveIndex = 0;
+            currentWave = waves[waveIndex];
+        }
+        // Aucun délai programmé tant que TriggerArena n'est pas appelé
+        waitingForStartDelay = false;
         waitingForClear = false;
+    }
+
+    // Lance la première vague à la demande.
+    // respectDelay=true: attend TimeBeforeThisWave avant de spawner.
+    // respectDelay=false: spawn immédiat.
+    public void TriggerArena(bool respectDelay = true)
+    {
+        if (stopSpawning || waves == null || waves.Length == 0)
+            return;
+
+        waveIndex = 0;
+        currentWave = waves[waveIndex];
+
+        if (respectDelay)
+        {
+            nextWaveStartTime = Time.time + Mathf.Max(0f, currentWave.TimeBeforeThisWave);
+            waitingForStartDelay = true;
+            waitingForClear = false;
+        }
+        else
+        {
+            SpawnWave();
+            waitingForStartDelay = false;
+            waitingForClear = true;
+        }
     }
 
     private void Update()
@@ -35,7 +65,7 @@ public class WaveSpawner : MonoBehaviour
         if (stopSpawning)
             return;
 
-        // Étape 1: attendre le délai avant de démarrer la vague
+        // Étape 1: attendre le délai avant de démarrer la vague (uniquement après TriggerArena)
         if (waitingForStartDelay)
         {
             if (Time.time >= nextWaveStartTime)
@@ -52,12 +82,10 @@ public class WaveSpawner : MonoBehaviour
         {
             if (aliveCount <= 0)
             {
-                // Tous les ennemis de la vague sont morts -> passer à la suivante
                 IncWave();
 
                 if (!stopSpawning)
                 {
-                    // Programmer le démarrage de la prochaine vague après son délai
                     nextWaveStartTime = Time.time + Mathf.Max(0f, currentWave.TimeBeforeThisWave);
                     waitingForStartDelay = true;
                     waitingForClear = false;
@@ -68,10 +96,8 @@ public class WaveSpawner : MonoBehaviour
 
     private void SpawnWave()
     {
-        // Réinitialiser le compteur pour la nouvelle vague
         aliveCount = 0;
 
-        // Assurer un entier pour NumberToSpawn
         int countToSpawn = Mathf.Max(0, Mathf.RoundToInt(currentWave.NumberToSpawn));
 
         for (int i = 0; i < countToSpawn; i++)
@@ -85,26 +111,17 @@ public class WaveSpawner : MonoBehaviour
                 spawnpoints[spawnIndex].rotation
             );
 
-            // Tenter de récupérer EnemyHealth pour suivre la mort
             var health = enemy.GetComponent<EnemyHealth>();
+            aliveCount++;
             if (health != null)
             {
-                aliveCount++;
-
-                // Abonnement à OnDeath pour décrémenter le compteur
                 health.OnDeath.AddListener(() =>
                 {
-                    // Protéger contre les multiples appels potentiels
                     aliveCount = Mathf.Max(0, aliveCount - 1);
                 });
             }
             else
             {
-                // Si pas de composant santé, considérer l'ennemi comme "non traçable" mais le compter
-                // et prévoir une décrémentation à la destruction (fallback)
-                aliveCount++;
-
-                // Fallback: décrémenter quand le GameObject est détruit
                 StartCoroutine(TrackDestructionAndDecrement(enemy));
             }
         }
@@ -112,7 +129,6 @@ public class WaveSpawner : MonoBehaviour
 
     private IEnumerator TrackDestructionAndDecrement(GameObject go)
     {
-        // Attendre tant que l'objet existe
         while (go != null)
             yield return null;
 

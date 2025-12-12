@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class ArenaTriggerBox : MonoBehaviour
 {
-    [SerializeField] private ArenaRunner arenaRunner;
+    [SerializeField] private WaveSpawner arena;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            arenaRunner.TriggerArena();
+            arena.TriggerArena();    
             gameObject.SetActive(false);
         }
     }
