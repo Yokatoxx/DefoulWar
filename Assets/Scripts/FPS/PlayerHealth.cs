@@ -76,13 +76,16 @@ namespace FPS
             if (isDead || isInvulnerable) return;
             if (IsDashing()) return;
 
-            soundPlayer.PlayOneShot("OuchRoblox", 0.5f, Random.Range(0.9f, 1.1f));  
+            if (soundPlayer != null)
+            {
+                soundPlayer.PlayOneShot("OuchRoblox", 0.5f, Random.Range(0.9f, 1.1f));
+            }
 
             currentHealth = Mathf.Max(0, currentHealth - damage);
             timeSinceLastDamage = 0f;
-            
+
             OnHealthChanged?.Invoke(currentHealth / maxHealth);
-            
+
             if (currentHealth <= 0)
             {
                 Die();
