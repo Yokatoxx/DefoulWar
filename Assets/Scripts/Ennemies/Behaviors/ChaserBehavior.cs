@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Ennemies.Settings;
+using Ennemies.Effect;
 
 namespace Ennemies.Behaviors
 {
@@ -14,6 +15,7 @@ namespace Ennemies.Behaviors
         private Transform player;
         private Transform owner;
         private EnemyBehaviorSettings settings;
+        private EnemyShield shield;
 
         private bool isChasing;
         private bool canAttack;
@@ -127,6 +129,18 @@ namespace Ennemies.Behaviors
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(owner.position, settings.attackRange);
         }
+
+        public void SetShield(Ennemies.Effect.EnemyShield shield)
+        {
+            this.shield = shield;
+        }
+
+        public void SetShieldActive(bool active)
+        {
+            if (shield != null)
+                shield.ShieldActive = active;
+        }
+
+        public EnemyShield GetShield() => shield;
     }
 }
-

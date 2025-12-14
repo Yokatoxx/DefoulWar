@@ -260,7 +260,14 @@ public class WeaponSystem : MonoBehaviour
         if (zoneMultDict.TryGetValue(zoneName, out float mult))
             dmg *= mult;
 
-        enemyHealth.TakeDamage(dmg, zoneName);
+        // Utiliser la nouvelle API DamageInfo pour transmettre le collider et le point/normal
+        var info = new DamageInfo(amount: dmg, zoneName: zoneName, type: DamageType.Bullet,
+            hitPoint: collider.ClosestPoint(bulletSpawnPoint != null ? bulletSpawnPoint.position : collider.transform.position),
+            hitNormal: Vector3.zero, // pas d'info de normale pour le raycast ici
+            attacker: FindFirstObjectByType<PlayerHealth>()?.transform,
+            hitCollider: collider);
+
+        enemyHealth.TakeDamage(info);
     }
 
     public void StartReload()

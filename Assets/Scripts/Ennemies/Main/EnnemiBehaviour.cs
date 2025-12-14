@@ -112,6 +112,13 @@ namespace Ennemies
             currentBehavior = CreateBehavior(settings.behaviorType);
             currentBehavior.Initialize(agent, player, settings, transform);
 
+            // Si le comportement supporte un shield, lier le composant s'il existe
+            var shieldComp = GetComponentInChildren<Ennemies.Effect.EnemyShield>();
+            if (shieldComp != null && currentBehavior is Ennemies.Behaviors.ChaserBehavior chaser)
+            {
+                chaser.SetShield(shieldComp);
+            }
+
             // Configuration spéciale pour ZonePatrol
             if (currentBehavior is ZonePatrolBehavior zonePatrol && waypointPath != null)
             {
