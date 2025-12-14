@@ -17,6 +17,12 @@ namespace Ennemies.Effect
         [Tooltip("Nom de la zone associée (doit correspondre au HitZone si utilisé)")]
         [SerializeField] private string shieldZoneName = "Shield";
 
+        [Header("Dash Blocking")]
+        [Tooltip("Si true, le shield bloquera les Dash qui proviennent d'un attaquant situé dans le cône frontal de l'ennemi.")]
+        [SerializeField] private bool blockDashByFrontalCone = true;
+        [Tooltip("Angle total (en degrés) du cône frontal centré sur l'avant de l'ennemi. Ex: 90 => +/-45°")]
+        [SerializeField] private float frontalBlockAngle = 90f;
+
         public bool ShieldActive { get => shieldActive; set => shieldActive = value; }
         public string ShieldZoneName => shieldZoneName;
 
@@ -25,30 +31,59 @@ namespace Ennemies.Effect
         {
             if (!shieldActive) return true;
 
-            // Si la zone explicitement indique Shield, bloquer
-            if (!string.IsNullOrWhiteSpace(damage.zoneName) && damage.zoneName == shieldZoneName)
+            // Seuls les Dashs peuvent être interceptés par ce composant ; les autres dégâts passent normalement
+            if (damage.type != DamageType.Dash)
             {
-                TryFlashHitZone(damage.hitCollider);
-                return false;
+                // Feedback visuel si la hitzone Shield est touchée
+                if (damage.hitCollider != null)
+                {
+                    var hz = damage.hitCollider.GetComponent<HitZone>() ?? damage.hitCollider.GetComponentInParent<HitZone>();
+                    if (hz != null && hz.ZoneName == shieldZoneName)
+                        hz.FlashOnHit();
+                }
+                return true;
             }
 
-            // Si le collider touché appartient au GameObject du shield (ou à un parent ayant ce component), bloquer
-            if (damage.hitCollider != null)
+            // === SIMPLE: blocage par cône frontal ===
+            if (blockDashByFrontalCone)
             {
-                // Vérifier si le collider a un EnemyShield dans ses parents
-                var shieldComp = damage.hitCollider.GetComponentInParent<EnemyShield>();
-                if (shieldComp != null)
+                // Récupérer transform racine de l'ennemi
+                Transform enemyTransform = GetComponentInParent<EnnemiBehaviour>()?.transform ?? GetComponentInParent<EnemyHealth>()?.transform ?? transform.parent;
+                if (enemyTransform != null)
                 {
-                    TryFlashHitZone(damage.hitCollider);
-                    return false;
-                }
+                    Vector3 attackerDir = Vector3.zero;
+                    // Prioriser hitNormal (fourni par le DashCible) car il représente la direction depuis l'ennemi vers l'attaquant
+                    if (damage.hitNormal != Vector3.zero)
+                    {
+                        attackerDir = damage.hitNormal.normalized;
+                    }
+                    else if (damage.attacker != null)
+                    {
+                        attackerDir = (damage.attacker.position - enemyTransform.position);
+                        if (attackerDir.sqrMagnitude > 0.0001f)
+                            attackerDir = attackerDir.normalized;
+                        else
+                            attackerDir = Vector3.zero;
+                    }
 
-                // Vérifier le HitZone associé au collider
-                var hz = damage.hitCollider.GetComponent<HitZone>() ?? damage.hitCollider.GetComponentInParent<HitZone>();
-                if (hz != null && hz.ZoneName == shieldZoneName)
-                {
-                    hz.FlashOnHit();
-                    return false;
+                    if (attackerDir != Vector3.zero)
+                    {
+                        Vector3 forward = enemyTransform.forward;
+                        float angle = Vector3.Angle(forward, attackerDir);
+                        bool blocked = angle <= frontalBlockAngle * 0.5f;
+
+#if UNITY_EDITOR
+                        Debug.Log($"[EnemyShield] Dash angle={angle:F1} blocked={blocked} attackerDir={attackerDir} enemy={enemyTransform.name}");
+#endif
+
+                        if (blocked)
+                        {
+                            TryFlashHitZone(damage.hitCollider);
+                            // Indiquer que le dash doit être compté comme un hit pour déclencher le rebond même si les dégâts sont bloqués
+                            damage.countAsHit = true;
+                            return false; // Bloquer le dash
+                        }
+                    }
                 }
             }
 
@@ -67,4 +102,3 @@ namespace Ennemies.Effect
         }
     }
 }
-

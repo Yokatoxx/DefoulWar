@@ -64,7 +64,8 @@ namespace FPS
             if (isDead) return false;
             // Intercepteurs (ex: MagicEnemy) — peuvent bloquer et déclencher des effets (renvoi)
             bool allow = true;
-            var interceptors = GetComponents<IDamageInterceptor>();
+            // Récupérer les intercepteurs présents sur cet objet ET ses enfants (pour inclure EnemyShield sur un child)
+            var interceptors = GetComponentsInChildren<IDamageInterceptor>();
             if (interceptors != null && interceptors.Length > 0)
             {
                 for (int i = 0; i < interceptors.Length; i++)
@@ -72,7 +73,37 @@ namespace FPS
                     try { allow = interceptors[i].OnBeforeDamage(ref info) && allow; } catch {}
                 }
             }
-            if (!allow) return false;
+
+            // Si un intercepteur a bloqué l'application
+            if (!allow)
+            {
+                // Mais s'il demande que l'attaque soit comptée comme un hit (ex: rebond de dash), appliquer les effets nécessaires sans enlever de vie
+                if (info.countAsHit)
+                {
+                    // Enregistrer la source du dernier coup
+                    lastHitType = info.type;
+                    lastAttacker = info.attacker;
+
+                    // Enregistrer le hit statistique (zone)
+                    string hitZoneNameBlocked = string.IsNullOrWhiteSpace(info.zoneName) ? "Body" : info.zoneName;
+                    string zoneKeyBlocked = NormalizeZoneKey(hitZoneNameBlocked);
+                    if (!zoneHitCount.ContainsKey(zoneKeyBlocked)) zoneHitCount[zoneKeyBlocked] = 0;
+                    zoneHitCount[zoneKeyBlocked]++;
+
+                    // Déclencher les callbacks/effets associés à un hit sans dégâts
+                    OnDamageTaken?.Invoke(0f, hitZoneNameBlocked);
+
+                    // Si c'est un dash, appliquer le knockback/effets de dash
+                    if (info.type == DamageType.Dash)
+                    {
+                        TryApplyDashKnockback(info);
+                    }
+
+                    return true; // considérer comme appliqué (pour que DashCible sache que le dash a touché)
+                }
+
+                return false;
+            }
             
             // Invulnérabilité de spawn propre (bloque sans "retirer puis remettre")
             if (IsSpawnInvulnerableFor(info.type))

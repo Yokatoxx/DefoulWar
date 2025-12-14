@@ -38,17 +38,24 @@ namespace FPS
         public void FlashOnHit()
         {
             if (cachedRenderer == null) return;
-            if (flashRoutine != null) StopCoroutine(flashRoutine);
+            // If a flash is already running, stop it and restore the base color immediately
+            if (flashRoutine != null)
+            {
+                StopCoroutine(flashRoutine);
+                flashRoutine = null;
+                // Restore the original base color to avoid staying stuck in hit color
+                cachedRenderer.material.color = baseColor;
+            }
             flashRoutine = StartCoroutine(FlashCoroutine());
         }
         
         private IEnumerator FlashCoroutine()
         {
             var mat = cachedRenderer.material;
-            Color before = mat.color;
+            // Always set to hit color, then restore to the stored baseColor after delay
             mat.color = hitFlashColor;
             yield return new WaitForSeconds(hitFlashDuration);
-            mat.color = before;
+            mat.color = baseColor;
             flashRoutine = null;
         }
         

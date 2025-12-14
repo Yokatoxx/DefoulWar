@@ -18,8 +18,8 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 4294967295
-  eyeHeight: 1.5
-  chaseSpeed: 5
+  eyeHeight: 2
+  chaseSpeed: 2
   patrolSpeed: 2
   keepDistance: 8
   distanceTolerance: 1
@@ -35,4 +35,4 @@ MonoBehaviour:
   bulletLifetime: 5
   bulletTrailPrefab: {fileID: 0}
   trailDuration: 0.5
-  rotationSpeed: 5
+  rotationSpeed: 10
