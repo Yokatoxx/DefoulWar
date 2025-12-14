@@ -33,3 +33,4 @@ MonoBehaviour:
   knockbackForce: 10
   knockbackDuration: 0.5
   knockbackAffectsYAxis: 0
+  postDashNoFireDuration: 0.2

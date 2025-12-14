@@ -38,5 +38,9 @@ namespace FPS
         
         [Tooltip("Si true, le knockback affecte aussi l'axe Y (propulse légèrement en l'air)")]
         public bool knockbackAffectsYAxis = false;
+
+        [Header("Gameplay")]
+        [Tooltip("Durée pendant laquelle le joueur ne peut pas tirer après un dash (en secondes, temps réel/unscaled)")]
+        [Min(0f)] public float postDashNoFireDuration = 0.1f;
     }
 }

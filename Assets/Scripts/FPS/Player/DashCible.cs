@@ -715,6 +715,24 @@ namespace FPS
             {
                 fpsMovement.EnableMovement();
             }
+
+            // Bloquer temporairement le tir via le WeaponSystem si configuré
+            try
+            {
+                if (Config != null && Config.postDashNoFireDuration > 0f)
+                {
+                    var ws = GetComponentInChildren<WeaponSystem>();
+                    if (ws != null)
+                    {
+                        ws.DisableShootingFor(Config.postDashNoFireDuration);
+                        Debug.Log($"[DashCible] WeaponSystem shooting disabled for {Config.postDashNoFireDuration} seconds (unscaled)");
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[DashCible] Erreur lors de la tentative de désactivation du tir: {ex}");
+            }
         }
 
         private void ApplyOrRefreshSlowMo()
