@@ -22,9 +22,10 @@ namespace FPS
         public Vector3 hitNormal;
         public Transform attacker;
         public Collider hitCollider;
+        public bool countAsHit; // Si true, même si un intercepteur bloque le dégât, on considère que l'attaque a "touché" pour les effets (ex: rebond)
 
         public DamageInfo(float amount, string zoneName = "Body", DamageType type = DamageType.Bullet,
-            Vector3 hitPoint = default, Vector3 hitNormal = default, Transform attacker = null, Collider hitCollider = null)
+            Vector3 hitPoint = default, Vector3 hitNormal = default, Transform attacker = null, Collider hitCollider = null, bool countAsHit = false)
         {
             this.amount = amount;
             this.zoneName = string.IsNullOrWhiteSpace(zoneName) ? "Body" : zoneName;
@@ -33,6 +34,7 @@ namespace FPS
             this.hitNormal = hitNormal;
             this.attacker = attacker;
             this.hitCollider = hitCollider;
+            this.countAsHit = countAsHit;
         }
     }
 }

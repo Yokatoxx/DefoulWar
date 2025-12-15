@@ -64,7 +64,8 @@ namespace FPS
             if (isDead) return false;
             // Intercepteurs (ex: MagicEnemy) — peuvent bloquer et déclencher des effets (renvoi)
             bool allow = true;
-            var interceptors = GetComponents<IDamageInterceptor>();
+            // Récupérer les intercepteurs présents sur cet objet ET ses enfants (pour inclure EnemyShield sur un child)
+            var interceptors = GetComponentsInChildren<IDamageInterceptor>();
             if (interceptors != null && interceptors.Length > 0)
             {
                 for (int i = 0; i < interceptors.Length; i++)
@@ -72,7 +73,37 @@ namespace FPS
                     try { allow = interceptors[i].OnBeforeDamage(ref info) && allow; } catch {}
                 }
             }
-            if (!allow) return false;
+
+            // Si un intercepteur a bloqué l'application
+            if (!allow)
+            {
+                // Mais s'il demande que l'attaque soit comptée comme un hit (ex: rebond de dash), appliquer les effets nécessaires sans enlever de vie
+                if (info.countAsHit)
+                {
+                    // Enregistrer la source du dernier coup
+                    lastHitType = info.type;
+                    lastAttacker = info.attacker;
+
+                    // Enregistrer le hit statistique (zone)
+                    string hitZoneNameBlocked = string.IsNullOrWhiteSpace(info.zoneName) ? "Body" : info.zoneName;
+                    string zoneKeyBlocked = NormalizeZoneKey(hitZoneNameBlocked);
+                    if (!zoneHitCount.ContainsKey(zoneKeyBlocked)) zoneHitCount[zoneKeyBlocked] = 0;
+                    zoneHitCount[zoneKeyBlocked]++;
+
+                    // Déclencher les callbacks/effets associés à un hit sans dégâts
+                    OnDamageTaken?.Invoke(0f, hitZoneNameBlocked);
+
+                    // Si c'est un dash, appliquer le knockback/effets de dash
+                    if (info.type == DamageType.Dash)
+                    {
+                        TryApplyDashKnockback(info);
+                    }
+
+                    return true; // considérer comme appliqué (pour que DashCible sache que le dash a touché)
+                }
+
+                return false;
+            }
             
             // Invulnérabilité de spawn propre (bloque sans "retirer puis remettre")
             if (IsSpawnInvulnerableFor(info.type))
@@ -105,6 +136,12 @@ namespace FPS
                 {
                     electricEnemy.TriggerElectricDischarge();
                 }
+            }
+            
+            // Appliquer le knockback si c'est un dash et que l'ennemi ne résiste pas
+            if (info.type == DamageType.Dash)
+            {
+                TryApplyDashKnockback(info);
             }
             
             if (currentHealth <= 0)
@@ -175,6 +212,98 @@ namespace FPS
             currentHealth = 0f;
             lastKillType = DamageType.Other;
             Die();
+        }
+        
+        /// <summary>
+        /// Tente d'appliquer le knockback lors d'un dash si l'ennemi n'y résiste pas.
+        /// </summary>
+        private void TryApplyDashKnockback(DamageInfo info)
+        {
+            // Vérifier si l'ennemi résiste au dash (ex: ElectricEnnemis avec ResistToDash)
+            var electricEnemy = GetComponent<Ennemies.Effect.ElectricEnnemis>();
+            if (electricEnemy != null && electricEnemy.ResistToDash)
+            {
+                return;
+            }
+            
+            // Récupérer ou créer le composant de knockback
+            var knockback = GetComponent<EnemyKnockback>();
+            if (knockback == null)
+            {
+                // Auto-ajouter le Rigidbody s'il n'existe pas
+                var rb = GetComponent<Rigidbody>();
+                if (rb == null)
+                {
+                    rb = gameObject.AddComponent<Rigidbody>();
+                    rb.isKinematic = true;
+                    rb.interpolation = RigidbodyInterpolation.Interpolate;
+                    rb.constraints = RigidbodyConstraints.FreezeRotation;
+                }
+                
+                // Auto-ajouter le composant EnemyKnockback
+                knockback = gameObject.AddComponent<EnemyKnockback>();
+            }
+            
+            if (knockback.ResistToKnockback)
+            {
+                return;
+            }
+            
+            // Calculer la direction du knockback (depuis l'attaquant vers l'ennemi)
+            Vector3 knockbackDirection;
+            if (info.attacker != null)
+            {
+                knockbackDirection = (transform.position - info.attacker.position).normalized;
+            }
+            else if (info.hitNormal != Vector3.zero)
+            {
+                // Utiliser l'inverse de la normale de hit comme direction
+                knockbackDirection = -info.hitNormal.normalized;
+            }
+            else
+            {
+                // Fallback: direction par défaut (vers l'arrière de l'ennemi)
+                knockbackDirection = -transform.forward;
+            }
+            
+            // Récupérer les paramètres de knockback depuis le DashCible du joueur
+            float force = 15f;      // Valeur par défaut
+            float duration = 0.5f;  // Valeur par défaut
+            bool affectsY = false;  // Valeur par défaut
+            
+            // Essayer de récupérer les paramètres du DashDefinition via le joueur
+            if (info.attacker != null)
+            {
+                var dashCible = info.attacker.GetComponent<DashCible>();
+                if (dashCible != null)
+                {
+                    var dashDef = GetDashDefinitionFromPlayer(dashCible);
+                    if (dashDef != null)
+                    {
+                        force = dashDef.knockbackForce;
+                        duration = dashDef.knockbackDuration;
+                        affectsY = dashDef.knockbackAffectsYAxis;
+                    }
+                }
+            }
+            
+            // Appliquer le knockback
+            knockback.ApplyKnockback(knockbackDirection, force, duration, affectsY);
+        }
+        
+        /// <summary>
+        /// Récupère le DashDefinition depuis le DashCible via réflexion (pour éviter de modifier DashCible).
+        /// </summary>
+        private DashDefinition GetDashDefinitionFromPlayer(DashCible dashCible)
+        {
+            // Utiliser la réflexion pour accéder au champ privé dashDefinition
+            var field = typeof(DashCible).GetField("dashDefinition", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field != null)
+            {
+                return field.GetValue(dashCible) as DashDefinition;
+            }
+            return null;
         }
     }
 }

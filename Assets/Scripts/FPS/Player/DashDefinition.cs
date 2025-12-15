@@ -22,6 +22,25 @@ namespace FPS
         [Min(0.01f)] public float dashTravelTime = 0.08f;
         [Min(0f)] public float capsuleRadius = 0.4f;
         [Min(0f)] public float stopOffset = 1f;
+
+        [Header("HitStop")]
+        [Tooltip("Durée du hitstop en temps réel (0 = désactivé)")]
+        [Min(0f)] public float hitStopUnscaledDuration = 0f;
+        [Tooltip("Si true, Time.timeScale = 0 pendant le hitstop; sinon = 0.01")]
+        public bool hitStopFreezeTime = true;
         
+        [Header("Knockback Ennemi")]
+        [Tooltip("Force de repousse appliquée à l'ennemi lors du dash")]
+        [Min(0f)] public float knockbackForce = 15f;
+        
+        [Tooltip("Durée du knockback (temps avant que l'ennemi reprenne son comportement IA)")]
+        [Min(0.1f)] public float knockbackDuration = 0.5f;
+        
+        [Tooltip("Si true, le knockback affecte aussi l'axe Y (propulse légèrement en l'air)")]
+        public bool knockbackAffectsYAxis = false;
+
+        [Header("Gameplay")]
+        [Tooltip("Durée pendant laquelle le joueur ne peut pas tirer après un dash (en secondes, temps réel/unscaled)")]
+        [Min(0f)] public float postDashNoFireDuration = 0.1f;
     }
 }

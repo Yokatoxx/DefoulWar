@@ -36,6 +36,10 @@ public class WeaponSystem : MonoBehaviour
     private bool isReloading;
     private Dictionary<string, float> zoneMultDict;
 
+    // Nouveau: contrôle de la possibilité de tirer
+    private bool canShoot = true;
+    private Coroutine disableShootingRoutine;
+
     public bool IsReloading => isReloading;
 
     private void Awake()
@@ -59,6 +63,27 @@ public class WeaponSystem : MonoBehaviour
             crosshair = FindAnyObjectByType<CrosshairAnim>();
     }
 
+    private void OnDisable()
+    {
+        // Cancel any pending disable timer and ensure shooting is allowed when disabled
+        if (disableShootingRoutine != null)
+        {
+            StopCoroutine(disableShootingRoutine);
+            disableShootingRoutine = null;
+        }
+        canShoot = true;
+    }
+
+    private void OnDestroy()
+    {
+        if (disableShootingRoutine != null)
+        {
+            StopCoroutine(disableShootingRoutine);
+            disableShootingRoutine = null;
+        }
+        canShoot = true;
+    }
+
     private void Update()
     {
         HandleFireInput();
@@ -69,6 +94,15 @@ public class WeaponSystem : MonoBehaviour
     {
         if (isReloading) return;
         if (weaponSettings == null || bulletSpawnPoint == null) return;
+
+        // Respecter le flag canShoot. Cependant, si le joueur est stunné et que le stun provoque des tirs automatiques,
+        // on autorise quand même les tirs forcés par le stun (priorité stun).
+        if (!canShoot)
+        {
+            var stunComp = GetComponentInParent<FPS.PlayerStunAutoFire>();
+            if (stunComp == null || !stunComp.IsStunned)
+                return;
+        }
 
         bool wantShoot = weaponSettings.isAutomatic
             ? Input.GetMouseButton(0)
@@ -108,6 +142,14 @@ public class WeaponSystem : MonoBehaviour
 
     public void Shoot()
     {
+        // Respecter le flag canShoot (même logique que dans HandleFireInput)
+        if (!canShoot)
+        {
+            var stunComp = GetComponentInParent<FPS.PlayerStunAutoFire>();
+            if (stunComp == null || !stunComp.IsStunned)
+                return;
+        }
+
         if (Time.time < lastShootTime + weaponSettings.shotDelay) return;
         if (currentMagazine <= 0)
         {
@@ -260,7 +302,14 @@ public class WeaponSystem : MonoBehaviour
         if (zoneMultDict.TryGetValue(zoneName, out float mult))
             dmg *= mult;
 
-        enemyHealth.TakeDamage(dmg, zoneName);
+        // Utiliser la nouvelle API DamageInfo pour transmettre le collider et le point/normal
+        var info = new DamageInfo(amount: dmg, zoneName: zoneName, type: DamageType.Bullet,
+            hitPoint: collider.ClosestPoint(bulletSpawnPoint != null ? bulletSpawnPoint.position : collider.transform.position),
+            hitNormal: Vector3.zero, // pas d'info de normale pour le raycast ici
+            attacker: FindFirstObjectByType<PlayerHealth>()?.transform,
+            hitCollider: collider);
+
+        enemyHealth.TakeDamage(info);
     }
 
     public void StartReload()
@@ -292,4 +341,34 @@ public class WeaponSystem : MonoBehaviour
         if (textAmmo != null)
             textAmmo.text = $"{currentMagazine} / {currentReserve}";
     }
+
+    // Nouvelle API publique : désactiver le tir pendant une durée realtime/unscaled
+    public void DisableShootingFor(float seconds)
+    {
+        // Stop previous routine if present
+        if (disableShootingRoutine != null)
+        {
+            StopCoroutine(disableShootingRoutine);
+            disableShootingRoutine = null;
+        }
+
+        if (seconds <= 0f)
+        {
+            canShoot = true;
+            return;
+        }
+
+        disableShootingRoutine = StartCoroutine(DisableShootingCoroutine(seconds));
+    }
+
+    private IEnumerator DisableShootingCoroutine(float seconds)
+    {
+        canShoot = false;
+        // Wait in real time (unaffected by timeScale/slowmo)
+        yield return new WaitForSecondsRealtime(seconds);
+
+        canShoot = true;
+        disableShootingRoutine = null;
+    }
 }
+

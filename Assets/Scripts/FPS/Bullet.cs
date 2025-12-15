@@ -57,20 +57,20 @@ namespace FPS
         {
             if (hasHit) return;
             hasHit = true;
-            
+
             var col = collision.collider;
             EnemyHealth enemyHealth = col.GetComponentInParent<EnemyHealth>();
             HitZone hitZone = col.GetComponent<HitZone>() ?? col.GetComponentInParent<HitZone>();
-            
+
             if (enemyHealth != null)
             {
                 string zoneName = hitZone != null ? hitZone.ZoneName : "Body";
-                
+
                 if (hitZone != null)
                 {
                     hitZone.FlashOnHit();
                 }
-                
+
                 // Calcul des degats: base damage * multiplier zone
                 float zoneMult = 1f;
                 if (hitZone != null)
@@ -84,11 +84,16 @@ namespace FPS
                         zoneMult = hitZone.BaseMultiplier;
                     }
                 }
-                
+
                 float finalDamage = damage * zoneMult;
-                enemyHealth.TakeDamage(finalDamage, zoneName);
+
+                // Utiliser DamageInfo pour transmettre le collider et la normale/point
+                var info = new DamageInfo(amount: finalDamage, zoneName: zoneName, type: DamageType.Bullet,
+                    hitPoint: collision.GetContact(0).point, hitNormal: collision.GetContact(0).normal, attacker: null, hitCollider: col);
+
+                enemyHealth.TakeDamage(info);
             }
-            
+
             Destroy(gameObject);
         }
         

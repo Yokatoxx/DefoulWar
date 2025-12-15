@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 128
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  maxAimAngle: 30
+    m_Bits: 1024
+  maxAimAngle: 2
   countDash: 6
   slowMoTime: 0.75
   slowMoScale: 0.2
@@ -28,3 +28,9 @@ MonoBehaviour:
   dashTravelTime: 0.08
   capsuleRadius: 0.4
   stopOffset: 1
+  hitStopUnscaledDuration: 0.1
+  hitStopFreezeTime: 1
+  knockbackForce: 10
+  knockbackDuration: 0.5
+  knockbackAffectsYAxis: 0
+  postDashNoFireDuration: 0.2

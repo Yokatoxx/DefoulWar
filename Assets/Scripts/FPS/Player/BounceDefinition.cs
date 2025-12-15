@@ -11,6 +11,12 @@ namespace FPS
 
         [Header("Force")]
         [Min(0f)] public float force = 18f;
+
+        [Header("Courbe de rebond")]
+        [Tooltip("Courbe d'application de la force sur la durée (X: temps normalisé 0-1, Y: multiplicateur de force)")]
+        public AnimationCurve forceOverTime = AnimationCurve.Linear(0f, 1f, 1f, 0f);
+        [Tooltip("Durée du rebond en secondes (0 = impulsion instantanée)")]
+        [Min(0f)] public float duration = 0.25f;
     }
 }
 

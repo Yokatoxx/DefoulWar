@@ -6,7 +6,7 @@ public class FollowCamera : MonoBehaviour
 {
     public Transform target;
 
-    public DashSystem dashPlayer;
+    public DashCible dashPlayer;
 
     public bool followPosition = true;
     public bool followRotation = true;

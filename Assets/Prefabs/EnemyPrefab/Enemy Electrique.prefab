@@ -11,10 +11,12 @@ GameObject:
   - component: {fileID: 2657800489959688396}
   - component: {fileID: 1654310326663819305}
   - component: {fileID: 2188955753850171073}
-  - component: {fileID: 2689582501457834611}
   - component: {fileID: -3158992528684757622}
   - component: {fileID: -8977643811127216630}
   - component: {fileID: 9159008837239357016}
+  - component: {fileID: 187447163467983752}
+  - component: {fileID: 1619272842727892379}
+  - component: {fileID: 7316351646241182328}
   m_Layer: 7
   m_Name: Enemy Electrique
   m_TagString: Enemy
@@ -85,28 +87,6 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2689582501457834611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 160580225223210161}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b35c933fe4a04fd7a4d569ff6a317dc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chaseSpeed: 3.5
-  patrolSpeed: 2
-  rotationSpeed: 5
-  detectionRange: 100
-  attackRange: 2
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  attackDamage: 10
-  attackCooldown: 1.5
 --- !u!114 &-3158992528684757622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +142,62 @@ MonoBehaviour:
   waypointPath: {fileID: 0}
   shootPoint: {fileID: 0}
   showDebugGizmos: 1
+--- !u!54 &187447163467983752
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &1619272842727892379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f385cdcca049278f4cc1bea15acca8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resistToKnockback: 1
+  impactParticlePrefab: {fileID: 0}
+  particleOffset: {x: 0, y: 0.5, z: 0}
+  impactSound: {fileID: 0}
+  impactVolume: 0.8
+--- !u!114 &7316351646241182328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a6396c44267481183db83553bd89f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
