@@ -140,6 +140,8 @@ namespace Ennemies
                     return new ChaserBehavior();
                 case EnemyBehaviorType.ZonePatrol:
                     return new ZonePatrolBehavior();
+                case EnemyBehaviorType.CompanionFollower: // branchement ajouté
+                    return new FollowCompanionBehavior();
                 default:
                     Debug.LogWarning($"[EnnemiBehaviour] Unknown behavior type: {type}. Using Chaser.");
                     return new ChaserBehavior();
