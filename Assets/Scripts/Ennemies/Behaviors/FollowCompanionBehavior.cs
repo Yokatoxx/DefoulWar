@@ -1,10 +1,10 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.AI;
 using Ennemies.Settings;
 
 namespace Ennemies.Behaviors
 {
-    // Implémentation basée sur la logique des behaviors existants (Chaser/Distance/ZonePatrol)
+    // Implï¿½mentation basï¿½e sur la logique des behaviors existants (Chaser/Distance/ZonePatrol)
     public class FollowCompanionBehavior : IEnemyBehavior
     {
         private NavMeshAgent agent;
@@ -31,7 +31,7 @@ namespace Ennemies.Behaviors
             if (agent != null)
             {
                 agent.isStopped = false;
-                agent.speed = settings.patrolSpeed; // vitesse d’escorte
+                agent.speed = settings.patrolSpeed; // vitesse dï¿½escorte
             }
 
             nextSearchTime = Time.time + Random.Range(0f, SEARCH_INTERVAL);
@@ -59,7 +59,7 @@ namespace Ennemies.Behaviors
                 return;
             }
 
-            // Perte si cible détruite/désactivée
+            // Perte si cible dï¿½truite/dï¿½sactivï¿½e
             if (!companionTarget.gameObject.activeInHierarchy)
             {
                 ClearCompanion();
@@ -70,7 +70,7 @@ namespace Ennemies.Behaviors
             bool hasLOS = !settings.requireLineOfSight || CheckLineOfSight(companionTarget);
             float d = Vector3.Distance(owner.position, companionTarget.position);
 
-            // Si pas de LOS et très loin, abandon
+            // Si pas de LOS et trï¿½s loin, abandon
             if (!hasLOS && d > settings.detectionRange * 1.5f)
             {
                 ClearCompanion();
@@ -82,7 +82,7 @@ namespace Ennemies.Behaviors
             {
                 agent.isStopped = false;
 
-                // viser un point autour du compagnon pour éviter le chevauchement
+                // viser un point autour du compagnon pour ï¿½viter le chevauchement
                 Vector3 dir = (owner.position - companionTarget.position).normalized;
                 if (dir.sqrMagnitude < 0.001f) dir = Random.insideUnitSphere;
                 dir.y = 0f;
@@ -110,14 +110,14 @@ namespace Ennemies.Behaviors
             float bestDist = float.PositiveInfinity;
             Transform best = null;
 
-            // On se base sur les ennemis configurés via EnnemiBehaviour
-            var enemies = Object.FindObjectsByType<Ennemies.EnnemiBehaviour>(FindObjectsSortMode.None);
+            // On se base sur les ennemis configurï¿½s via EnemyBehaviour
+            var enemies = Object.FindObjectsByType<Ennemies.EnemyBehaviour>(FindObjectsSortMode.None);
             foreach (var eb in enemies)
             {
                 if (eb == null) continue;
                 if (eb.transform == owner) continue;
 
-                // Ne pas suivre ceux qui sont eux-mêmes CompanionFollower
+                // Ne pas suivre ceux qui sont eux-mï¿½mes CompanionFollower
                 if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower)
                     continue;
 

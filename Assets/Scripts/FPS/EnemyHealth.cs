@@ -26,7 +26,6 @@ namespace FPS
         public UnityEvent<float, string> OnDamageTaken;
 
         private bool isDead;
-        private WaveManager waveManager;
 
         // Centralisation: suivi de l'origine des dégâts/kill
         private DamageType lastHitType = DamageType.Other;
@@ -37,14 +36,17 @@ namespace FPS
         {
             currentHealth = maxHealth;
             spawnInvulnerableUntil = Time.time + Mathf.Max(0f, spawnInvulnerabilityDuration);
-            waveManager = FindFirstObjectByType<WaveManager>();
+            
+            // S'enregistrer dans le registry
+            EnemyRegistry.Instance.Register(this);
         }
 
-        private void EnsureWaveManager()
+        private void OnDestroy()
         {
-            if (waveManager == null)
+            // Se désenregistrer du registry
+            if (EnemyRegistry.Instance != null)
             {
-                waveManager = FindFirstObjectByType<WaveManager>();
+                EnemyRegistry.Instance.Unregister(this);
             }
         }
 
@@ -179,13 +181,6 @@ namespace FPS
 
             isDead = true;
             OnDeath?.Invoke();
-
-            // Notifier le wave manager qu'un ennemi est mort
-            EnsureWaveManager();
-            if (waveManager != null)
-            {
-                waveManager.OnEnemyDeath(this);
-            }
 
             Destroy(gameObject);
         }

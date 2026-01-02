@@ -12,7 +12,7 @@ namespace Ennemies
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(EnemyHealth))]
-    public class EnnemiBehaviour : MonoBehaviour
+    public class EnemyBehaviour : MonoBehaviour
     {
         [Header("Behavior Configuration")]
         [Tooltip("Configuration du comportement de l'ennemi")]
@@ -33,9 +33,6 @@ namespace Ennemies
         private NavMeshAgent agent;
         private EnemyHealth health;
         private EnemyAttackHandler attackHandler;
-        
-        // Animator pour les animations futures
-        // private Animator animator;
 
         // Behavior
         private IEnemyBehavior currentBehavior;
@@ -50,8 +47,6 @@ namespace Ennemies
             agent = GetComponent<NavMeshAgent>();
             health = GetComponent<EnemyHealth>();
             attackHandler = GetComponent<EnemyAttackHandler>();
-            
-            // animator = GetComponent<Animator>();
 
             // Trouver le joueur
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -101,7 +96,7 @@ namespace Ennemies
         {
             if (settings == null)
             {
-                Debug.LogWarning($"[EnnemiBehaviour] No settings assigned on {gameObject.name}!");
+                Debug.LogWarning($"[EnemyBehaviour] No settings assigned on {gameObject.name}!");
                 return;
             }
 
@@ -122,7 +117,7 @@ namespace Ennemies
             // Configuration spéciale pour ZonePatrol
             if (currentBehavior is ZonePatrolBehavior zonePatrol && waypointPath != null)
             {
-                waypointPath.RefreshWaypoints(); // S'assurer que les waypoints sont chargés
+                waypointPath.RefreshWaypoints();
                 zonePatrol.SetWaypointPath(waypointPath);
             }
 
@@ -132,25 +127,18 @@ namespace Ennemies
 
         private IEnemyBehavior CreateBehavior(EnemyBehaviorType type)
         {
-            switch (type)
+            return type switch
             {
-                case EnemyBehaviorType.Distance:
-                    return new DistanceBehavior();
-                case EnemyBehaviorType.Chaser:
-                    return new ChaserBehavior();
-                case EnemyBehaviorType.ZonePatrol:
-                    return new ZonePatrolBehavior();
-                case EnemyBehaviorType.CompanionFollower: // branchement ajouté
-                    return new FollowCompanionBehavior();
-                default:
-                    Debug.LogWarning($"[EnnemiBehaviour] Unknown behavior type: {type}. Using Chaser.");
-                    return new ChaserBehavior();
-            }
+                EnemyBehaviorType.Distance => new DistanceBehavior(),
+                EnemyBehaviorType.Chaser => new ChaserBehavior(),
+                EnemyBehaviorType.ZonePatrol => new ZonePatrolBehavior(),
+                EnemyBehaviorType.CompanionFollower => new FollowCompanionBehavior(),
+                _ => new ChaserBehavior()
+            };
         }
 
         private void Update()
         {
-            // Ne rien faire si mort
             if (health != null && health.IsDead)
             {
                 agent.isStopped = true;
@@ -159,16 +147,13 @@ namespace Ennemies
 
             if (currentBehavior == null || player == null) return;
 
-            // Exécuter le comportement
             currentBehavior.Execute();
 
-            // Gérer les attaques
             if (currentBehavior.CanAttack())
             {
                 attackHandler.TryAttack();
             }
 
-            // Triggers d'animation (commentés pour le moment)
             UpdateAnimationTriggers();
         }
 
@@ -177,26 +162,15 @@ namespace Ennemies
             bool isChasing = currentBehavior.IsChasing();
             bool isPatrolling = currentBehavior.IsPatrolling();
 
-            // Trigger quand on commence à poursuivre
+            // Note: Animations commentées pour implémentation future
             if (isChasing && !wasChasing)
             {
                 // animator?.SetTrigger("OnChase");
-                // animator?.SetBool("IsChasing", true);
-            }
-            else if (!isChasing && wasChasing)
-            {
-                // animator?.SetBool("IsChasing", false);
             }
 
-            // Trigger quand on commence à patrouiller
             if (isPatrolling && !wasPatrolling)
             {
                 // animator?.SetTrigger("OnPatrol");
-                // animator?.SetBool("IsPatrolling", true);
-            }
-            else if (!isPatrolling && wasPatrolling)
-            {
-                // animator?.SetBool("IsPatrolling", false);
             }
 
             wasChasing = isChasing;
@@ -234,29 +208,24 @@ namespace Ennemies
             }
             else if (settings != null)
             {
-                // Dessiner les gizmos en mode éditeur (avant play)
                 DrawEditorGizmos();
             }
         }
 
         private void DrawEditorGizmos()
         {
-            // Zone de détection
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, settings.detectionRange);
 
-            // Portée d'attaque
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, settings.attackRange);
 
-            // Spécifique au type
             switch (settings.behaviorType)
             {
                 case EnemyBehaviorType.Distance:
                     Gizmos.color = Color.green;
                     Gizmos.DrawWireSphere(transform.position, settings.keepDistance);
                     break;
-
                 case EnemyBehaviorType.ZonePatrol:
                     Gizmos.color = Color.blue;
                     Gizmos.DrawWireSphere(transform.position, settings.patrolRadius);

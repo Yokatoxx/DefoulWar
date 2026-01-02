@@ -1,23 +1,15 @@
-// filepath: e:\Documents\Projet Unity\Proto3GD\Assets\Scripts\FPS\FPSDebugTools.cs
 using UnityEngine;
 
 namespace FPS
 {
     /// <summary>
-    /// Outils de debug en jeu: tuer tous les ennemis, augmenter/réinitialiser l'armure.
+    /// Outils de debug en jeu: tuer tous les ennemis.
     /// </summary>
     public class FPSDebugTools : MonoBehaviour
     {
         [Header("Hotkeys")]
         [SerializeField] private KeyCode killAllKey = KeyCode.F6;
         [SerializeField] private bool showButtons = true;
-        
-        private WaveManager waveManager;
-        
-        private void Awake()
-        {
-            waveManager = FindFirstObjectByType<WaveManager>();
-        }
         
         private void Update()
         {
@@ -43,26 +35,17 @@ namespace FPS
         
         private void KillAllEnemies()
         {
-            var enemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
-            foreach (var e in enemies)
+            // Utiliser le registry au lieu de FindObjectsByType
+            int count = 0;
+            foreach (var enemy in EnemyRegistry.Instance.GetAliveEnemies())
             {
-                if (!e.IsDead)
+                if (enemy != null && !enemy.IsDead)
                 {
-                    // Ne pas enregistrer de hit (sinon fausse les stats de la vague)
-                    e.KillImmediate();
+                    enemy.KillImmediate();
+                    count++;
                 }
             }
-            Debug.Log($"[Debug] Killed {enemies.Length} enemies.");
-            
-            // Enchaîner la prochaine vague immédiatement avec progression d'armure
-            if (waveManager == null)
-            {
-                waveManager = FindFirstObjectByType<WaveManager>();
-            }
-            if (waveManager != null)
-            {
-                waveManager.ForceNextWaveNow();
-            }
+            Debug.Log($"[Debug] Killed {count} enemies.");
         }
     }
 }
