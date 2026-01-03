@@ -289,29 +289,45 @@ public class WeaponSystem : MonoBehaviour
     private void ApplyDamage(Collider collider)
     {
         if (collider == null) return;
+
+        // 1) Priorité: weak point
+        var weakPoint = collider.GetComponentInParent<WeakPointTarget>()
+                        ?? collider.GetComponent<WeakPointTarget>();
+        if (weakPoint != null && weakPoint.isActiveAndEnabled)
+        {
+            // Infliger des dégâts au point faible et sortir (ne pas toucher la santé de l'ennemi)
+            weakPoint.TakeWeakPointDamage(weaponSettings.bulletDammage);
+
+            // Feedback d’impact si voulu (éviter double impact sur Enemy)
+            var hitZone = collider.GetComponent<HitZone>();
+            if (hitZone != null) hitZone.FlashOnHit();
+            return;
+        }
+
+        // 2) Sinon: dégâts classiques à l'ennemi
         var enemyHealth = collider.GetComponentInParent<EnemyHealth>();
         if (enemyHealth == null) return;
 
         float dmg = weaponSettings.bulletDammage;
-        var hitZone = collider.GetComponent<HitZone>();
-        string zoneName = hitZone != null ? hitZone.ZoneName : "Body";
-
-        if (hitZone != null)
-            hitZone.FlashOnHit();
+        var hz = collider.GetComponent<HitZone>();
+        string zoneName = hz != null ? hz.ZoneName : "Body";
+        if (hz != null) hz.FlashOnHit();
 
         if (zoneMultDict.TryGetValue(zoneName, out float mult))
             dmg *= mult;
 
-        // Utiliser la nouvelle API DamageInfo pour transmettre le collider et le point/normal
-        var info = new DamageInfo(amount: dmg, zoneName: zoneName, type: DamageType.Bullet,
+        var info = new DamageInfo(
+            amount: dmg,
+            zoneName: zoneName,
+            type: DamageType.Bullet,
             hitPoint: collider.ClosestPoint(bulletSpawnPoint != null ? bulletSpawnPoint.position : collider.transform.position),
-            hitNormal: Vector3.zero, // pas d'info de normale pour le raycast ici
+            hitNormal: Vector3.zero,
             attacker: FindFirstObjectByType<PlayerHealth>()?.transform,
-            hitCollider: collider);
+            hitCollider: collider
+        );
 
         enemyHealth.TakeDamage(info);
     }
-
     public void StartReload()
     {
         if (isReloading) return;
