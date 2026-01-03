@@ -15,6 +15,10 @@ namespace FPS
         [SerializeField] private float regenDelay = 3f;
         [SerializeField] private float regenRate = 5f;
         
+        [Header("References")]
+        [Tooltip("Référence au DashCible pour vérifier l'état du dash. Auto-détecté si non assigné.")]
+        [SerializeField] private DashCible dashCible;
+        
         [Header("Events")]
         public UnityEvent<float> OnHealthChanged;
         public UnityEvent OnDeath;
@@ -22,19 +26,17 @@ namespace FPS
         private float timeSinceLastDamage;
         private bool isDead;
         private bool isInvulnerable;
-        private DashCible dashCible;
         
         private void Awake()
         {
             currentHealth = maxHealth;
-            // Chercher DashCible sur cet objet, dans les enfants, ou dans les parents
-            dashCible = GetComponent<DashCible>();
+            // Auto-détection si non assigné dans l'inspecteur
+            if (dashCible == null)
+                dashCible = GetComponent<DashCible>();
             if (dashCible == null)
                 dashCible = GetComponentInChildren<DashCible>();
             if (dashCible == null)
                 dashCible = GetComponentInParent<DashCible>();
-            if (dashCible == null)
-                dashCible = FindFirstObjectByType<DashCible>();
         }
         
         private void Update()

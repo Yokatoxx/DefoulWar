@@ -12,7 +12,9 @@ namespace Ennemies.Settings
         /// <summary>Poursuit le joueur en permanence.</summary>
         Chaser,
         /// <summary>Poursuit dans sa zone, retourne patrouiller si le joueur sort.</summary>
-        ZonePatrol
+        ZonePatrol,
+        /// <summary>Suit un autre ennemi (compagnon) s’il est disponible.</summary>
+        CompanionFollower
     }
 
     /// <summary>
@@ -37,10 +39,10 @@ namespace Ennemies.Settings
         public EnemyBehaviorType behaviorType = EnemyBehaviorType.Chaser;
 
         [Header("Movement Settings")]
-        [Tooltip("Distance à laquelle l'ennemi détecte le joueur")]
+        [Tooltip("Distance à laquelle l'ennemi détecte le joueur ou ses cibles")]
         [Min(0f)] public float detectionRange = 15f;
 
-        [Tooltip("Nécessite une ligne de vue directe pour détecter le joueur")]
+        [Tooltip("Nécessite une ligne de vue directe pour détecter la cible")]
         public bool requireLineOfSight = true;
 
         [Tooltip("Layers considérés comme obstacles pour la ligne de vue")]
@@ -52,20 +54,20 @@ namespace Ennemies.Settings
         [Tooltip("Vitesse de déplacement en poursuite")]
         [Min(0f)] public float chaseSpeed = 3.5f;
 
-        [Tooltip("Vitesse de déplacement en patrouille")]
+        [Tooltip("Vitesse de déplacement en patrouille / escorte")]
         [Min(0f)] public float patrolSpeed = 2f;
 
-        [Tooltip("Distance à maintenir avec le joueur (pour le type Distance)")]
+        [Tooltip("Distance à maintenir (Distance et CompanionFollower)")]
         [Min(0f)] public float keepDistance = 8f;
 
-        [Tooltip("Tolérance de distance avant de se repositionner")]
+        [Tooltip("Tolérance de distance avant de se repositionner (Distance)")]
         [Min(0f)] public float distanceTolerance = 1f;
 
         [Header("Zone Patrol Settings")]
-        [Tooltip("Rayon de la zone de patrouille (pour ZonePatrol)")]
+        [Tooltip("Rayon de la zone de patrouille (ZonePatrol)")]
         [Min(0f)] public float patrolRadius = 20f;
 
-        [Tooltip("Temps d'attente à chaque waypoint")]
+        [Tooltip("Temps d'attente à chaque waypoint (ZonePatrol)")]
         [Min(0f)] public float waypointWaitTime = 1f;
 
         [Header("Attack Settings")]
@@ -102,8 +104,7 @@ namespace Ennemies.Settings
         [Min(0f)] public float trailDuration = 0.5f;
 
         [Header("Rotation Settings")]
-        [Tooltip("Vitesse de rotation vers le joueur")]
+        [Tooltip("Vitesse de rotation vers la cible")]
         [Min(0f)] public float rotationSpeed = 5f;
     }
 }
-

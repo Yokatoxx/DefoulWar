@@ -19,7 +19,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   eyeHeight: 1.5
-  chaseSpeed: 3.5
+  chaseSpeed: 10
   patrolSpeed: 4
   keepDistance: 8
   distanceTolerance: 1

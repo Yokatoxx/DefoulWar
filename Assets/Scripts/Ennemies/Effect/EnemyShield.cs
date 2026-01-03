@@ -48,7 +48,7 @@ namespace Ennemies.Effect
             if (blockDashByFrontalCone)
             {
                 // Récupérer transform racine de l'ennemi
-                Transform enemyTransform = GetComponentInParent<EnnemiBehaviour>()?.transform ?? GetComponentInParent<EnemyHealth>()?.transform ?? transform.parent;
+                Transform enemyTransform = GetComponentInParent<EnemyBehaviour>()?.transform ?? GetComponentInParent<EnemyHealth>()?.transform ?? transform.parent;
                 if (enemyTransform != null)
                 {
                     Vector3 attackerDir = Vector3.zero;

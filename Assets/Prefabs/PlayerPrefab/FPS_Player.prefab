@@ -83,6 +83,11 @@ GameObject:
   - component: {fileID: 2920386777163252129}
   - component: {fileID: 4496668197879187442}
   - component: {fileID: 3261044043832076446}
+  - component: {fileID: 2359903377046822170}
+  - component: {fileID: 1347673265557315538}
+  - component: {fileID: 2667271215102757460}
+  - component: {fileID: 1508233293093554113}
+  - component: {fileID: 3501572353110011912}
   m_Layer: 3
   m_Name: FPS_Player
   m_TagString: Player
@@ -120,15 +125,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aimCamera: {fileID: 3725817409442096485}
-  dashDefinition: {fileID: 0}
-  groundBounce: {fileID: 0}
-  airBounce: {fileID: 0}
+  dashDefinition: {fileID: 11400000, guid: a52eadeeb91d02e4f929b40420cb8892, type: 2}
+  groundBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
+  airBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
   activationKey: 324
+  steerMaxAngle: 30
+  steerSamples: 4
+  minAcceptableProgress: 0.25
   playerController: {fileID: 2084425902901004486}
   rb: {fileID: 0}
   fpsMovement: {fileID: 4379777072623147912}
   isDashing: 0
-  slowMoApplied: 0
 --- !u!114 &1442011852720692160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,13 +183,13 @@ MonoBehaviour:
   OnSpeedChanged:
     m_PersistentCalls:
       m_Calls: []
-  moveSpeed: 5
-  sprintSpeed: 8
+  moveSpeed: 7
+  sprintSpeed: 11
   jumpHeight: 4
   gravity: -9.81
   gravityMultiplier: 2
   maxFallSpeed: -20
-  increaseSpeedFactor: 6
+  increaseSpeedFactor: 0
   speedLimit: 15
   coyoteTime: 0.15
   airControlFactor: 1
@@ -226,6 +233,7 @@ MonoBehaviour:
   enableRegen: 1
   regenDelay: 3
   regenRate: 5
+  dashCible: {fileID: 0}
   OnHealthChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -245,7 +253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   volume: {fileID: 0}
-  dashSystem: {fileID: 0}
+  dashSystem: {fileID: 3469333960817140672}
   dashEffectLensIntensity: -0.7
   dashEffectDuration: 0.5
   dashBokehAperture: 0.4
@@ -306,22 +314,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad10986b331ce024f8de44517166fc57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponSettings: {fileID: 11400000, guid: c3876e400c078074d8c4b7800835f143, type: 2}
-  weaponShake: {fileID: 0}
-  enemyTag: Enemy
-  textAmmo: {fileID: 0}
-  bulletSpawnPoint: {fileID: 0}
-  weapon: {fileID: 0}
-  aimCamera: {fileID: 3725817409442096485}
+  weaponSettings: {fileID: 11400000, guid: d26f4c83c96e2874fabe3ce7dcca72d2, type: 2}
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  bulletSpawnPoint: {fileID: 0}
+  aimCamera: {fileID: 3725817409442096485}
+  crosshair: {fileID: 0}
+  soundPlayer: {fileID: 0}
+  textAmmo: {fileID: 0}
+  enemyTag: Enemy
+  animator: {fileID: 0}
+  weaponShake: {fileID: 0}
+  weaponReloadRotation: {fileID: 0}
   zoneDamageMultipliers:
   - zoneName: Body
     multiplier: 1
   - zoneName: Head
     multiplier: 2
-  crosshair: {fileID: 0}
+  - zoneName: Shield
+    multiplier: 0
 --- !u!54 &4496668197879187442
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -348,7 +360,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!136 &3261044043832076446
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -369,9 +381,77 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 1
+  m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &2359903377046822170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89ac13a1db8fee94295c02ebd01c1de6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slowMoScale: 0.2
+  slowMoDuration: 0.75
+--- !u!114 &1347673265557315538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5a44fb276e3f244cbdabed44d058327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
+  airBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
+--- !u!114 &2667271215102757460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc781b2ac0b2540409c72d126a4156af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineWidth: 2
+  showDuringSlowMo: 1
+--- !u!114 &1508233293093554113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb53defe9c285149a76be9836a03580, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3501572353110011912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f18743da82811bc4896ccfa140e5304b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnRoot: {fileID: 0}
 --- !u!1 &4673607940017463061
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,7 +529,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 447
+    m_Bits: 1983
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -567,9 +647,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da70cac90980495fa13fde6d08f6eae9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bobFrequency: 1
-  bobHorizontalAmplitude: 0.08
-  bobVerticalAmplitude: 0.07
+  bobFrequency: 3
+  bobHorizontalAmplitude: 0.09
+  bobVerticalAmplitude: 0.15
   bobSmoothing: 8
   defaultFOV: 60
   sprintFOV: 70

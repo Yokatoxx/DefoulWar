@@ -15,10 +15,10 @@ GameObject:
   - component: {fileID: -3158992528684757622}
   - component: {fileID: 2145429180474956741}
   - component: {fileID: 7108234100319031770}
-  - component: {fileID: 8000465441468370388}
   - component: {fileID: -4771881891493624518}
   - component: {fileID: 631859628192321004}
   - component: {fileID: 6348895224033040618}
+  - component: {fileID: 7435946224319219415}
   m_Layer: 7
   m_Name: EnemyMagique
   m_TagString: Enemy
@@ -170,22 +170,6 @@ MonoBehaviour:
   trailWidth: 1
   firePoint: {fileID: 2657800489959688396}
   upOffset: 1.5
---- !u!114 &8000465441468370388
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 160580225223210161}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06c56eae9ac4bdf44abb1bcfde75fd4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  settings: {fileID: 11400000, guid: 8006954f8abb81747bfe0e362c984bbb, type: 2}
-  waypointPath: {fileID: 0}
-  shootPoint: {fileID: 5979755068541550699}
-  showDebugGizmos: 1
 --- !u!54 &-4771881891493624518
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -242,6 +226,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a6396c44267481183db83553bd89f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7435946224319219415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2030f32c3d80c714eafbe896f5e2d80f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 8006954f8abb81747bfe0e362c984bbb, type: 2}
+  waypointPath: {fileID: 0}
+  shootPoint: {fileID: 5979755068541550699}
+  showDebugGizmos: 1
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
