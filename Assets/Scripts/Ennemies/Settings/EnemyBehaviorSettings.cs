@@ -14,7 +14,9 @@ namespace Ennemies.Settings
         /// <summary>Poursuit dans sa zone, retourne patrouiller si le joueur sort.</summary>
         ZonePatrol,
         /// <summary>Suit un autre ennemi (compagnon) s’il est disponible.</summary>
-        CompanionFollower
+        CompanionFollower,
+        /// <summary> poursuit le joueur et insatncie une zone d'attaque à ses pieds si il est proche du joueur </summary>
+        GroundSlam
     }
 
     /// <summary>
@@ -106,5 +108,15 @@ namespace Ennemies.Settings
         [Header("Rotation Settings")]
         [Tooltip("Vitesse de rotation vers la cible")]
         [Min(0f)] public float rotationSpeed = 5f;
+
+        [Header("Slam Settings")]
+        [Tooltip("Prefab de la zone de dégâts (doit contenir un Collider isTrigger + SlamDamageZone).")]
+        public GameObject slamZonePrefab;
+        [Tooltip("Durée de vie de la zone slam (secondes).")]
+        [Min(0f)] public float slamLifetime = 0.6f;
+        [Tooltip("Décalage vertical du spawn par rapport aux pieds.")]
+        public float slamYOffset = 0.05f;
+        [Tooltip("Rayon/portée de la zone de trigger du slam (si applicable).")]
+        [Min(0f)] public float slamTriggerRadius = 10f;
     }
 }

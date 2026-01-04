@@ -10,29 +10,32 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6039615d1c9d4be4a3e406654f1343d9, type: 3}
-  m_Name: EnemyBehavior
+  m_Name: Boss
   m_EditorClassIdentifier: 
-  behaviorType: 2
+  behaviorType: 4
   detectionRange: 15
   requireLineOfSight: 1
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 4294967295
-  eyeHeight: 1.53
-  chaseSpeed: 10
-  patrolSpeed: 4
+  eyeHeight: 1.5
+  chaseSpeed: 3.5
+  patrolSpeed: 2
   keepDistance: 8
-  distanceTolerance: 1
+  distanceTolerance: 15
   patrolRadius: 20
   waypointWaitTime: 1
   attackType: 0
-  attackDamage: 10
+  attackDamage: 50
   attackCooldown: 1.5
   attackRange: 2
-  isHitscan: 1
+  isHitscan: 0
   bulletPrefab: {fileID: 0}
   bulletSpeed: 20
   bulletLifetime: 5
   bulletTrailPrefab: {fileID: 0}
   trailDuration: 0.5
   rotationSpeed: 5
+  slamZonePrefab: {fileID: 2645094815069657699, guid: 8f13fc9cc01025e4fa45c1149bdb4104, type: 3}
+  slamLifetime: 1
+  slamYOffset: 0.05

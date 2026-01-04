@@ -18855,6 +18855,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyBoss
       objectReference: {fileID: 0}
+    - target: {fileID: 4479012537968092976, guid: 85518614f8988df4a9b3c9f9664f7dae, type: 3}
+      propertyPath: settings
+      value: 
+      objectReference: {fileID: 11400000, guid: c85a209bb83ce3c4e9d571855d1c554d, type: 2}
     - target: {fileID: 8822407487818134662, guid: 85518614f8988df4a9b3c9f9664f7dae, type: 3}
       propertyPath: m_LocalPosition.x
       value: 6.115739

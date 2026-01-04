@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoneName: Body
-  baseDamageMultiplier: 1
+  baseDamageMultiplier: 0
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
 --- !u!1 &525026324071530389
@@ -410,7 +410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16bb0ed92c0240aa9cddb09695e8ee2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 1500
   currentHealth: 0
   spawnInvulnerabilityDuration: 0
   spawnInvulnerableAllDamage: 0
@@ -1171,7 +1171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e39471a1781c477aaee7738b6e6d8ee7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldOffset: {x: 0, y: 2.2, z: 0}
+  worldOffset: {x: 0, y: 3.5, z: 0}
   width: 1.4
   height: 0.15
   hideWhenFull: 1

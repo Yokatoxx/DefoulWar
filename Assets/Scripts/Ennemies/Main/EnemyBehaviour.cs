@@ -127,14 +127,17 @@ namespace Ennemies
 
         private IEnemyBehavior CreateBehavior(EnemyBehaviorType type)
         {
-            return type switch
+            switch (type)
             {
-                EnemyBehaviorType.Distance => new DistanceBehavior(),
-                EnemyBehaviorType.Chaser => new ChaserBehavior(),
-                EnemyBehaviorType.ZonePatrol => new ZonePatrolBehavior(),
-                EnemyBehaviorType.CompanionFollower => new FollowCompanionBehavior(),
-                _ => new ChaserBehavior()
-            };
+                case EnemyBehaviorType.Distance: return new DistanceBehavior();
+                case EnemyBehaviorType.Chaser: return new ChaserBehavior();
+                case EnemyBehaviorType.ZonePatrol: return new ZonePatrolBehavior();
+                case EnemyBehaviorType.CompanionFollower: return new FollowCompanionBehavior();
+                case EnemyBehaviorType.GroundSlam: return new GroundSlamBehavior();
+                default:
+                    Debug.LogWarning($"[EnnemiBehaviour] Unknown behavior type: {type}. Using Chaser.");
+                    return new ChaserBehavior();
+            }
         }
 
         private void Update()
