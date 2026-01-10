@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   shotDelay: 0.35
-  reloadTime: 2
+  reloadTime: 0.5
   shootingDistance: 50
   shootTrailWidth: 0.5
   bulletsPerShot: 1
