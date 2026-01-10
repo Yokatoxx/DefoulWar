@@ -82,12 +82,12 @@ GameObject:
   - component: {fileID: 9097555686013398260}
   - component: {fileID: 2920386777163252129}
   - component: {fileID: 4496668197879187442}
-  - component: {fileID: 3261044043832076446}
   - component: {fileID: 2359903377046822170}
   - component: {fileID: 1347673265557315538}
   - component: {fileID: 2667271215102757460}
   - component: {fileID: 1508233293093554113}
   - component: {fileID: 3501572353110011912}
+  - component: {fileID: 3261044043832076446}
   m_Layer: 3
   m_Name: FPS_Player
   m_TagString: Player
@@ -361,29 +361,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!136 &3261044043832076446
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4622188377374526642}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &2359903377046822170
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,6 +429,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnRoot: {fileID: 0}
+--- !u!136 &3261044043832076446
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &4673607940017463061
 GameObject:
   m_ObjectHideFlags: 0

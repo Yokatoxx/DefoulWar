@@ -39,7 +39,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ZonePatrolBehavior.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/EnemyShield.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/EnemyAttackHandler.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Main/EnnemiBehaviour.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Main/EnnemiBehaviour.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/Settings/EnemyBehaviorSettings.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Ennemies/WaypointPath.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/FPS/CameraShake.cs" root0="FORCE_HIGHLIGHTING" />
@@ -172,6 +172,7 @@
       <workItem from="1765556192797" duration="682000" />
       <workItem from="1765733680539" duration="6641000" />
       <workItem from="1767371511284" duration="3000" />
+      <workItem from="1767456508078" duration="8000" />
     </task>
     <servers />
   </component>
