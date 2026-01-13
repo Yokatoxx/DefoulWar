@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   shotDelay: 0.35
-  reloadTime: 2
+  reloadTime: 0.5
   shootingDistance: 50
   shootTrailWidth: 0.5
   bulletsPerShot: 1
   magazineSize: 6
-  maxAmmo: 120
+  maxAmmo: 30
   bulletDammage: 50
   shakeAmount: 5
   recoilAmount: 5
