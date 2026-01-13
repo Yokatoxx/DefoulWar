@@ -1,78 +1,119 @@
-# DefoulWar - FPS Arena Shooter
+# DefoulWar
 
-Un jeu FPS Arena développé sous **Unity 6.0+** avec un système de dash ciblé et des ennemis variés.
+> **FPS Arena Shooter** | Film Noir Surnaturel | Unity 6.0+
 
-## 🎮 Fonctionnalités
+Un jeu d'action frénétique dans un Londres géorgien-victorien envahi par les démons. Maîtrisez l'art du **dash ciblé** et du **tir tactique** pour survivre aux arènes infernales.
 
-### Système de Mouvement
-- Mouvement WASD avec sprint
-- Saut avec conservation du momentum
-- **Dash ciblé** (touche E) vers les ennemis avec FOV dynamique
-- Caméra FPS fluide
+---
 
-### Système d'Armes
-- Tir au raycast
-- Munitions et rechargement (R)
-- Recul et effets de shake caméra
+## 🎮 Concept
 
-### Types d'Ennemis (7 variantes)
-| Type | Comportement |
-|------|--------------|
-| Standard | Chaser (poursuite) |
-| Healer | Zone de soin pour alliés |
-| Distance | Tire des projectiles |
-| Magique | Attaque hitscan |
-| Électrique | Stun du joueur |
-| Shield | Bouclier protecteur |
-| Companion | Suit un autre ennemi |
+DefoulWar repose sur une **dualité tir/dash** où chaque type d'ennemi réagit différemment à vos capacités. Tirez à distance ou dashiez au corps-à-corps — mais attention, certains ennemis punissent le mauvais choix !
 
-### Arènes Dynamiques
-- Portes et triggers
-- Points de spawn groupés
-- Système de progression
+### Direction Artistique
+- **Style architectural :** Georgian Victorian London
+- **Univers :** Film Noir, Surnaturel (Urban Fantasy)
+- **Ton :** Sérieux
+- **Ennemis :** Démons aux formes et couleurs distinctes
+
+---
+
+## ⚔️ Mécaniques Principales
+
+### Système de Combat Dual
+
+| Capacité | Description | Risque |
+|----------|-------------|--------|
+| **Tir** | Arme à distance avec munitions limitées | Reload = vulnérabilité |
+| **Dash** | Mouvement ciblé vers un ennemi avec dégâts | Certains ennemis punissent le dash |
+
+### Types d'Ennemis (6 variantes)
+
+| Type | Comportement | Réaction au Dash |
+|------|--------------|------------------|
+| **Electric** ⚡ | Stun le joueur | **PUNITIF** - Stun + immunité |
+| **Healer** 💚 | Zone de soin + invocateur | Normal |
+| **Distance** 🎯 | Projectiles | Normal |
+| **Magique** ✨ | Attaque hitscan | Normal |
+| **Shield** 🛡️ | Bouclier frontal | Contournable par derrière |
+| **Standard** 💀 | Chaser (poursuite) | Normal |
+
+---
 
 ## 🕹️ Contrôles
 
 | Action | Touche |
 |--------|--------|
-| Déplacement | WASD |
+| Déplacement | ZQSD |
 | Regarder | Souris |
 | Sauter | Espace |
 | Sprint | Shift Gauche |
-| Tirer | Clic Gauche |
+| **Tirer** | **Clic Gauche** |
 | Recharger | R |
 | **Dash ciblé** | **E** |
 | Pause | Échap |
 
-## 📁 Structure
+---
+
+## 🏛️ Arènes
+
+- **Déclenchement :** Le joueur entre dans une zone → portes fermées → ennemis arrivent
+- **Victoire :** Éliminer tous les ennemis
+- **Progression :** Vagues d'ennemis de difficulté croissante
+- **Environnement :** Lieux victoriens extérieurs (marchés, cimetières, quais, ruelles...)
+
+---
+
+## 📁 Structure du Projet
 
 ```
 Assets/Scripts/
 ├── FPS/
-│   ├── Player/      # Mouvement, dash, caméra
+│   ├── Player/      # DashCible, DashSlowMo, DashHighlight, FPSMovement
 │   ├── Weapon/      # Armes et presets
-│   └── Effect/      # Effets visuels
+│   └── Effect/      # Effets visuels (CameraShake, etc.)
 ├── Ennemies/
 │   ├── Behaviors/   # IA (Chaser, Distance, Patrol, Companion)
 │   ├── Effect/      # Effets spéciaux (Electric, Magic, Shield)
-│   └── Main/        # Scripts principaux
+│   ├── Main/        # EnemyBehaviour, EnemyAttackHandler
+│   └── Settings/    # ScriptableObjects de configuration
 ├── Manager/         # Game, UI managers
-└── System/Arena/    # Système d'arènes
+├── System/Arena/    # Système d'arènes et vagues
+└── Utils/           # Utilitaires divers
 ```
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [SPECIFICATIONS.md](Docs/SPECIFICATIONS.md) | Spécifications complètes du jeu |
+| [DEVELOPMENT_PLAN.md](Docs/DEVELOPMENT_PLAN.md) | Plan de développement par phases |
+
+---
 
 ## ⚙️ Configuration Requise
 
-- Unity 6.0+
+- **Unity 6.0+**
 - Input System package
 - NavMesh pour l'IA ennemis
 
+---
+
 ## 🚀 Installation
 
-1. Ouvrir le projet dans Unity 6.0+
+1. Ouvrir le projet dans **Unity 6.0+**
 2. Configurer le NavMesh : `Window > AI > Navigation > Bake`
 3. Vérifier les tags `Player` et `Enemy`
 4. Lancer la scène principale
 
 ---
 
-**DefoulWar** | FPS Arena Shooter
+## 👥 Équipe
+
+Projet développé par une équipe de **4 personnes**.
+
+---
+
+**DefoulWar** | FPS Arena Shooter | Film Noir Surnaturel
