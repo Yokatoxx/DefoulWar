@@ -29,12 +29,22 @@ public class WeaponSystem : MonoBehaviour
         new HitZoneMultiplier("Head", 2f)
     };
 
+    [Header("Blood Bullets - Tir avec la vie")]
+    [Tooltip("Permet de tirer en utilisant la vie quand plus de munitions")]
+    [SerializeField] private bool enableBloodBullets = true;
+    [Tooltip("Coût en vie par balle tirée")]
+    [SerializeField] private float healthCostPerBullet = 5f;
+    [Tooltip("Vie minimum requise pour pouvoir tirer (ne peut pas se suicider)")]
+    [SerializeField] private float minHealthToShoot = 1f;
+    [SerializeField] private PlayerHealth playerHealth;
+
     // Runtime
     private int currentMagazine;
     private int currentReserve;
     private float lastShootTime;
     private bool isReloading;
     private Dictionary<string, float> zoneMultDict;
+    private bool isUsingBloodBullets; // Flag pour savoir si on tire avec la vie
 
     // Nouveau: contrôle de la possibilité de tirer
     private bool canShoot = true;
@@ -61,6 +71,9 @@ public class WeaponSystem : MonoBehaviour
 
         if (crosshair == null)
             crosshair = FindAnyObjectByType<CrosshairAnim>();
+        
+        if (playerHealth == null)
+            playerHealth = GetComponentInParent<PlayerHealth>();
     }
 
     private void OnDisable()
@@ -151,34 +164,99 @@ public class WeaponSystem : MonoBehaviour
         }
 
         if (Time.time < lastShootTime + weaponSettings.shotDelay) return;
+        
+        // Vérifier si on peut tirer normalement ou avec la vie
         if (currentMagazine <= 0)
         {
-            StartReload();
-            return;
+            if (currentReserve > 0)
+            {
+                StartReload();
+                return;
+            }
+            
+            // Plus de munitions du tout - tenter le tir avec la vie
+            if (CanUseBloodBullets())
+            {
+                isUsingBloodBullets = true;
+            }
+            else
+            {
+                isUsingBloodBullets = false;
+                return;
+            }
+        }
+        else
+        {
+            isUsingBloodBullets = false;
         }
 
         lastShootTime = Time.time;
         PerformShotBurst();
     }
+    
+    private bool CanUseBloodBullets()
+    {
+        if (!enableBloodBullets) return false;
+        if (playerHealth == null) return false;
+        if (playerHealth.IsDead) return false;
+        return playerHealth.CurrentHealth > minHealthToShoot;
+    }
 
     private void PerformShotBurst()
     {
-        int shots = Mathf.Min(weaponSettings.bulletsPerShot, currentMagazine);
+        int shots;
+        
+        if (isUsingBloodBullets)
+        {
+            // En mode blood bullets, on tire une balle à la fois
+            shots = 1;
+        }
+        else
+        {
+            shots = Mathf.Min(weaponSettings.bulletsPerShot, currentMagazine);
+        }
 
         if (animator != null) animator.SetBool("isShooting", true);
         if (crosshair != null) crosshair.PlayShoot();
-        if (weaponShake != null) weaponShake.Shake(); // AJOUT: jouer le shake au tir
+        if (weaponShake != null) weaponShake.Shake();
         if (soundPlayer != null && weaponSettings.shootSound != null)
             soundPlayer.PlayOneShot(weaponSettings.shootSound, 1f, Random.Range(0.95f, 1.05f));
 
         for (int i = 0; i < shots; i++)
         {
+            if (isUsingBloodBullets)
+            {
+                // Vérifier qu'on a assez de vie pour cette balle
+                if (!CanUseBloodBullets()) break;
+                
+                // Consommer la vie pour tirer
+                ConsumeHealthForBullet();
+            }
+            else
+            {
+                currentMagazine--;
+            }
+            
             FireSingleRay();
-            currentMagazine--;
-            if (currentMagazine <= 0) break;
+            
+            if (!isUsingBloodBullets && currentMagazine <= 0) break;
         }
 
         UpdateAmmoUI();
+    }
+    
+    private void ConsumeHealthForBullet()
+    {
+        if (playerHealth == null) return;
+        
+        // Infliger les dégâts au joueur (bypass invulnérabilité via méthode directe)
+        float newHealth = Mathf.Max(minHealthToShoot, playerHealth.CurrentHealth - healthCostPerBullet);
+        float actualDamage = playerHealth.CurrentHealth - newHealth;
+        
+        if (actualDamage > 0)
+        {
+            playerHealth.TakeDamage(actualDamage);
+        }
     }
 
     private void FireSingleRay()
@@ -354,9 +432,22 @@ public class WeaponSystem : MonoBehaviour
 
     private void UpdateAmmoUI()
     {
-        if (textAmmo != null)
+        if (textAmmo == null) return;
+        
+        if (isUsingBloodBullets && currentMagazine <= 0 && currentReserve <= 0)
+        {
+            // Afficher que le joueur utilise sa vie pour tirer
+            textAmmo.text = "<color=red>BLOOD</color>";
+        }
+        else
+        {
             textAmmo.text = $"{currentMagazine} / {currentReserve}";
+        }
     }
+    
+    // Propriétés publiques pour l'état des munitions
+    public bool IsOutOfAmmo => currentMagazine <= 0 && currentReserve <= 0;
+    public bool IsUsingBloodBullets => isUsingBloodBullets && IsOutOfAmmo;
 
     // Nouvelle API publique : désactiver le tir pendant une durée realtime/unscaled
     public void DisableShootingFor(float seconds)
