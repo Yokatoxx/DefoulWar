@@ -36,3 +36,7 @@ MonoBehaviour:
   bulletTrailPrefab: {fileID: 0}
   trailDuration: 0.5
   rotationSpeed: 5
+  slamZonePrefab: {fileID: 0}
+  slamLifetime: 0.6
+  slamYOffset: 0.05
+  slamTriggerRadius: 10

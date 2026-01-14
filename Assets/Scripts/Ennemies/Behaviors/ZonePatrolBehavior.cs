@@ -8,13 +8,8 @@ namespace Ennemies.Behaviors
     /// Comportement d'ennemi qui patrouille sur des waypoints.
     /// Poursuit le joueur s'il entre dans la zone, retourne patrouiller s'il sort.
     /// </summary>
-    public class ZonePatrolBehavior : IEnemyBehavior
+    public class ZonePatrolBehavior : BaseEnemyBehavior
     {
-        private NavMeshAgent agent;
-        private Transform player;
-        private Transform owner;
-        private EnemyBehaviorSettings settings;
-
         private Vector3 spawnPosition;
         private WaypointPath waypointPath;
         private int currentWaypointIndex;
@@ -31,12 +26,9 @@ namespace Ennemies.Behaviors
         private const float ARRIVAL_DISTANCE = 1.5f;
         private const float ALERT_DURATION = 5f; // Durée de l'alerte après avoir été touché
 
-        public void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
+        public override void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
         {
-            this.agent = agent;
-            this.player = player;
-            this.settings = settings;
-            this.owner = owner;
+            base.Initialize(agent, player, settings, owner);
             this.spawnPosition = owner.position;
             this.isPatrolling = true;
             this.isChasing = false;
@@ -46,6 +38,8 @@ namespace Ennemies.Behaviors
             this.isAlerted = false;
             this.alertTimer = 0f;
         }
+
+        protected override bool IsCurrentlyChasing() => isChasing;
 
         /// <summary>
         /// Définit le chemin de waypoints pour la patrouille.
@@ -62,7 +56,7 @@ namespace Ennemies.Behaviors
             }
         }
 
-        public void Execute()
+        protected override void ExecuteBehavior()
         {
             if (agent == null || player == null) return;
 
@@ -95,7 +89,7 @@ namespace Ennemies.Behaviors
                 {
                     agent.isStopped = true;
                     canAttack = true;
-                    RotateTowardsPlayer();
+                    RotateTowardsPlayerSmooth();
                 }
                 else
                 {
@@ -186,45 +180,18 @@ namespace Ennemies.Behaviors
             }
         }
 
-        private void RotateTowardsPlayer()
-        {
-            Vector3 direction = (player.position - owner.position).normalized;
-            direction.y = 0;
+        public override bool CanAttack() => canAttack;
+        public override bool IsChasing() => isChasing;
+        public override bool IsPatrolling() => isPatrolling;
 
-            if (direction != Vector3.zero)
-            {
-                Quaternion lookRotation = Quaternion.LookRotation(direction);
-                owner.rotation = Quaternion.Slerp(owner.rotation, lookRotation, Time.deltaTime * settings.rotationSpeed);
-            }
-        }
-
-        private bool CheckLineOfSight()
-        {
-            Vector3 eyePosition = owner.position + Vector3.up * settings.eyeHeight;
-            Vector3 targetPosition = player.position + Vector3.up * 1f;
-            Vector3 direction = targetPosition - eyePosition;
-            float distance = direction.magnitude;
-
-            if (Physics.Raycast(eyePosition, direction.normalized, out RaycastHit hit, distance, settings.obstacleLayer))
-            {
-                return hit.transform == player || hit.transform.IsChildOf(player);
-            }
-            
-            return true;
-        }
-
-        public bool CanAttack() => canAttack;
-        public bool IsChasing() => isChasing;
-        public bool IsPatrolling() => isPatrolling;
-
-        public void OnDamageTaken()
+        public override void OnDamageTaken()
         {
             // Quand l'ennemi est touché, il devient alerté et poursuit le joueur
             isAlerted = true;
             alertTimer = ALERT_DURATION;
         }
 
-        public void DrawGizmos()
+        public override void DrawGizmos()
         {
             if (settings == null) return;
 
@@ -259,4 +226,3 @@ namespace Ennemies.Behaviors
         }
     }
 }
-

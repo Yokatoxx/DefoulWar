@@ -4,13 +4,11 @@ using Ennemies.Settings;
 
 namespace Ennemies.Behaviors
 {
-    // Impl�mentation bas�e sur la logique des behaviors existants (Chaser/Distance/ZonePatrol)
-    public class FollowCompanionBehavior : IEnemyBehavior
+    /// <summary>
+    /// Comportement d'ennemi qui suit un autre ennemi (compagnon) s'il est disponible.
+    /// </summary>
+    public class FollowCompanionBehavior : BaseEnemyBehavior
     {
-        private NavMeshAgent agent;
-        private Transform owner;
-        private EnemyBehaviorSettings settings;
-
         private Transform companionTarget;
         private float nextSearchTime;
         private const float SEARCH_INTERVAL = 1.0f;
@@ -18,11 +16,12 @@ namespace Ennemies.Behaviors
         private bool isFollowing;
         private bool canAttack;
 
-        public void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
+        // Ce behavior ne poursuit pas le joueur, donc pas de turn-before-move
+        protected override bool RequiresTurnBeforeMove => false;
+
+        public override void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
         {
-            this.agent = agent;
-            this.owner = owner;
-            this.settings = settings;
+            base.Initialize(agent, player, settings, owner);
 
             isFollowing = false;
             canAttack = false;
@@ -31,13 +30,15 @@ namespace Ennemies.Behaviors
             if (agent != null)
             {
                 agent.isStopped = false;
-                agent.speed = settings.patrolSpeed; // vitesse d�escorte
+                agent.speed = settings.patrolSpeed;
             }
 
             nextSearchTime = Time.time + Random.Range(0f, SEARCH_INTERVAL);
         }
 
-        public void Execute()
+        protected override bool IsCurrentlyChasing() => false; // Ce behavior ne poursuit pas le joueur
+
+        protected override void ExecuteBehavior()
         {
             if (agent == null || owner == null) return;
 
@@ -59,7 +60,7 @@ namespace Ennemies.Behaviors
                 return;
             }
 
-            // Perte si cible d�truite/d�sactiv�e
+            // Perte si cible détruite/désactivée
             if (!companionTarget.gameObject.activeInHierarchy)
             {
                 ClearCompanion();
@@ -67,10 +68,10 @@ namespace Ennemies.Behaviors
             }
 
             // LOS optionnelle selon settings
-            bool hasLOS = !settings.requireLineOfSight || CheckLineOfSight(companionTarget);
+            bool hasLOS = !settings.requireLineOfSight || CheckLineOfSightTo(companionTarget);
             float d = Vector3.Distance(owner.position, companionTarget.position);
 
-            // Si pas de LOS et tr�s loin, abandon
+            // Si pas de LOS et très loin, abandon
             if (!hasLOS && d > settings.detectionRange * 1.5f)
             {
                 ClearCompanion();
@@ -82,7 +83,7 @@ namespace Ennemies.Behaviors
             {
                 agent.isStopped = false;
 
-                // viser un point autour du compagnon pour �viter le chevauchement
+                // viser un point autour du compagnon pour éviter le chevauchement
                 Vector3 dir = (owner.position - companionTarget.position).normalized;
                 if (dir.sqrMagnitude < 0.001f) dir = Random.insideUnitSphere;
                 dir.y = 0f;
@@ -110,14 +111,13 @@ namespace Ennemies.Behaviors
             float bestDist = float.PositiveInfinity;
             Transform best = null;
 
-            // On se base sur les ennemis configur�s via EnemyBehaviour
             var enemies = Object.FindObjectsByType<Ennemies.EnemyBehaviour>(FindObjectsSortMode.None);
             foreach (var eb in enemies)
             {
                 if (eb == null) continue;
                 if (eb.transform == owner) continue;
 
-                // Ne pas suivre ceux qui sont eux-m�mes CompanionFollower
+                // Ne pas suivre ceux qui sont eux-mêmes CompanionFollower
                 if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower)
                     continue;
 
@@ -141,7 +141,7 @@ namespace Ennemies.Behaviors
             agent.isStopped = true;
         }
 
-        private bool CheckLineOfSight(Transform target)
+        private bool CheckLineOfSightTo(Transform target)
         {
             Vector3 eye = owner.position + Vector3.up * settings.eyeHeight;
             Vector3 tgt = target.position + Vector3.up * 1f;
@@ -166,11 +166,12 @@ namespace Ennemies.Behaviors
             }
         }
 
-        public bool CanAttack() => canAttack;
-        public bool IsChasing() => false;
-        public bool IsPatrolling() => !isFollowing && companionTarget == null;
-        public void OnDamageTaken() { }
-        public void DrawGizmos()
+        public override bool CanAttack() => canAttack;
+        public override bool IsChasing() => false;
+        public override bool IsPatrolling() => !isFollowing && companionTarget == null;
+        public override void OnDamageTaken() { }
+        
+        public override void DrawGizmos()
         {
             if (owner == null || settings == null) return;
             Gizmos.color = Color.cyan;

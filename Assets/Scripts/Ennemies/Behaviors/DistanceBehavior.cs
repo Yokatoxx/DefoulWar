@@ -8,26 +8,20 @@ namespace Ennemies.Behaviors
     /// Comportement d'ennemi qui maintient une distance fixe avec le joueur.
     /// Recule si le joueur est trop proche, avance s'il est trop loin.
     /// </summary>
-    public class DistanceBehavior : IEnemyBehavior
+    public class DistanceBehavior : BaseEnemyBehavior
     {
-        private NavMeshAgent agent;
-        private Transform player;
-        private Transform owner;
-        private EnemyBehaviorSettings settings;
-
         private bool isChasing;
         private bool canAttack;
 
-        public void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
+        public override void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
         {
-            this.agent = agent;
-            this.player = player;
-            this.settings = settings;
-            this.owner = owner;
+            base.Initialize(agent, player, settings, owner);
             this.isChasing = false;
         }
 
-        public void Execute()
+        protected override bool IsCurrentlyChasing() => isChasing;
+
+        protected override void ExecuteBehavior()
         {
             if (agent == null || player == null) return;
 
@@ -44,7 +38,7 @@ namespace Ennemies.Behaviors
                 float maxDistance = settings.keepDistance + settings.distanceTolerance;
 
                 // Toujours viser le joueur quand il est détecté
-                RotateTowardsPlayer();
+                RotateTowardsPlayerSmooth();
 
                 if (distanceToPlayer < minDistance)
                 {
@@ -94,40 +88,13 @@ namespace Ennemies.Behaviors
             }
         }
 
-        private bool CheckLineOfSight()
-        {
-            Vector3 eyePosition = owner.position + Vector3.up * settings.eyeHeight;
-            Vector3 targetPosition = player.position + Vector3.up * 1f;
-            Vector3 direction = targetPosition - eyePosition;
-            float distance = direction.magnitude;
+        public override bool CanAttack() => canAttack;
+        public override bool IsChasing() => isChasing;
+        public override bool IsPatrolling() => false;
 
-            if (Physics.Raycast(eyePosition, direction.normalized, out RaycastHit hit, distance, settings.obstacleLayer))
-            {
-                return hit.transform == player || hit.transform.IsChildOf(player);
-            }
-            
-            return true;
-        }
+        public override void OnDamageTaken() { } // Pas d'effet spécial pour ce comportement
 
-        private void RotateTowardsPlayer()
-        {
-            Vector3 direction = (player.position - owner.position).normalized;
-            direction.y = 0;
-            
-            if (direction != Vector3.zero)
-            {
-                Quaternion lookRotation = Quaternion.LookRotation(direction);
-                owner.rotation = Quaternion.Slerp(owner.rotation, lookRotation, Time.deltaTime * settings.rotationSpeed);
-            }
-        }
-
-        public bool CanAttack() => canAttack;
-        public bool IsChasing() => isChasing;
-        public bool IsPatrolling() => false;
-
-        public void OnDamageTaken() { } // Pas d'effet spécial pour ce comportement
-
-        public void DrawGizmos()
+        public override void DrawGizmos()
         {
             if (owner == null) return;
 
@@ -150,4 +117,3 @@ namespace Ennemies.Behaviors
         }
     }
 }
-
