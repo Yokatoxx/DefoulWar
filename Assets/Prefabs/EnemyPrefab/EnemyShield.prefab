@@ -140,7 +140,7 @@ GameObject:
   - component: {fileID: 7795808518942882505}
   - component: {fileID: 3074746511472831467}
   - component: {fileID: 4062171721609725400}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: Head
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -465,7 +465,7 @@ GameObject:
   - component: {fileID: 6277783872427992221}
   - component: {fileID: 6551056582859119117}
   - component: {fileID: 7072189409071410649}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}

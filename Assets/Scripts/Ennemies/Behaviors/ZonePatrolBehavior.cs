@@ -39,8 +39,6 @@ namespace Ennemies.Behaviors
             this.alertTimer = 0f;
         }
 
-        protected override bool IsCurrentlyChasing() => isChasing;
-
         /// <summary>
         /// Définit le chemin de waypoints pour la patrouille.
         /// </summary>
@@ -79,8 +77,21 @@ namespace Ennemies.Behaviors
 
             // Si alerté (touché par le joueur), poursuivre le joueur sans limite de distance
             // Sinon, poursuivre seulement si le joueur est dans la zone ET détecté ET visible
-            if (isAlerted || (playerInZone && playerDetected && hasLineOfSight))
+            bool shouldChase = isAlerted || (playerInZone && playerDetected && hasLineOfSight);
+            
+            if (shouldChase)
             {
+                // Si on commence à chasser, vérifier si on doit tourner d'abord
+                if (!isChasing)
+                {
+                    if (TryStartChaseWithTurn())
+                    {
+                        isChasing = true;
+                        isPatrolling = false;
+                        return; // On tourne d'abord
+                    }
+                }
+                
                 isChasing = true;
                 isPatrolling = false;
                 agent.speed = settings.chaseSpeed;

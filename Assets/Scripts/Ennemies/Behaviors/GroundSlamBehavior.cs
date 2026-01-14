@@ -5,6 +5,9 @@ using Ennemies.Effect;
 
 namespace Ennemies.Behaviors
 {
+    /// <summary>
+    /// Comportement d'ennemi qui poursuit le joueur et declenche une attaque au sol.
+    /// </summary>
     public class GroundSlamBehavior : BaseEnemyBehavior
     {
         private float nextSlamTime;
@@ -23,8 +26,6 @@ namespace Ennemies.Behaviors
                 agent.speed = settings.patrolSpeed;
         }
 
-        protected override bool IsCurrentlyChasing() => isChasing;
-
         protected override void ExecuteBehavior()
         {
             if (agent == null || player == null || owner == null || settings == null) return;
@@ -41,6 +42,16 @@ namespace Ennemies.Behaviors
                 agent.isStopped = true;
                 canAttack = false;
                 return;
+            }
+
+            // Si on commence a chasser, verifier si on doit tourner d'abord
+            if (!isChasing)
+            {
+                if (TryStartChaseWithTurn())
+                {
+                    isChasing = true;
+                    return; // On tourne d'abord
+                }
             }
 
             isChasing = true;

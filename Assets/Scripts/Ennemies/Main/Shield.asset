@@ -17,11 +17,11 @@ MonoBehaviour:
   requireLineOfSight: 1
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4095
   eyeHeight: 2
   chaseSpeed: 2
   patrolSpeed: 2
-  keepDistance: 8
+  keepDistance: 1
   distanceTolerance: 1
   patrolRadius: 20
   waypointWaitTime: 1
@@ -35,7 +35,7 @@ MonoBehaviour:
   bulletLifetime: 5
   bulletTrailPrefab: {fileID: 0}
   trailDuration: 0.5
-  rotationSpeed: 50
+  rotationSpeed: 100
   slamZonePrefab: {fileID: 0}
   slamLifetime: 0.6
   slamYOffset: 0.05

@@ -24,8 +24,6 @@ namespace Ennemies.Behaviors
             this.isChasing = false;
         }
 
-        protected override bool IsCurrentlyChasing() => isChasing;
-
         protected override void ExecuteBehavior()
         {
             if (agent == null || player == null) return;
@@ -38,7 +36,15 @@ namespace Ennemies.Behaviors
             // Gestion de l'état de poursuite
             if (!isChasing && distanceToPlayer <= settings.detectionRange && hasLineOfSight)
             {
-                // Détection du joueur, commencer la poursuite
+                // Détection du joueur - vérifier si on doit tourner d'abord
+                if (TryStartChaseWithTurn())
+                {
+                    // On tourne d'abord, ne pas bouger
+                    isChasing = true; // Marquer comme chasing pour que la prochaine frame continue
+                    return;
+                }
+                
+                // Pas besoin de tourner, commencer la poursuite
                 isChasing = true;
                 agent.speed = settings.chaseSpeed;
             }
@@ -63,6 +69,7 @@ namespace Ennemies.Behaviors
                 {
                     // Continuer la poursuite
                     agent.isStopped = false;
+                    agent.speed = settings.chaseSpeed;
                     agent.SetDestination(player.position);
                     canAttack = false;
                 }

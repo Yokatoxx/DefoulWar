@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Chaser
   m_EditorClassIdentifier: 
   behaviorType: 1
-  detectionRange: 15
+  detectionRange: 45
   requireLineOfSight: 1
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 3967
   eyeHeight: 1.5
   chaseSpeed: 5
   patrolSpeed: 2
-  keepDistance: 8
+  keepDistance: 1
   distanceTolerance: 1
   patrolRadius: 20
   waypointWaitTime: 1

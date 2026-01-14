@@ -17,7 +17,6 @@ namespace Ennemies.Behaviors
 
         // État de rotation initiale
         private bool isTurningTowardsPlayer;
-        private bool wasChasing;
         private bool wasUpdateRotationEnabled;
         
         /// <summary>
@@ -39,7 +38,6 @@ namespace Ennemies.Behaviors
             this.owner = owner;
             
             isTurningTowardsPlayer = false;
-            wasChasing = false;
             wasUpdateRotationEnabled = agent != null && agent.updateRotation;
         }
 
@@ -47,20 +45,7 @@ namespace Ennemies.Behaviors
         {
             if (agent == null || player == null || owner == null) return;
 
-            bool currentlyChasing = IsCurrentlyChasing();
-            
-            // Détection du début de poursuite (transition idle/patrol -> chase)
-            if (RequiresTurnBeforeMove && currentlyChasing && !wasChasing)
-            {
-                // On vient de détecter le joueur, vérifier si on doit tourner d'abord
-                float angleToPlayer = GetAngleToPlayer();
-                if (angleToPlayer > TurnAngleThreshold)
-                {
-                    StartTurningPhase();
-                }
-            }
-            
-            // Phase de rotation initiale
+            // Phase de rotation initiale en cours
             if (isTurningTowardsPlayer)
             {
                 TurnTowardsPlayer();
@@ -70,20 +55,36 @@ namespace Ennemies.Behaviors
                 {
                     // Rotation terminée, on peut passer au comportement normal
                     EndTurningPhase();
-                    OnTurnComplete();
                 }
                 else
                 {
                     // Toujours en train de tourner, on ne fait rien d'autre
-                    wasChasing = currentlyChasing;
                     return;
                 }
             }
             
-            wasChasing = currentlyChasing;
-            
             // Exécuter la logique de comportement spécifique
             ExecuteBehavior();
+        }
+
+        /// <summary>
+        /// Appelé par les behaviors quand ils commencent à poursuivre le joueur.
+        /// Déclenche la phase de rotation si nécessaire.
+        /// Retourne true si une phase de rotation a été démarrée (le behavior ne doit pas bouger).
+        /// </summary>
+        protected bool TryStartChaseWithTurn()
+        {
+            if (!RequiresTurnBeforeMove) return false;
+            if (isTurningTowardsPlayer) return true; // Déjà en train de tourner
+            
+            float angleToPlayer = GetAngleToPlayer();
+            if (angleToPlayer > TurnAngleThreshold)
+            {
+                StartTurningPhase();
+                return true; // Ne pas bouger, on tourne d'abord
+            }
+            
+            return false; // Pas besoin de tourner, le behavior peut bouger
         }
 
         /// <summary>
@@ -114,6 +115,9 @@ namespace Ennemies.Behaviors
             
             // Restaurer la rotation automatique du NavMeshAgent
             agent.updateRotation = wasUpdateRotationEnabled;
+            
+            // S'assurer que l'agent peut bouger
+            agent.isStopped = false;
         }
 
         /// <summary>
@@ -151,20 +155,9 @@ namespace Ennemies.Behaviors
         }
 
         /// <summary>
-        /// Appelé quand la rotation initiale est terminée.
-        /// Peut être override pour des actions spécifiques.
+        /// Retourne true si l'ennemi est en phase de rotation initiale.
         /// </summary>
-        protected virtual void OnTurnComplete()
-        {
-            // Par défaut, reprendre le mouvement
-            agent.isStopped = false;
-        }
-
-        /// <summary>
-        /// Retourne true si l'ennemi est actuellement en mode poursuite/détection active.
-        /// Utilisé pour détecter la transition vers la poursuite.
-        /// </summary>
-        protected abstract bool IsCurrentlyChasing();
+        protected bool IsTurning => isTurningTowardsPlayer;
 
         /// <summary>
         /// Logique de comportement spécifique à implémenter par les classes dérivées.

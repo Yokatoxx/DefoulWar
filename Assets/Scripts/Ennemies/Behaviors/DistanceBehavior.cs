@@ -19,8 +19,6 @@ namespace Ennemies.Behaviors
             this.isChasing = false;
         }
 
-        protected override bool IsCurrentlyChasing() => isChasing;
-
         protected override void ExecuteBehavior()
         {
             if (agent == null || player == null) return;
@@ -31,6 +29,16 @@ namespace Ennemies.Behaviors
             // Détection du joueur
             if (distanceToPlayer <= settings.detectionRange && hasLineOfSight)
             {
+                // Si on vient de détecter le joueur, vérifier si on doit tourner d'abord
+                if (!isChasing)
+                {
+                    if (TryStartChaseWithTurn())
+                    {
+                        isChasing = true;
+                        return; // On tourne d'abord
+                    }
+                }
+                
                 isChasing = true;
                 agent.speed = settings.chaseSpeed;
 
