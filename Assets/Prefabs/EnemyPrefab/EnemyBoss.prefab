@@ -482,7 +482,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resistToKnockback: 0
-  impactParticlePrefab: {fileID: 0}
+  impactParticlePrefab: {fileID: 2645094815069657699, guid: 8f13fc9cc01025e4fa45c1149bdb4104, type: 3}
   particleOffset: {x: 0, y: 0.5, z: 0}
   impactSound: {fileID: 0}
   impactVolume: 0.8
