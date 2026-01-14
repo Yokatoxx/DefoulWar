@@ -10,10 +10,18 @@ namespace FPS
     public class EnemyRegistry : MonoBehaviour
     {
         private static EnemyRegistry instance;
+        private static bool applicationIsQuitting = false;
+        
         public static EnemyRegistry Instance
         {
             get
             {
+                // Ne pas créer d'instance si l'application quitte
+                if (applicationIsQuitting)
+                {
+                    return null;
+                }
+                
                 if (instance == null)
                 {
                     // Créer automatiquement si n'existe pas
@@ -51,8 +59,14 @@ namespace FPS
         {
             if (instance == this)
             {
+                applicationIsQuitting = true;
                 instance = null;
             }
+        }
+        
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
         }
         
         /// <summary>
