@@ -39,6 +39,14 @@ namespace Ennemies.Behaviors
             
             isTurningTowardsPlayer = false;
             wasUpdateRotationEnabled = agent != null && agent.updateRotation;
+
+            // Appliquer les paramètres de réactivité du NavMeshAgent
+            if (agent != null)
+            {
+                agent.acceleration = settings.acceleration;
+                agent.angularSpeed = settings.angularSpeed;
+                agent.autoBraking = settings.autoBraking;
+            }
         }
 
         public void Execute()

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Distance
   m_EditorClassIdentifier: 
   behaviorType: 0
-  detectionRange: 15
+  detectionRange: 30
   requireLineOfSight: 1
   obstacleLayer:
     serializedVersion: 2
@@ -36,3 +36,7 @@ MonoBehaviour:
   bulletTrailPrefab: {fileID: 4795970869987127494, guid: a527b787c415e734797cb5209dacaba1, type: 3}
   trailDuration: 0.1
   rotationSpeed: 5
+  slamZonePrefab: {fileID: 0}
+  slamLifetime: 0.6
+  slamYOffset: 0.05
+  slamTriggerRadius: 10

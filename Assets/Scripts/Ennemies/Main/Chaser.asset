@@ -19,8 +19,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 3967
   eyeHeight: 1.5
-  chaseSpeed: 5
-  patrolSpeed: 2
+  chaseSpeed: 15
+  patrolSpeed: 5
   keepDistance: 1
   distanceTolerance: 1
   patrolRadius: 20
@@ -35,7 +35,10 @@ MonoBehaviour:
   bulletLifetime: 5
   bulletTrailPrefab: {fileID: 0}
   trailDuration: 0.5
-  rotationSpeed: 30
+  rotationSpeed: 200
+  acceleration: 25
+  angularSpeed: 360
+  autoBraking: 0
   slamZonePrefab: {fileID: 0}
   slamLifetime: 0.6
   slamYOffset: 0.05

@@ -53,6 +53,8 @@ namespace Ennemies.Behaviors
                 // Joueur trop loin ou plus visible, perdre l'aggro
                 isChasing = false;
                 agent.isStopped = true;
+                // Reset immédiat de la vélocité pour éviter l'effet d'inertie
+                agent.velocity = Vector3.zero;
             }
 
             if (isChasing)

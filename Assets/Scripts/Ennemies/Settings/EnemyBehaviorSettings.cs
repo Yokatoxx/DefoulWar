@@ -109,6 +109,16 @@ namespace Ennemies.Settings
         [Tooltip("Vitesse de rotation vers la cible")]
         [Min(0f)] public float rotationSpeed = 5f;
 
+        [Header("NavMesh Agent Settings")]
+        [Tooltip("Accélération du NavMeshAgent (plus élevé = changements de direction plus rapides)")]
+        [Min(1f)] public float acceleration = 25f;
+
+        [Tooltip("Vitesse de rotation du NavMeshAgent en degrés/seconde")]
+        [Min(60f)] public float angularSpeed = 360f;
+
+        [Tooltip("Si false, l'agent ne ralentit pas automatiquement avant d'atteindre sa destination")]
+        public bool autoBraking = false;
+
         [Header("Slam Settings")]
         [Tooltip("Prefab de la zone de dégâts (doit contenir un Collider isTrigger + SlamDamageZone).")]
         public GameObject slamZonePrefab;
