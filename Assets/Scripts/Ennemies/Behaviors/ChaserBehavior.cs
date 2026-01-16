@@ -6,14 +6,12 @@ using Ennemies.Effect;
 namespace Ennemies.Behaviors
 {
     /// <summary>
-    /// Comportement d'ennemi qui poursuit le joueur en permanence.
-    /// Perd l'aggro si le joueur sort de 1.5x la distance de détection.
+    /// Comportement d'ennemi qui poursuit le joueur.
+    /// Utilise le système de vision avec FOV et mémoire de position.
     /// </summary>
     public class ChaserBehavior : BaseEnemyBehavior
     {
         private EnemyShield shield;
-
-        private bool isChasing;
         private bool canAttack;
 
         private const float AGGRO_LOSS_MULTIPLIER = 1.5f;
@@ -21,7 +19,7 @@ namespace Ennemies.Behaviors
         public override void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
         {
             base.Initialize(agent, player, settings, owner);
-            this.isChasing = false;
+            detectionState = DetectionState.Idle;
         }
 
         protected override void ExecuteBehavior()
@@ -29,40 +27,56 @@ namespace Ennemies.Behaviors
             if (agent == null || player == null) return;
 
             float distanceToPlayer = Vector3.Distance(owner.position, player.position);
-            float aggroLossDistance = settings.detectionRange * AGGRO_LOSS_MULTIPLIER;
+            bool canSeePlayer = IsPlayerInFieldOfView();
 
-            bool hasLineOfSight = !settings.requireLineOfSight || CheckLineOfSight();
-
-            // Gestion de l'état de poursuite
-            if (!isChasing && distanceToPlayer <= settings.detectionRange && hasLineOfSight)
+            switch (detectionState)
             {
-                // Détection du joueur - vérifier si on doit tourner d'abord
+                case DetectionState.Idle:
+                    HandleIdleState(canSeePlayer);
+                    break;
+
+                case DetectionState.Chasing:
+                    HandleChasingState(canSeePlayer, distanceToPlayer);
+                    break;
+
+                case DetectionState.Investigating:
+                    HandleInvestigatingState(canSeePlayer);
+                    break;
+
+                case DetectionState.Lost:
+                    HandleLostState(canSeePlayer);
+                    break;
+            }
+        }
+
+        private void HandleIdleState(bool canSeePlayer)
+        {
+            canAttack = false;
+            
+            if (canSeePlayer)
+            {
+                // Joueur détecté - vérifier si on doit tourner d'abord
                 if (TryStartChaseWithTurn())
                 {
-                    // On tourne d'abord, ne pas bouger
-                    isChasing = true; // Marquer comme chasing pour que la prochaine frame continue
+                    detectionState = DetectionState.Chasing;
                     return;
                 }
                 
-                // Pas besoin de tourner, commencer la poursuite
-                isChasing = true;
-                agent.speed = settings.chaseSpeed;
+                StartChasing();
             }
-            else if (isChasing && (distanceToPlayer > aggroLossDistance || !hasLineOfSight))
-            {
-                // Joueur trop loin ou plus visible, perdre l'aggro
-                isChasing = false;
-                agent.isStopped = true;
-                // Reset immédiat de la vélocité pour éviter l'effet d'inertie
-                agent.velocity = Vector3.zero;
-            }
+        }
 
-            if (isChasing)
+        private void HandleChasingState(bool canSeePlayer, float distanceToPlayer)
+        {
+            if (canSeePlayer)
             {
-                // En poursuite
+                // On voit toujours le joueur
+                UpdateLastKnownPosition();
+                AlertNearbyEnemies();
+
                 if (distanceToPlayer <= settings.attackRange)
                 {
-                    // À portée d'attaque, s'arrêter et attaquer
+                    // À portée d'attaque
                     agent.isStopped = true;
                     canAttack = true;
                     RotateTowardsPlayerSmooth();
@@ -78,31 +92,122 @@ namespace Ennemies.Behaviors
             }
             else
             {
+                // Perte de vue - passer en investigation
+                detectionState = DetectionState.Investigating;
+                investigationTimer = settings.investigationTime;
+                agent.SetDestination(lastKnownPlayerPosition);
+                agent.isStopped = false;
                 canAttack = false;
             }
         }
 
+        private void HandleInvestigatingState(bool canSeePlayer)
+        {
+            canAttack = false;
+
+            if (canSeePlayer)
+            {
+                // Joueur retrouvé !
+                StartChasing();
+                return;
+            }
+
+            // Aller vers la dernière position connue
+            if (!HasReachedLastKnownPosition())
+            {
+                agent.SetDestination(lastKnownPlayerPosition);
+                agent.isStopped = false;
+            }
+            else
+            {
+                // Arrivé à la dernière position, regarder autour
+                agent.isStopped = true;
+                
+                if (UpdateInvestigationTimer())
+                {
+                    // Temps écoulé, perdre la cible
+                    detectionState = DetectionState.Lost;
+                    ResetAlertState();
+                }
+            }
+        }
+
+        private void HandleLostState(bool canSeePlayer)
+        {
+            canAttack = false;
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero;
+
+            if (canSeePlayer)
+            {
+                StartChasing();
+            }
+            else
+            {
+                // Revenir à Idle après un court délai
+                detectionState = DetectionState.Idle;
+            }
+        }
+
+        private void StartChasing()
+        {
+            detectionState = DetectionState.Chasing;
+            agent.speed = settings.chaseSpeed;
+            agent.isStopped = false;
+            UpdateLastKnownPosition();
+        }
+
         public override bool CanAttack() => canAttack;
-        public override bool IsChasing() => isChasing;
+        public override bool IsChasing() => detectionState == DetectionState.Chasing;
         public override bool IsPatrolling() => false;
 
-        public override void OnDamageTaken() { } // Pas d'effet spécial pour ce comportement
+        public override void OnDamageTaken()
+        {
+            // Quand touché, on sait où est le joueur
+            if (player != null && detectionState != DetectionState.Chasing)
+            {
+                UpdateLastKnownPosition();
+                StartChasing();
+            }
+        }
 
         public override void DrawGizmos()
         {
-            if (owner == null) return;
+            if (owner == null || settings == null) return;
 
             // Zone de détection
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(owner.position, settings.detectionRange);
 
-            // Zone de perte d'aggro
-            Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f); // Orange transparent
-            Gizmos.DrawWireSphere(owner.position, settings.detectionRange * AGGRO_LOSS_MULTIPLIER);
+            // Zone d'écoute (360°)
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(owner.position, settings.hearingRange);
 
             // Portée d'attaque
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(owner.position, settings.attackRange);
+
+            // Dessiner le cône de vision
+            DrawFieldOfViewGizmo();
+
+            // Dernière position connue
+            if (detectionState == DetectionState.Investigating)
+            {
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawWireSphere(lastKnownPlayerPosition, 0.5f);
+                Gizmos.DrawLine(owner.position, lastKnownPlayerPosition);
+            }
+        }
+
+        private void DrawFieldOfViewGizmo()
+        {
+            float halfAngle = settings.viewAngle / 2f;
+            Vector3 leftDir = Quaternion.Euler(0, -halfAngle, 0) * owner.forward;
+            Vector3 rightDir = Quaternion.Euler(0, halfAngle, 0) * owner.forward;
+
+            Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+            Gizmos.DrawRay(owner.position + Vector3.up * settings.eyeHeight, leftDir * settings.detectionRange);
+            Gizmos.DrawRay(owner.position + Vector3.up * settings.eyeHeight, rightDir * settings.detectionRange);
         }
 
         public void SetShield(Ennemies.Effect.EnemyShield shield)

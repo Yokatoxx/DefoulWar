@@ -1,130 +1,151 @@
 using FPS;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class WaveSpawner : MonoBehaviour
 {
-    public Wave[] waves;
-
-    private Wave currentWave;
-
-    [SerializeField]
-    private Transform[] spawnpoints;
-
-    private float nextWaveStartTime;
+    [Header("Configuration")]
+    [SerializeField] public Wave[] waves;
+    [SerializeField] public Transform[] spawnpoints;
+    [SerializeField] public DoorArena[] doors;
 
     private int waveIndex = 0;
+    private Wave currentWave;
     private int aliveCount = 0;
-
-    private bool waitingForStartDelay = false; // ne pas dÈmarrer automatiquement
-    private bool waitingForClear = false;
-
     private bool stopSpawning = false;
+    private bool waitingForClear = false;
+    private bool arenaTriggered = false;
 
-    private void Awake()
+    public void TriggerArena()
     {
-        // PrÈparer la premiËre vague sans la lancer
-        if (waves != null && waves.Length > 0)
+        if (arenaTriggered) return;
+        arenaTriggered = true;
+
+        Debug.Log("[WaveSpawner] Arena triggered!");
+
+        if (waves == null || waves.Length == 0)
         {
-            waveIndex = 0;
-            currentWave = waves[waveIndex];
-        }
-        // Aucun dÈlai programmÈ tant que TriggerArena n'est pas appelÈ
-        waitingForStartDelay = false;
-        waitingForClear = false;
-    }
-
-    // Lance la premiËre vague ‡ la demande.
-    // respectDelay=true: attend TimeBeforeThisWave avant de spawner.
-    // respectDelay=false: spawn immÈdiat.
-    public void TriggerArena(bool respectDelay = true)
-    {
-        if (stopSpawning || waves == null || waves.Length == 0)
+            Debug.LogWarning("[WaveSpawner] No waves configured!");
             return;
+        }
 
         waveIndex = 0;
         currentWave = waves[waveIndex];
 
-        if (respectDelay)
-        {
-            nextWaveStartTime = Time.time + Mathf.Max(0f, currentWave.TimeBeforeThisWave);
-            waitingForStartDelay = true;
-            waitingForClear = false;
-        }
-        else
-        {
-            SpawnWave();
-            waitingForStartDelay = false;
-            waitingForClear = true;
-        }
+        // Ferme toutes les portes au d√©but de l'ar√®ne
+        CloseDoors();
+
+        StartCoroutine(StartWaveAfterDelay(currentWave.TimeBeforeThisWave));
+    }
+
+    private IEnumerator StartWaveAfterDelay(float delay)
+    {
+        if (delay > 0)
+            yield return new WaitForSeconds(delay);
+
+        SpawnWave();
     }
 
     private void Update()
     {
+        if (waitingForClear && aliveCount <= 0)
+        {
+            Debug.Log("[WaveSpawner] Wave cleared! Alive count: " + aliveCount);
+            waitingForClear = false;
+            OnWaveCleared();
+        }
+    }
+
+    private void OnWaveCleared()
+    {
+        // Passe √† la vague suivante (ou met stopSpawning = true si c'√©tait la derni√®re)
+        IncWave();
+
+        // V√©rifie si toutes les vagues sont termin√©es
         if (stopSpawning)
-            return;
-
-        // …tape 1: attendre le dÈlai avant de dÈmarrer la vague (uniquement aprËs TriggerArena)
-        if (waitingForStartDelay)
         {
-            if (Time.time >= nextWaveStartTime)
-            {
-                SpawnWave();
-                waitingForStartDelay = false;
-                waitingForClear = true;
-            }
+            Debug.Log("[WaveSpawner] All waves complete! Opening doors...");
+            OpenDoors();
             return;
         }
 
-        // …tape 2: attendre que tous les ennemis de la vague soient morts
-        if (waitingForClear)
-        {
-            if (aliveCount <= 0)
-            {
-                IncWave();
-
-                if (!stopSpawning)
-                {
-                    nextWaveStartTime = Time.time + Mathf.Max(0f, currentWave.TimeBeforeThisWave);
-                    waitingForStartDelay = true;
-                    waitingForClear = false;
-                }
-            }
-        }
+        Debug.Log("[WaveSpawner] Starting wave " + (waveIndex + 1));
+        StartCoroutine(StartWaveAfterDelay(currentWave.TimeBeforeThisWave));
     }
 
     private void SpawnWave()
     {
-        aliveCount = 0;
+        if (stopSpawning || waves == null || waves.Length == 0) return;
 
-        int countToSpawn = Mathf.Max(0, Mathf.RoundToInt(currentWave.NumberToSpawn));
-
-        for (int i = 0; i < countToSpawn; i++)
+        if (currentWave.EnemySpawnList == null || currentWave.EnemySpawnList.Length == 0)
         {
-            int enemyIndex = Random.Range(0, currentWave.EnemiesInWave.Length);
-            int spawnIndex = Random.Range(0, spawnpoints.Length);
+            Debug.LogWarning("[WaveSpawner] No enemies configured in wave!");
+            waitingForClear = true;
+            return;
+        }
 
-            GameObject enemy = Instantiate(
-                currentWave.EnemiesInWave[enemyIndex],
-                spawnpoints[spawnIndex].position,
-                spawnpoints[spawnIndex].rotation
-            );
+        if (spawnpoints == null || spawnpoints.Length == 0)
+        {
+            Debug.LogWarning("[WaveSpawner] No spawnpoints configured!");
+            waitingForClear = true;
+            return;
+        }
 
-            var health = enemy.GetComponent<EnemyHealth>();
-            aliveCount++;
-            if (health != null)
+        int totalSpawned = 0;
+        int spawnIndex = 0;
+
+        // Spawn chaque type d'ennemi avec son nombre respectif
+        foreach (var spawnInfo in currentWave.EnemySpawnList)
+        {
+            if (spawnInfo == null || spawnInfo.EnemyPrefab == null || spawnInfo.Count <= 0)
+                continue;
+
+            for (int i = 0; i < spawnInfo.Count; i++)
             {
-                health.OnDeath.AddListener(() =>
+                Transform spawnPoint = spawnpoints[spawnIndex % spawnpoints.Length];
+                
+                // D√©calage al√©atoire pour √©viter les superpositions
+                Vector3 offset = new Vector3(
+                    Random.Range(-1.5f, 1.5f),
+                    0f,
+                    Random.Range(-1.5f, 1.5f)
+                );
+
+                GameObject enemy = Instantiate(
+                    spawnInfo.EnemyPrefab,
+                    spawnPoint.position + offset,
+                    spawnPoint.rotation
+                );
+
+                aliveCount++;
+                totalSpawned++;
+                spawnIndex++;
+
+                var health = enemy.GetComponent<EnemyHealth>();
+                if (health != null)
                 {
-                    aliveCount = Mathf.Max(0, aliveCount - 1);
-                });
-            }
-            else
-            {
-                StartCoroutine(TrackDestructionAndDecrement(enemy));
+                    health.OnDeath.AddListener(() =>
+                    {
+                        aliveCount = Mathf.Max(0, aliveCount - 1);
+                        Debug.Log("[WaveSpawner] Enemy died, alive count: " + aliveCount);
+                    });
+                }
+                else
+                {
+                    Debug.LogWarning("[WaveSpawner] Enemy has no EnemyHealth component, using fallback tracking");
+                    StartCoroutine(TrackDestructionAndDecrement(enemy));
+                }
             }
         }
+
+        Debug.Log("[WaveSpawner] Spawning wave " + (waveIndex + 1) + " with " + totalSpawned + " enemies");
+
+        if (totalSpawned == 0)
+        {
+            Debug.LogWarning("[WaveSpawner] Wave has 0 enemies, moving to next wave");
+        }
+
+        waitingForClear = true;
     }
 
     private IEnumerator TrackDestructionAndDecrement(GameObject go)
@@ -133,6 +154,7 @@ public class WaveSpawner : MonoBehaviour
             yield return null;
 
         aliveCount = Mathf.Max(0, aliveCount - 1);
+        Debug.Log("[WaveSpawner] Object destroyed (fallback), alive count: " + aliveCount);
     }
 
     private void IncWave()
@@ -145,6 +167,35 @@ public class WaveSpawner : MonoBehaviour
         else
         {
             stopSpawning = true;
+            Debug.Log("[WaveSpawner] No more waves, stopSpawning = true");
         }
+    }
+
+    private void CloseDoors()
+    {
+        if (doors == null || doors.Length == 0)
+        {
+            Debug.LogWarning("[WaveSpawner] No doors assigned!");
+            return;
+        }
+
+        foreach (var door in doors)
+        {
+            if (door != null)
+                door.isClosed = true;
+        }
+        Debug.Log("[WaveSpawner] All doors closed");
+    }
+
+    private void OpenDoors()
+    {
+        if (doors == null || doors.Length == 0) return;
+
+        foreach (var door in doors)
+        {
+            if (door != null)
+                door.isClosed = false;
+        }
+        Debug.Log("[WaveSpawner] All doors opened");
     }
 }

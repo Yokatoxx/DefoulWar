@@ -5,8 +5,19 @@ using Ennemies.Settings;
 namespace Ennemies.Behaviors
 {
     /// <summary>
+    /// État de détection de l'ennemi.
+    /// </summary>
+    public enum DetectionState
+    {
+        Idle,           // Pas de cible connue
+        Chasing,        // Poursuit le joueur (le voit)
+        Investigating,  // Va vers la dernière position connue
+        Lost            // A perdu la cible après investigation
+    }
+
+    /// <summary>
     /// Classe abstraite de base pour tous les comportements d'ennemis.
-    /// Gère automatiquement la rotation vers le joueur avant de commencer le déplacement.
+    /// Gère le système de vision avec angle de vue, mémoire de position et alertes.
     /// </summary>
     public abstract class BaseEnemyBehavior : IEnemyBehavior
     {
@@ -18,6 +29,12 @@ namespace Ennemies.Behaviors
         // État de rotation initiale
         private bool isTurningTowardsPlayer;
         private bool wasUpdateRotationEnabled;
+
+        // Système de détection avancé
+        protected DetectionState detectionState = DetectionState.Idle;
+        protected Vector3 lastKnownPlayerPosition;
+        protected float investigationTimer;
+        private bool hasAlertedOthers;
         
         /// <summary>
         /// Angle en degrés en dessous duquel on considère que l'ennemi fait face au joueur.
@@ -26,7 +43,6 @@ namespace Ennemies.Behaviors
         
         /// <summary>
         /// Si true, l'ennemi doit tourner vers le joueur avant de se déplacer lors de la détection initiale.
-        /// Les behaviors peuvent override cette propriété pour désactiver ce comportement.
         /// </summary>
         protected virtual bool RequiresTurnBeforeMove => true;
 
@@ -39,6 +55,10 @@ namespace Ennemies.Behaviors
             
             isTurningTowardsPlayer = false;
             wasUpdateRotationEnabled = agent != null && agent.updateRotation;
+            detectionState = DetectionState.Idle;
+            lastKnownPlayerPosition = Vector3.zero;
+            investigationTimer = 0f;
+            hasAlertedOthers = false;
 
             // Appliquer les paramètres de réactivité du NavMeshAgent
             if (agent != null)
@@ -47,6 +67,9 @@ namespace Ennemies.Behaviors
                 agent.angularSpeed = settings.angularSpeed;
                 agent.autoBraking = settings.autoBraking;
             }
+
+            // Enregistrer dans le système d'alerte
+            EnemyAlertSystem.Instance.RegisterEnemy(this);
         }
 
         public void Execute()
@@ -61,12 +84,10 @@ namespace Ennemies.Behaviors
                 float angleToPlayer = GetAngleToPlayer();
                 if (angleToPlayer <= TurnAngleThreshold)
                 {
-                    // Rotation terminée, on peut passer au comportement normal
                     EndTurningPhase();
                 }
                 else
                 {
-                    // Toujours en train de tourner, on ne fait rien d'autre
                     return;
                 }
             }
@@ -76,78 +97,167 @@ namespace Ennemies.Behaviors
         }
 
         /// <summary>
+        /// Vérifie si le joueur est dans le champ de vision (distance + angle + raycast).
+        /// Optimisé : vérifie distance → angle → raycast (du moins au plus coûteux).
+        /// </summary>
+        protected bool IsPlayerInFieldOfView()
+        {
+            if (player == null) return false;
+
+            float distance = Vector3.Distance(owner.position, player.position);
+
+            // 1. Vérifier la distance de détection
+            if (distance > settings.detectionRange) return false;
+
+            // 2. Vérifier si dans le rayon d'écoute (360°, court rayon)
+            if (distance <= settings.hearingRange) 
+            {
+                // Joueur très proche = détecté (bruit)
+                return !settings.requireLineOfSight || CheckLineOfSight();
+            }
+
+            // 3. Vérifier l'angle de vue
+            float angle = GetAngleToPlayer();
+            float halfViewAngle = settings.viewAngle / 2f;
+            if (angle > halfViewAngle) return false;
+
+            // 4. Vérifier la ligne de vue (raycast)
+            if (settings.requireLineOfSight && !CheckLineOfSight()) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Met à jour la dernière position connue du joueur si visible.
+        /// </summary>
+        protected void UpdateLastKnownPosition()
+        {
+            if (player != null)
+            {
+                lastKnownPlayerPosition = player.position;
+            }
+        }
+
+        /// <summary>
+        /// Alerte les ennemis proches de la position du joueur.
+        /// </summary>
+        protected void AlertNearbyEnemies()
+        {
+            if (hasAlertedOthers) return;
+            
+            EnemyAlertSystem.Instance.AlertEnemiesInRadius(
+                owner.position, 
+                lastKnownPlayerPosition, 
+                settings.alertRadius
+            );
+            hasAlertedOthers = true;
+        }
+
+        /// <summary>
+        /// Reçoit une alerte d'un autre ennemi avec la position du joueur.
+        /// </summary>
+        public virtual void ReceiveAlert(Vector3 playerPosition)
+        {
+            // Si on n'a pas de cible, utiliser la position alertée
+            if (detectionState == DetectionState.Idle || detectionState == DetectionState.Lost)
+            {
+                lastKnownPlayerPosition = playerPosition;
+                detectionState = DetectionState.Investigating;
+                investigationTimer = settings.investigationTime;
+            }
+        }
+
+        /// <summary>
+        /// Vérifie si l'ennemi a atteint la dernière position connue.
+        /// </summary>
+        protected bool HasReachedLastKnownPosition()
+        {
+            if (agent == null) return true;
+            
+            float distance = Vector3.Distance(owner.position, lastKnownPlayerPosition);
+            return distance <= agent.stoppingDistance + 0.5f;
+        }
+
+        /// <summary>
+        /// Met à jour le timer d'investigation.
+        /// Retourne true si le temps d'investigation est écoulé.
+        /// </summary>
+        protected bool UpdateInvestigationTimer()
+        {
+            if (investigationTimer > 0)
+            {
+                investigationTimer -= Time.deltaTime;
+                return investigationTimer <= 0;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Réinitialise l'état d'alerte (permet d'alerter à nouveau).
+        /// </summary>
+        protected void ResetAlertState()
+        {
+            hasAlertedOthers = false;
+        }
+
+        /// <summary>
         /// Appelé par les behaviors quand ils commencent à poursuivre le joueur.
-        /// Déclenche la phase de rotation si nécessaire.
-        /// Retourne true si une phase de rotation a été démarrée (le behavior ne doit pas bouger).
         /// </summary>
         protected bool TryStartChaseWithTurn()
         {
             if (!RequiresTurnBeforeMove) return false;
-            if (isTurningTowardsPlayer) return true; // Déjà en train de tourner
+            if (isTurningTowardsPlayer) return true;
             
             float angleToPlayer = GetAngleToPlayer();
             if (angleToPlayer > TurnAngleThreshold)
             {
                 StartTurningPhase();
-                return true; // Ne pas bouger, on tourne d'abord
+                return true;
             }
             
-            return false; // Pas besoin de tourner, le behavior peut bouger
+            return false;
         }
 
-        /// <summary>
-        /// Démarre la phase de rotation avec arrêt immédiat.
-        /// </summary>
         private void StartTurningPhase()
         {
             isTurningTowardsPlayer = true;
-            
-            // Sauvegarder l'état de rotation du NavMeshAgent
             wasUpdateRotationEnabled = agent.updateRotation;
-            
-            // Désactiver la rotation automatique du NavMeshAgent pendant qu'on tourne manuellement
             agent.updateRotation = false;
-            
-            // Arrêt immédiat - pas d'effet "voiture qui freine"
             agent.isStopped = true;
             agent.velocity = Vector3.zero;
             agent.ResetPath();
         }
 
-        /// <summary>
-        /// Termine la phase de rotation et restaure l'état normal.
-        /// </summary>
         private void EndTurningPhase()
         {
             isTurningTowardsPlayer = false;
-            
-            // Restaurer la rotation automatique du NavMeshAgent
             agent.updateRotation = wasUpdateRotationEnabled;
-            
-            // S'assurer que l'agent peut bouger
             agent.isStopped = false;
         }
 
-        /// <summary>
-        /// Retourne l'angle en degrés entre la direction actuelle et la direction vers le joueur.
-        /// </summary>
         protected float GetAngleToPlayer()
         {
             Vector3 directionToPlayer = (player.position - owner.position).normalized;
-            directionToPlayer.y = 0;
+            // Note: On garde Y pour permettre de voir le joueur en contrebas (sniper en hauteur)
             
             Vector3 forward = owner.forward;
-            forward.y = 0;
+            // Pour la comparaison, on utilise une direction 3D complète
             
             if (directionToPlayer.sqrMagnitude < 0.001f || forward.sqrMagnitude < 0.001f)
                 return 0f;
             
-            return Vector3.Angle(forward.normalized, directionToPlayer.normalized);
+            // Calcul de l'angle horizontal seulement (pour le cône de vision latéral)
+            Vector3 directionHorizontal = directionToPlayer;
+            directionHorizontal.y = 0;
+            Vector3 forwardHorizontal = forward;
+            forwardHorizontal.y = 0;
+            
+            if (directionHorizontal.sqrMagnitude < 0.001f || forwardHorizontal.sqrMagnitude < 0.001f)
+                return 0f; // Joueur directement au-dessus ou en-dessous = dans le champ
+            
+            return Vector3.Angle(forwardHorizontal.normalized, directionHorizontal.normalized);
         }
 
-        /// <summary>
-        /// Tourne progressivement l'ennemi vers le joueur.
-        /// </summary>
         protected void TurnTowardsPlayer()
         {
             Vector3 direction = (player.position - owner.position).normalized;
@@ -156,20 +266,25 @@ namespace Ennemies.Behaviors
             if (direction.sqrMagnitude > 0.001f)
             {
                 Quaternion lookRotation = Quaternion.LookRotation(direction);
-                // Utiliser une vitesse de rotation plus élevée pour la phase initiale
                 float turnSpeed = settings.rotationSpeed * 2f;
                 owner.rotation = Quaternion.Slerp(owner.rotation, lookRotation, Time.deltaTime * turnSpeed);
             }
         }
 
-        /// <summary>
-        /// Retourne true si l'ennemi est en phase de rotation initiale.
-        /// </summary>
+        protected void TurnTowardsPosition(Vector3 position)
+        {
+            Vector3 direction = (position - owner.position).normalized;
+            direction.y = 0;
+
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                Quaternion lookRotation = Quaternion.LookRotation(direction);
+                owner.rotation = Quaternion.Slerp(owner.rotation, lookRotation, Time.deltaTime * settings.rotationSpeed);
+            }
+        }
+
         protected bool IsTurning => isTurningTowardsPlayer;
 
-        /// <summary>
-        /// Logique de comportement spécifique à implémenter par les classes dérivées.
-        /// </summary>
         protected abstract void ExecuteBehavior();
 
         // Implémentations de l'interface
@@ -180,8 +295,10 @@ namespace Ennemies.Behaviors
         public abstract void DrawGizmos();
 
         /// <summary>
-        /// Méthode utilitaire pour la rotation continue vers le joueur (utilisée pendant le combat).
+        /// Retourne l'état de détection actuel.
         /// </summary>
+        public DetectionState GetDetectionState() => detectionState;
+
         protected void RotateTowardsPlayerSmooth()
         {
             Vector3 direction = (player.position - owner.position).normalized;
@@ -194,9 +311,6 @@ namespace Ennemies.Behaviors
             }
         }
 
-        /// <summary>
-        /// Vérifie la ligne de vue vers le joueur.
-        /// </summary>
         protected bool CheckLineOfSight()
         {
             Vector3 eyePosition = owner.position + Vector3.up * settings.eyeHeight;
@@ -204,12 +318,52 @@ namespace Ennemies.Behaviors
             Vector3 direction = targetPosition - eyePosition;
             float distance = direction.magnitude;
 
-            if (Physics.Raycast(eyePosition, direction.normalized, out RaycastHit hit, distance, settings.obstacleLayer))
+            // Utiliser RaycastAll pour filtrer les obstacles
+            RaycastHit[] hits = Physics.RaycastAll(eyePosition, direction.normalized, distance, settings.obstacleLayer);
+            
+            // Trier par distance
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+            
+            foreach (var hit in hits)
             {
-                return hit.transform == player || hit.transform.IsChildOf(player);
+                // Ignorer l'ennemi lui-même
+                if (hit.transform == owner || hit.transform.IsChildOf(owner))
+                    continue;
+                
+                // Ignorer les obstacles très proches de l'ennemi (bord de plateforme)
+                if (hit.distance < 0.5f)
+                    continue;
+                
+                // C'est le joueur = ligne de vue OK
+                if (hit.transform == player || hit.transform.IsChildOf(player))
+                    return true;
+                
+                // Obstacle entre l'ennemi et le joueur
+                return false;
             }
             
+            // Rien touché = ligne de vue claire
             return true;
+        }
+
+        /// <summary>
+        /// Vérifie la ligne de vue vers une position spécifique.
+        /// </summary>
+        protected bool CheckLineOfSightToPosition(Vector3 targetPosition)
+        {
+            Vector3 eyePosition = owner.position + Vector3.up * settings.eyeHeight;
+            Vector3 direction = targetPosition - eyePosition;
+            float distance = direction.magnitude;
+
+            return !Physics.Raycast(eyePosition, direction.normalized, distance, settings.obstacleLayer);
+        }
+
+        /// <summary>
+        /// Retourne la position de l'ennemi (pour le système d'alerte).
+        /// </summary>
+        public Vector3 GetOwnerPosition()
+        {
+            return owner != null ? owner.position : Vector3.zero;
         }
     }
 }

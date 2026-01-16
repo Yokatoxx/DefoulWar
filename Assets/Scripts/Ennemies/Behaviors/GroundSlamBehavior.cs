@@ -7,20 +7,19 @@ namespace Ennemies.Behaviors
 {
     /// <summary>
     /// Comportement d'ennemi qui poursuit le joueur et declenche une attaque au sol.
+    /// Utilise le système de vision avec FOV et mémoire de position.
     /// </summary>
     public class GroundSlamBehavior : BaseEnemyBehavior
     {
         private float nextSlamTime;
         private bool canAttack;
-        private bool isChasing;
 
         public override void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
         {
             base.Initialize(agent, player, settings, owner);
-
             nextSlamTime = 0f;
             canAttack = false;
-            isChasing = false;
+            detectionState = DetectionState.Idle;
 
             if (agent != null)
                 agent.speed = settings.patrolSpeed;
@@ -34,45 +33,128 @@ namespace Ennemies.Behaviors
             Vector3 playerXZ = new Vector3(player.position.x, 0f, player.position.z);
             float distXZ = Vector3.Distance(ownerXZ, playerXZ);
 
-            bool detected = distXZ <= settings.detectionRange && (!settings.requireLineOfSight || CheckLineOfSight());
+            bool canSeePlayer = IsPlayerInFieldOfView();
 
-            if (!detected)
+            switch (detectionState)
             {
-                isChasing = false;
-                agent.isStopped = true;
-                canAttack = false;
-                return;
-            }
+                case DetectionState.Idle:
+                    HandleIdleState(canSeePlayer);
+                    break;
 
-            // Si on commence a chasser, verifier si on doit tourner d'abord
-            if (!isChasing)
+                case DetectionState.Chasing:
+                    HandleChasingState(canSeePlayer, distXZ);
+                    break;
+
+                case DetectionState.Investigating:
+                    HandleInvestigatingState(canSeePlayer);
+                    break;
+
+                case DetectionState.Lost:
+                    HandleLostState(canSeePlayer);
+                    break;
+            }
+        }
+
+        private void HandleIdleState(bool canSeePlayer)
+        {
+            canAttack = false;
+            agent.isStopped = true;
+
+            if (canSeePlayer)
             {
                 if (TryStartChaseWithTurn())
                 {
-                    isChasing = true;
-                    return; // On tourne d'abord
+                    detectionState = DetectionState.Chasing;
+                    return;
                 }
+                StartChasing();
             }
+        }
 
-            isChasing = true;
-
-            float slamRange = Mathf.Max(0.01f, settings.slamTriggerRadius);
-
-            if (distXZ <= slamRange && Time.time >= nextSlamTime)
+        private void HandleChasingState(bool canSeePlayer, float distXZ)
+        {
+            if (canSeePlayer)
             {
-                agent.isStopped = true;
-                RotateTowardsPlayerSmooth();
-                TriggerSlam();
-                nextSlamTime = Time.time + Mathf.Max(0.01f, settings.attackCooldown);
-                canAttack = true;
+                UpdateLastKnownPosition();
+                AlertNearbyEnemies();
+
+                float slamRange = Mathf.Max(0.01f, settings.slamTriggerRadius);
+
+                if (distXZ <= slamRange && Time.time >= nextSlamTime)
+                {
+                    agent.isStopped = true;
+                    RotateTowardsPlayerSmooth();
+                    TriggerSlam();
+                    nextSlamTime = Time.time + Mathf.Max(0.01f, settings.attackCooldown);
+                    canAttack = true;
+                }
+                else
+                {
+                    agent.isStopped = false;
+                    agent.speed = settings.chaseSpeed;
+                    agent.SetDestination(player.position);
+                    canAttack = false;
+                }
             }
             else
             {
+                // Perte de vue
+                detectionState = DetectionState.Investigating;
+                investigationTimer = settings.investigationTime;
+                agent.SetDestination(lastKnownPlayerPosition);
                 agent.isStopped = false;
-                agent.speed = settings.chaseSpeed;
-                agent.SetDestination(player.position);
                 canAttack = false;
             }
+        }
+
+        private void HandleInvestigatingState(bool canSeePlayer)
+        {
+            canAttack = false;
+
+            if (canSeePlayer)
+            {
+                StartChasing();
+                return;
+            }
+
+            if (!HasReachedLastKnownPosition())
+            {
+                agent.SetDestination(lastKnownPlayerPosition);
+                agent.isStopped = false;
+            }
+            else
+            {
+                agent.isStopped = true;
+                if (UpdateInvestigationTimer())
+                {
+                    detectionState = DetectionState.Lost;
+                    ResetAlertState();
+                }
+            }
+        }
+
+        private void HandleLostState(bool canSeePlayer)
+        {
+            canAttack = false;
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero;
+
+            if (canSeePlayer)
+            {
+                StartChasing();
+            }
+            else
+            {
+                detectionState = DetectionState.Idle;
+            }
+        }
+
+        private void StartChasing()
+        {
+            detectionState = DetectionState.Chasing;
+            agent.speed = settings.chaseSpeed;
+            agent.isStopped = false;
+            UpdateLastKnownPosition();
         }
 
         private void TriggerSlam()
@@ -123,18 +205,42 @@ namespace Ennemies.Behaviors
         }
 
         public override bool CanAttack() => canAttack;
-        public override bool IsChasing() => isChasing;
+        public override bool IsChasing() => detectionState == DetectionState.Chasing;
         public override bool IsPatrolling() => false;
 
-        public override void OnDamageTaken() { }
+        public override void OnDamageTaken()
+        {
+            if (player != null && detectionState != DetectionState.Chasing)
+            {
+                UpdateLastKnownPosition();
+                StartChasing();
+            }
+        }
 
         public override void DrawGizmos()
         {
             if (owner == null || settings == null) return;
+            
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(owner.position, settings.detectionRange);
+            
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(owner.position, Mathf.Max(0.01f, settings.slamTriggerRadius));
+
+            // Cône de vision
+            float halfAngle = settings.viewAngle / 2f;
+            Vector3 leftDir = Quaternion.Euler(0, -halfAngle, 0) * owner.forward;
+            Vector3 rightDir = Quaternion.Euler(0, halfAngle, 0) * owner.forward;
+            Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+            Gizmos.DrawRay(owner.position + Vector3.up * settings.eyeHeight, leftDir * settings.detectionRange);
+            Gizmos.DrawRay(owner.position + Vector3.up * settings.eyeHeight, rightDir * settings.detectionRange);
+
+            // Dernière position connue
+            if (detectionState == DetectionState.Investigating)
+            {
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawWireSphere(lastKnownPlayerPosition, 0.5f);
+            }
         }
     }
 }

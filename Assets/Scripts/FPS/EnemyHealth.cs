@@ -11,6 +11,14 @@ namespace FPS
         [SerializeField] private float maxHealth = 100f;
         [SerializeField] private float currentHealth;
 
+        [Header("Damage Type Modifiers")]
+        [Tooltip("Multiplicateur de dégâts des balles (0.5 = prend 2x moins de dégâts)")]
+        [SerializeField] private float bulletDamageMultiplier = 1f;
+        [Tooltip("Multiplicateur de dégâts du dash (0.33 = prend 3x moins de dégâts)")]
+        [SerializeField] private float dashDamageMultiplier = 1f;
+        [Tooltip("Multiplicateur de dégâts électriques")]
+        [SerializeField] private float electricDamageMultiplier = 1f;
+
         [Header("Spawn Invulnerability")]
         [Tooltip("Durée d'invulnérabilité après l'apparition (secondes)")]
         [SerializeField] private float spawnInvulnerabilityDuration = 0f;
@@ -113,8 +121,8 @@ namespace FPS
                 return false;
             }
 
-            // Appliquer
-            float damage = Mathf.Max(0f, info.amount);
+            // Appliquer le multiplicateur de dégâts selon le type
+            float damage = Mathf.Max(0f, info.amount * GetDamageMultiplier(info.type));
             string zoneName = string.IsNullOrWhiteSpace(info.zoneName) ? "Body" : info.zoneName;
             currentHealth -= damage;
 
@@ -199,6 +207,21 @@ namespace FPS
         public DamageType LastHitType => lastHitType;
         public DamageType LastKillType => lastKillType;
         public Transform LastAttacker => lastAttacker;
+
+        /// <summary>
+        /// Retourne le multiplicateur de dégâts pour un type donné.
+        /// </summary>
+        private float GetDamageMultiplier(DamageType type)
+        {
+            return type switch
+            {
+                DamageType.Bullet => bulletDamageMultiplier,
+                DamageType.Dash => dashDamageMultiplier,
+                DamageType.Melee => dashDamageMultiplier, // Melee = Dash dans ce jeu
+                DamageType.Electric => electricDamageMultiplier,
+                _ => 1f
+            };
+        }
 
         // Tue immédiatement cet ennemi sans enregistrer de hit
         public void KillImmediate()

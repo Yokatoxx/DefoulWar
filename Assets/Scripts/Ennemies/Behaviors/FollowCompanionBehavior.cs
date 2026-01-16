@@ -169,6 +169,11 @@ namespace Ennemies.Behaviors
         public override bool IsPatrolling() => !isFollowing && companionTarget == null;
         public override void OnDamageTaken() { }
         
+        public override void ReceiveAlert(Vector3 playerPosition)
+        {
+            // Ce comportement ne suit pas le joueur, ignorer les alertes
+        }
+        
         public override void DrawGizmos()
         {
             if (owner == null || settings == null) return;

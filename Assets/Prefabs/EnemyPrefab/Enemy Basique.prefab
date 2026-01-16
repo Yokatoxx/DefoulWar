@@ -345,7 +345,7 @@ GameObject:
   - component: {fileID: 7994179154030387157}
   - component: {fileID: 4479012537968092976}
   m_Layer: 7
-  m_Name: Enemy 1
+  m_Name: Enemy Basique
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -405,7 +405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16bb0ed92c0240aa9cddb09695e8ee2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 150
   currentHealth: 0
   spawnInvulnerabilityDuration: 0
   spawnInvulnerableAllDamage: 0

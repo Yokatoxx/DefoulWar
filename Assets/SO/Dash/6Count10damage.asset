@@ -24,7 +24,7 @@ MonoBehaviour:
   slowMoScale: 0.383
   distanceDash: 25
   cooldown: 2
-  dashDamage: 100
+  dashDamage: 150
   dashTravelTime: 0.08
   capsuleRadius: 0.4
   stopOffset: 1

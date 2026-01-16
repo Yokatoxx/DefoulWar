@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Distance
   m_EditorClassIdentifier: 
   behaviorType: 0
-  detectionRange: 30
+  detectionRange: 20
   requireLineOfSight: 1
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 4294967295
-  eyeHeight: 1.5
-  chaseSpeed: 3.5
+  eyeHeight: 2
+  chaseSpeed: 10
   patrolSpeed: 2
   keepDistance: 15.2
   distanceTolerance: 1
@@ -27,16 +27,27 @@ MonoBehaviour:
   waypointWaitTime: 1
   attackType: 1
   attackDamage: 10
-  attackCooldown: 1.5
-  attackRange: 20.8
+  attackCooldown: 3
+  attackRange: 15
   isHitscan: 1
   bulletPrefab: {fileID: 0}
   bulletSpeed: 20
   bulletLifetime: 5
   bulletTrailPrefab: {fileID: 4795970869987127494, guid: a527b787c415e734797cb5209dacaba1, type: 3}
   trailDuration: 0.1
-  rotationSpeed: 5
+  rotationSpeed: 20
+  acceleration: 25
+  angularSpeed: 360
+  autoBraking: 0
+  viewAngle: 120
+  investigationTime: 3
+  hearingRange: 8
+  alertRadius: 15
   slamZonePrefab: {fileID: 0}
   slamLifetime: 0.6
   slamYOffset: 0.05
   slamTriggerRadius: 10
+  fleeToHighGroundDistance: 8
+  sniperChargeDuration: 1
+  sniperLockDuration: 0.5
+  highGroundSearchRadius: 10

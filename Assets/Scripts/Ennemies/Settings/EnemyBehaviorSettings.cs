@@ -119,6 +119,19 @@ namespace Ennemies.Settings
         [Tooltip("Si false, l'agent ne ralentit pas automatiquement avant d'atteindre sa destination")]
         public bool autoBraking = false;
 
+        [Header("Vision Settings")]
+        [Tooltip("Angle de vue de l'ennemi en degrés (120° = vision humaine normale)")]
+        [Range(30f, 360f)] public float viewAngle = 120f;
+
+        [Tooltip("Temps en secondes que l'ennemi passe à investiguer la dernière position connue")]
+        [Min(0f)] public float investigationTime = 3f;
+
+        [Tooltip("Rayon de détection 360° (bruit, dash proche, etc.)")]
+        [Min(0f)] public float hearingRange = 8f;
+
+        [Tooltip("Rayon d'alerte pour prévenir les autres ennemis")]
+        [Min(0f)] public float alertRadius = 15f;
+
         [Header("Slam Settings")]
         [Tooltip("Prefab de la zone de dégâts (doit contenir un Collider isTrigger + SlamDamageZone).")]
         public GameObject slamZonePrefab;
@@ -128,5 +141,18 @@ namespace Ennemies.Settings
         public float slamYOffset = 0.05f;
         [Tooltip("Rayon/portée de la zone de trigger du slam (si applicable).")]
         [Min(0f)] public float slamTriggerRadius = 10f;
+
+        [Header("Sniper Settings (Distance Behavior)")]
+        [Tooltip("Distance à laquelle l'ennemi fuit vers la hauteur au lieu de tirer")]
+        [Min(0f)] public float fleeToHighGroundDistance = 8f;
+
+        [Tooltip("Durée de la phase de charge (laser rouge suit le joueur)")]
+        [Min(0.1f)] public float sniperChargeDuration = 1.0f;
+
+        [Tooltip("Durée de la phase de verrouillage (laser vert fixe)")]
+        [Min(0.1f)] public float sniperLockDuration = 0.5f;
+
+        [Tooltip("Rayon de recherche des points en hauteur")]
+        [Min(1f)] public float highGroundSearchRadius = 20f;
     }
 }

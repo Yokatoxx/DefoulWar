@@ -154,7 +154,23 @@ namespace Ennemies
 
             if (currentBehavior.CanAttack())
             {
-                attackHandler.TryAttack();
+                // Vérifier si c'est un comportement sniper avec position verrouillée
+                if (currentBehavior is DistanceBehavior distanceBehavior)
+                {
+                    var sniperTarget = distanceBehavior.GetSniperTargetPosition();
+                    if (sniperTarget.HasValue)
+                    {
+                        attackHandler.TryAttackAtPosition(sniperTarget.Value);
+                    }
+                    else
+                    {
+                        attackHandler.TryAttack();
+                    }
+                }
+                else
+                {
+                    attackHandler.TryAttack();
+                }
             }
 
             UpdateAnimationTriggers();

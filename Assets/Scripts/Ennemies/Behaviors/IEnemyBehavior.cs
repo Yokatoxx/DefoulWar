@@ -44,6 +44,11 @@ namespace Ennemies.Behaviors
         void OnDamageTaken();
 
         /// <summary>
+        /// Reçoit une alerte d'un autre ennemi avec la position du joueur.
+        /// </summary>
+        void ReceiveAlert(Vector3 playerPosition);
+
+        /// <summary>
         /// Dessine les gizmos de debug dans l'éditeur.
         /// </summary>
         void DrawGizmos();

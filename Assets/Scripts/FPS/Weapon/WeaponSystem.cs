@@ -448,6 +448,18 @@ public class WeaponSystem : MonoBehaviour
     // Propriétés publiques pour l'état des munitions
     public bool IsOutOfAmmo => currentMagazine <= 0 && currentReserve <= 0;
     public bool IsUsingBloodBullets => isUsingBloodBullets && IsOutOfAmmo;
+    public int CurrentMagazine => currentMagazine;
+    public int CurrentReserve => currentReserve;
+
+    /// <summary>
+    /// Ajoute des munitions à la réserve.
+    /// </summary>
+    public void AddAmmo(int amount)
+    {
+        if (weaponSettings == null) return;
+        currentReserve = Mathf.Min(currentReserve + amount, weaponSettings.maxAmmo);
+        UpdateAmmoUI();
+    }
 
     // Nouvelle API publique : désactiver le tir pendant une durée realtime/unscaled
     public void DisableShootingFor(float seconds)

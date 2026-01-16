@@ -8,20 +8,20 @@ using UnityEditor;
 [CustomEditor(typeof(Wave))]
 public class WaveEditor : Editor
 {
-    SerializedProperty enemiesInWave;
+    SerializedProperty enemySpawnList;
     SerializedProperty timeBeforeThisWave;
-    SerializedProperty numberToSpawn;
 
     void OnEnable()
     {
-        enemiesInWave = serializedObject.FindProperty("EnemiesInWave");
+        enemySpawnList = serializedObject.FindProperty("EnemySpawnList");
         timeBeforeThisWave = serializedObject.FindProperty("TimeBeforeThisWave");
-        numberToSpawn = serializedObject.FindProperty("NumberToSpawn");
     }
 
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
+
+        Wave wave = (Wave)target;
 
         EditorGUILayout.Space(5);
         EditorGUILayout.LabelField("Configuration de la Vague", EditorStyles.boldLabel);
@@ -29,16 +29,18 @@ public class WaveEditor : Editor
 
         // Timing
         EditorGUILayout.PropertyField(timeBeforeThisWave, new GUIContent("Délai avant spawn (s)"));
-        
-        // Nombre à spawn
-        EditorGUILayout.PropertyField(numberToSpawn, new GUIContent("Nombre à spawner"));
 
         EditorGUILayout.Space(10);
         EditorGUILayout.LabelField("Ennemis dans cette vague", EditorStyles.boldLabel);
         EditorGUILayout.Space(5);
 
-        // Liste des ennemis avec affichage amélioré
-        EditorGUILayout.PropertyField(enemiesInWave, new GUIContent("Prefabs Ennemis"), true);
+        // Liste des ennemis avec leur nombre
+        EditorGUILayout.PropertyField(enemySpawnList, new GUIContent("Types d'ennemis"), true);
+
+        EditorGUILayout.Space(10);
+        
+        // Affichage du total calculé
+        EditorGUILayout.HelpBox($"Total d'ennemis: {wave.TotalEnemyCount}", MessageType.Info);
 
         serializedObject.ApplyModifiedProperties();
     }
