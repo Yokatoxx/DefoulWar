@@ -1,6 +1,7 @@
 using UnityEngine;
 using FPS;
 using Ennemies.Settings;
+using Ennemies.Effect;
 
 namespace Ennemies
 {
@@ -16,6 +17,10 @@ namespace Ennemies
         [Header("Hitscan FX (optionnel)")]
         [Tooltip("Composant pour les effets visuels hitscan")]
         [SerializeField] private MagicEnemyHitScan hitscanFX;
+
+        [Header("Shield Attack Animation (optionnel)")]
+        [Tooltip("Composant d'animation du shield pour les attaques melee")]
+        [SerializeField] private ShieldAttackAnimation shieldAttackAnimation;
 
         [Header("Layers")]
         [Tooltip("Layer du joueur pour les raycasts")]
@@ -41,6 +46,19 @@ namespace Ennemies
             if (shootPoint == null)
             {
                 shootPoint = transform;
+            }
+
+            // Recherche automatique du ShieldAttackAnimation s'il n'est pas assigné
+            if (shieldAttackAnimation == null)
+            {
+                shieldAttackAnimation = GetComponentInChildren<ShieldAttackAnimation>();
+            }
+
+            // Connecter l'événement d'impact du shield aux dégâts
+            if (shieldAttackAnimation != null)
+            {
+                shieldAttackAnimation.OnImpactHit.RemoveListener(ApplyMeleeDamage);
+                shieldAttackAnimation.OnImpactHit.AddListener(ApplyMeleeDamage);
             }
         }
 
@@ -93,6 +111,25 @@ namespace Ennemies
 
         private void PerformMeleeAttack()
         {
+            // Si le shield a une animation, les dégâts sont appliqués lors de l'impact
+            if (shieldAttackAnimation != null)
+            {
+                shieldAttackAnimation.PlayAttackAnimation();
+                // Les dégâts seront infligés via l'événement OnImpactHit
+                return;
+            }
+
+            // Sans animation, appliquer les dégâts immédiatement
+            ApplyMeleeDamage();
+        }
+
+        /// <summary>
+        /// Applique les dégâts melee au joueur. Appelé directement ou via l'événement OnImpactHit du shield.
+        /// </summary>
+        public void ApplyMeleeDamage()
+        {
+            if (player == null || settings == null) return;
+
             float distance = Vector3.Distance(transform.position, player.position);
             
             if (distance <= settings.attackRange)

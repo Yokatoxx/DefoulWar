@@ -403,7 +403,30 @@ namespace FPS
         
         private IEnumerator ApplyDashDamage(EnemyHealth target, Vector3 dirToTarget)
         {
-            var hitCol = target.GetComponentInChildren<Collider>();
+            // Chercher le shield si présent
+            var shield = target.GetComponentInChildren<Ennemies.Effect.EnemyShield>();
+            Collider hitCol = null;
+
+            if (shield != null && shield.ShieldActive)
+            {
+                // Vérifier si on attaque de face (le shield doit intercepter)
+                Vector3 enemyForward = target.transform.forward;
+                Vector3 attackerDir = -dirToTarget; // Direction vers l'attaquant
+                float angle = Vector3.Angle(enemyForward, attackerDir);
+
+                // Si on est dans le cône frontal, cibler le shield
+                if (angle <= 45f) // Moitié de 90° (cône frontal)
+                {
+                    hitCol = shield.GetComponent<Collider>();
+                }
+            }
+
+            // Fallback sur n'importe quel collider
+            if (hitCol == null)
+            {
+                hitCol = target.GetComponentInChildren<Collider>();
+            }
+
             var dmg = new DamageInfo(
                 amount: ConfigDashDamage,
                 zoneName: "Dash",

@@ -468,6 +468,7 @@ GameObject:
   - component: {fileID: 6277783872427992221}
   - component: {fileID: 6551056582859119117}
   - component: {fileID: 7072189409071410649}
+  - component: {fileID: 3307348198493035423}
   m_Layer: 12
   m_Name: Shield
   m_TagString: Untagged
@@ -596,6 +597,33 @@ MonoBehaviour:
   shieldZoneName: Shield
   blockDashByFrontalCone: 1
   frontalBlockAngle: 90
+--- !u!114 &3307348198493035423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4779014995437992861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c4323b7ba2be0942b13fb3d7e564cc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  raiseTime: 0.3
+  slamTime: 0.3
+  holdTime: 0.1
+  returnTime: 0.25
+  raiseHeight: 0.8
+  raiseAngle: 30
+  slamAngle: 30
+  impactVFXPrefab: {fileID: 2645094815069657699, guid: 8f13fc9cc01025e4fa45c1149bdb4104, type: 3}
+  vfxSpawnOffset: {x: 0, y: -1, z: 0}
+  vfxLifetime: 2
+  impactSound: {fileID: 0}
+  impactVolume: 0.7
+  OnImpactHit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7277404602049207658
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,7 +650,7 @@ Transform:
   m_GameObject: {fileID: 7277404602049207658}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
