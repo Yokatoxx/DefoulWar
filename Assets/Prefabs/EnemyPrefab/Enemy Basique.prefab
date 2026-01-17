@@ -214,7 +214,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c0ff4b8db2914b9459ee034bf692fd62, type: 2}
+  - {fileID: 2100000, guid: e9360cb2bf0187b48a398456ccc9fd36, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -407,6 +407,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 150
   currentHealth: 0
+  bulletDamageMultiplier: 1
+  dashDamageMultiplier: 1
+  electricDamageMultiplier: 1
   spawnInvulnerabilityDuration: 0
   spawnInvulnerableAllDamage: 0
   OnDeath:

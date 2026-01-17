@@ -39,7 +39,15 @@ MonoBehaviour:
   acceleration: 25
   angularSpeed: 360
   autoBraking: 0
+  viewAngle: 120
+  investigationTime: 3
+  hearingRange: 8
+  alertRadius: 15
   slamZonePrefab: {fileID: 0}
   slamLifetime: 0.6
   slamYOffset: 0.05
   slamTriggerRadius: 10
+  fleeToHighGroundDistance: 8
+  sniperChargeDuration: 1
+  sniperLockDuration: 0.5
+  highGroundSearchRadius: 20

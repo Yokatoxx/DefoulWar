@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71918038bb21d749a01346ee20dded1, type: 3}
   m_Name: A2_W_02
   m_EditorClassIdentifier: 
-  TimeBeforeThisWave: 0
+  TimeBeforeThisWave: 2
   EnemySpawnList:
   - EnemyPrefab: {fileID: 1807755940922956229, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
     Count: 3
   - EnemyPrefab: {fileID: 160580225223210161, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
-    Count: 3
+    Count: 2
+  - EnemyPrefab: {fileID: 1807755940922956229, guid: bce280ca584f7b04cbd37d060b2c50a3, type: 3}
+    Count: 1
