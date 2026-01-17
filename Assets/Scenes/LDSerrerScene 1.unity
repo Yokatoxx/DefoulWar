@@ -26772,7 +26772,7 @@ PrefabInstance:
     - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: volume
       value: 
-      objectReference: {fileID: 1057034679}
+      objectReference: {fileID: 1553481446}
     - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: dashSystem
       value: 
@@ -26783,11 +26783,31 @@ PrefabInstance:
       objectReference: {fileID: 1856454561}
     - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: dashEffectDuration
-      value: 5
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: dashParticleSystem
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: dashVignetteDuration
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: dashVignetteIntensity
+      value: 0.72
       objectReference: {fileID: 0}
     - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: dashEffectLensIntensity
-      value: -1
+      value: -0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: deactivateParticleGOOnStop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9088486695770291489, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -33937,55 +33957,6 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 8422785729160626329, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
   m_PrefabInstance: {fileID: 936028692}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1057034678
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1057034680}
-  - component: {fileID: 1057034679}
-  m_Layer: 0
-  m_Name: Sky and Fog Global Volume
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1057034679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1057034678}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  priority: 0
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: 2aa8778565ee7a94c96ca453f44f7a9c, type: 2}
---- !u!4 &1057034680
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1057034678}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.0412464, y: -6.3336854, z: -5.1287494}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1058636332
 GameObject:
   m_ObjectHideFlags: 0
@@ -50553,10 +50524,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsGlobal: 1
-  priority: 0
+  priority: 1
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: 9fc760bd40aa40e44904bd260fe1e25f, type: 2}
+  sharedProfile: {fileID: 11400000, guid: 2aa8778565ee7a94c96ca453f44f7a9c, type: 2}
 --- !u!4 &1553481447
 Transform:
   m_ObjectHideFlags: 0
@@ -60867,7 +60838,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2040653890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62521,4 +62492,3 @@ SceneRoots:
   - {fileID: 278019717}
   - {fileID: 1164128010}
   - {fileID: 1236325952}
-  - {fileID: 1057034680}
