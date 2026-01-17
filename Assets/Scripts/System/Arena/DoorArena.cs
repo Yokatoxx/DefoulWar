@@ -7,25 +7,26 @@ public class DoorArena : MonoBehaviour
     private Vector3 closedPosition;
     private Vector3 openPosition;
     private Vector3 currentPosition; 
-    public bool isOpen = false;
+    public bool isClosed = false;
 
-    [SerializeField] Vector3 openOffset = new Vector3(0, 5, 0);
+    [SerializeField] Vector3 closeOffset = new Vector3(0, -5, 0);
 
     private void Start()
     {
-        closedPosition = doorObject.transform.position;
-        openPosition = closedPosition + openOffset;
+        // La position dans la scene = position ouverte
+        openPosition = doorObject.transform.position;
+        closedPosition = openPosition + closeOffset;
     }
 
     private void Update()
     {
-        if (isOpen)
+        if (isClosed)
         {
-            currentPosition = Vector3.MoveTowards(doorObject.transform.position, openPosition, doorSpeed * Time.deltaTime);
+            currentPosition = Vector3.MoveTowards(doorObject.transform.position, closedPosition, doorSpeed * Time.deltaTime);
         }
         else
         {
-            currentPosition = Vector3.MoveTowards(doorObject.transform.position, closedPosition, doorSpeed * Time.deltaTime);
+            currentPosition = Vector3.MoveTowards(doorObject.transform.position, openPosition, doorSpeed * Time.deltaTime);
         }
         doorObject.transform.position = currentPosition;
     }

@@ -30,15 +30,9 @@ namespace Ennemies.Effect
         [Tooltip("Durée de l'effet visuel de réflexion")]
         [SerializeField] private float reflectEffectDuration = 0.5f;
         
-        [Header("Soin lors du dash")]
-        [Tooltip("Points de vie rendus au joueur lorsqu'il tue cet ennemi avec un dash")]
-        [SerializeField] private float healAmount = 30f;
-        
-        [Tooltip("Effet visuel de soin (optionnel)")]
-        [SerializeField] private GameObject healEffectPrefab;
-        
-        [Tooltip("Durée de l'effet visuel de soin")]
-        [SerializeField] private float healEffectDuration = 1f;
+        [Header("Munitions lors du dash")]
+        [Tooltip("Munitions rendues au joueur lorsqu'il tue cet ennemi avec un dash")]
+        [SerializeField] private int ammoAmount = 10;
         
         [Header("Effet visuel de protection")]
         [Tooltip("Particules ou aura de protection magique (optionnel)")]
@@ -83,8 +77,8 @@ namespace Ennemies.Effect
             // Vérifier si l'ennemi a été tué par un dash (centralisé via EnemyHealth)
             if (health != null && health.LastKillType == DamageType.Dash)
             {
-                // Soigner le joueur
-                HealPlayer();
+                // Donner des munitions au joueur
+                GiveAmmoToPlayer();
             }
             
             // Désactiver l'effet de bouclier magique
@@ -194,20 +188,14 @@ namespace Ennemies.Effect
             }
         }
         
-        // Soigne le joueur
-        private void HealPlayer()
+        // Donne des munitions au joueur
+        private void GiveAmmoToPlayer()
         {
-            var player = FindFirstObjectByType<PlayerHealth>();
-            if (player != null)
+            var weaponSystem = FindFirstObjectByType<WeaponSystem>();
+            if (weaponSystem != null && ammoAmount > 0)
             {
-                player.Heal(healAmount);
-                Debug.Log($"[MagicEnemy] Le joueur a récupéré {healAmount} PV !");
-                
-                // Créer l'effet visuel de soin sur le joueur
-                if (healEffectPrefab != null)
-                {
-                    CreateHealEffect(player.transform.position);
-                }
+                weaponSystem.AddAmmo(ammoAmount);
+                Debug.Log($"[MagicEnemy] Le joueur a récupéré {ammoAmount} munitions !");
             }
         }
         
@@ -216,13 +204,6 @@ namespace Ennemies.Effect
         {
             GameObject effect = Instantiate(reflectEffectPrefab, position, Quaternion.identity);
             Destroy(effect, reflectEffectDuration);
-        }
-        
-        // Crée un effet visuel de soin
-        private void CreateHealEffect(Vector3 position)
-        {
-            GameObject effect = Instantiate(healEffectPrefab, position, Quaternion.identity);
-            Destroy(effect, healEffectDuration);
         }
     }
 }

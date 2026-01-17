@@ -3,11 +3,56 @@ guid: 5a473b067884d2848962e43f5cbe9a18
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Bas
+    second: {fileID: 2100000, guid: 0cc6ab49abbb6544ea88b46b1c031eec, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Detail_Fenetre
+    second: {fileID: 2100000, guid: a66f97510f04b8e4dbbbafd80b1e968c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Fenetre
+    second: {fileID: 2100000, guid: 329f54c96a0f26749b5063a3c41a887c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Haut
+    second: {fileID: 2100000, guid: 7b350760984094f468b7937394fc8776, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Mid
+    second: {fileID: 2100000, guid: 9949b162368064848990b96a815d787b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Mid_Haut
+    second: {fileID: 2100000, guid: 28da35b21dbd2a142921ac6bd48d839a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Pillier_Droit
+    second: {fileID: 2100000, guid: 788d2ccafc7e88c4597a76ae8bf42a4c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Pillier_Gauche
+    second: {fileID: 2100000, guid: 48b7bd17d1c4ef444a5af9cfa8734360, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Magasin_1_Porte
+    second: {fileID: 2100000, guid: 785143038c9160947b613c6c37603588, type: 2}
   materials:
     materialImportMode: 2
-    materialName: 0
-    materialSearch: 1
+    materialName: 1
+    materialSearch: 2
     materialLocation: 1
   animations:
     legacyGenerateAnimations: 4

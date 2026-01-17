@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FPS; // EnemyHealth
@@ -19,7 +19,7 @@ public class ArenaRunner : MonoBehaviour
     {
         if (arena == null)
         {
-            Debug.LogError("[ArenaRunner] ArenaSetter non assigné sur ce composant.");
+            Debug.LogError("[ArenaRunner] ArenaSetter non assignÃ© sur ce composant.");
             enabled = false;
             return;
         }
@@ -50,12 +50,12 @@ public class ArenaRunner : MonoBehaviour
         if (currentWave >= arena.totalWaves)
         {
             if (debugLogs) Debug.Log("[ArenaRunner] Arena complete!");
-            if (arena.door != null) arena.door.isOpen = true;
+            if (arena.door != null) arena.door.isClosed = false;
             startingWave = false;
             yield break;
         }
 
-        // délai entre vagues
+        // dÃ©lai entre vagues
         if (arena.delayBetweenWaves > 0f)
             yield return new WaitForSeconds(arena.delayBetweenWaves);
 
@@ -83,7 +83,7 @@ public class ArenaRunner : MonoBehaviour
             }
             if (wave.count <= 0)
             {
-                if (debugLogs) Debug.LogWarning($"[ArenaRunner] WaveSetter (index {wave.spawnWaveNb}) count <= 0, rien à spawn.");
+                if (debugLogs) Debug.LogWarning($"[ArenaRunner] WaveSetter (index {wave.spawnWaveNb}) count <= 0, rien Ã  spawn.");
                 continue;
             }
             if (wave.spawnPoints == null || wave.spawnPoints.Count == 0)
@@ -92,7 +92,7 @@ public class ArenaRunner : MonoBehaviour
                 continue;
             }
 
-            // Instancier les ennemis de cette entrée
+            // Instancier les ennemis de cette entrÃ©e
             for (int i = 0; i < wave.count; i++)
             {
                 Transform spawnPoint = PickValidSpawnPoint(wave.spawnPoints);
@@ -110,13 +110,13 @@ public class ArenaRunner : MonoBehaviour
                 }
                 else
                 {
-                    if (debugLogs) Debug.LogWarning("[ArenaRunner] Enemy instancié sans EnemyHealth (le décrément ne se fera pas automatiquement).");
+                    if (debugLogs) Debug.LogWarning("[ArenaRunner] Enemy instanciÃ© sans EnemyHealth (le dÃ©crÃ©ment ne se fera pas automatiquement).");
                 }
 
                 ennemiesAlive++;
                 spawnedThisWave++;
 
-                // délai entre ennemis
+                // dÃ©lai entre ennemis
                 if (arena.delayBetweenEnemies > 0f)
                     yield return new WaitForSeconds(arena.delayBetweenEnemies);
             }
@@ -124,8 +124,8 @@ public class ArenaRunner : MonoBehaviour
 
         if (spawnedThisWave == 0)
         {
-            // Rien spawné pour cette vague (mauvaise config ?), on passe à la suivante pour éviter le blocage
-            Debug.LogWarning($"[ArenaRunner] Aucune entrée WaveSetter correspondant à la vague {currentWave} ou config invalide. On passe à la suivante.");
+            // Rien spawnÃ© pour cette vague (mauvaise config ?), on passe Ã  la suivante pour Ã©viter le blocage
+            Debug.LogWarning($"[ArenaRunner] Aucune entrÃ©e WaveSetter correspondant Ã  la vague {currentWave} ou config invalide. On passe Ã  la suivante.");
         }
 
         currentWave++;
@@ -139,7 +139,7 @@ public class ArenaRunner : MonoBehaviour
             // eviter boucle infinie: ne lance pas Next si on a atteint totalWaves
             if (currentWave < arena.totalWaves)
                 StartCoroutine(StartNextWave());
-            else if (arena.door != null) arena.door.isOpen = true;
+            else if (arena.door != null) arena.door.isClosed = false;
         }
     }
 
@@ -164,11 +164,11 @@ public class ArenaRunner : MonoBehaviour
     {
         if (arena.waves == null || arena.waves.Count == 0)
         {
-            Debug.LogWarning("[ArenaRunner] ArenaSetter.waves est vide. Aucune vague ne sera spawné.");
+            Debug.LogWarning("[ArenaRunner] ArenaSetter.waves est vide. Aucune vague ne sera spawnÃ©.");
             return;
         }
 
-        // Log d’aperçu
+        // Log dâ€™aperÃ§u
         if (debugLogs)
         {
             for (int i = 0; i < arena.waves.Count; i++)

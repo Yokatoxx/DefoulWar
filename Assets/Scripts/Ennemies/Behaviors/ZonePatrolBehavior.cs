@@ -7,14 +7,10 @@ namespace Ennemies.Behaviors
     /// <summary>
     /// Comportement d'ennemi qui patrouille sur des waypoints.
     /// Poursuit le joueur s'il entre dans la zone, retourne patrouiller s'il sort.
+    /// Utilise le système de vision avec FOV.
     /// </summary>
-    public class ZonePatrolBehavior : IEnemyBehavior
+    public class ZonePatrolBehavior : BaseEnemyBehavior
     {
-        private NavMeshAgent agent;
-        private Transform player;
-        private Transform owner;
-        private EnemyBehaviorSettings settings;
-
         private Vector3 spawnPosition;
         private WaypointPath waypointPath;
         private int currentWaypointIndex;
@@ -22,29 +18,18 @@ namespace Ennemies.Behaviors
         private bool isWaiting;
         private bool hasReachedCurrentWaypoint;
 
-        private bool isChasing;
-        private bool isPatrolling;
         private bool canAttack;
-        private bool isAlerted; // Alerte quand touché par le joueur
-        private float alertTimer;
 
         private const float ARRIVAL_DISTANCE = 1.5f;
-        private const float ALERT_DURATION = 5f; // Durée de l'alerte après avoir été touché
 
-        public void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
+        public override void Initialize(NavMeshAgent agent, Transform player, EnemyBehaviorSettings settings, Transform owner)
         {
-            this.agent = agent;
-            this.player = player;
-            this.settings = settings;
-            this.owner = owner;
+            base.Initialize(agent, player, settings, owner);
             this.spawnPosition = owner.position;
-            this.isPatrolling = true;
-            this.isChasing = false;
             this.currentWaypointIndex = 0;
             this.hasReachedCurrentWaypoint = false;
             this.isWaiting = false;
-            this.isAlerted = false;
-            this.alertTimer = 0f;
+            detectionState = DetectionState.Idle;
         }
 
         /// <summary>
@@ -55,47 +40,74 @@ namespace Ennemies.Behaviors
             this.waypointPath = path;
             if (path != null && path.WaypointCount > 0)
             {
-                // Commencer au waypoint le plus proche
                 currentWaypointIndex = path.GetClosestWaypointIndex(owner.position);
                 isWaiting = false;
                 hasReachedCurrentWaypoint = false;
             }
         }
 
-        public void Execute()
+        protected override void ExecuteBehavior()
         {
             if (agent == null || player == null) return;
 
-            // Gérer le timer d'alerte
-            if (isAlerted)
-            {
-                alertTimer -= Time.deltaTime;
-                if (alertTimer <= 0f)
-                {
-                    isAlerted = false;
-                }
-            }
-
             float distanceToPlayer = Vector3.Distance(owner.position, player.position);
             float distancePlayerToSpawn = Vector3.Distance(player.position, spawnPosition);
-
             bool playerInZone = distancePlayerToSpawn <= settings.patrolRadius;
-            bool playerDetected = distanceToPlayer <= settings.detectionRange;
-            bool hasLineOfSight = !settings.requireLineOfSight || CheckLineOfSight();
+            bool canSeePlayer = IsPlayerInFieldOfView();
 
-            // Si alerté (touché par le joueur), poursuivre le joueur sans limite de distance
-            // Sinon, poursuivre seulement si le joueur est dans la zone ET détecté ET visible
-            if (isAlerted || (playerInZone && playerDetected && hasLineOfSight))
+            switch (detectionState)
             {
-                isChasing = true;
-                isPatrolling = false;
+                case DetectionState.Idle:
+                    HandleIdleState(canSeePlayer, playerInZone);
+                    break;
+
+                case DetectionState.Chasing:
+                    HandleChasingState(canSeePlayer, distanceToPlayer, playerInZone);
+                    break;
+
+                case DetectionState.Investigating:
+                    HandleInvestigatingState(canSeePlayer);
+                    break;
+
+                case DetectionState.Lost:
+                    HandleLostState(canSeePlayer);
+                    break;
+            }
+        }
+
+        private void HandleIdleState(bool canSeePlayer, bool playerInZone)
+        {
+            canAttack = false;
+
+            // Patrouiller normalement
+            ExecutePatrol();
+
+            // Détection du joueur dans la zone
+            if (canSeePlayer && playerInZone)
+            {
+                if (TryStartChaseWithTurn())
+                {
+                    detectionState = DetectionState.Chasing;
+                    return;
+                }
+                StartChasing();
+            }
+        }
+
+        private void HandleChasingState(bool canSeePlayer, float distanceToPlayer, bool playerInZone)
+        {
+            if (canSeePlayer)
+            {
+                UpdateLastKnownPosition();
+                AlertNearbyEnemies();
+
                 agent.speed = settings.chaseSpeed;
 
                 if (distanceToPlayer <= settings.attackRange)
                 {
                     agent.isStopped = true;
                     canAttack = true;
-                    RotateTowardsPlayer();
+                    RotateTowardsPlayerSmooth();
                 }
                 else
                 {
@@ -106,19 +118,72 @@ namespace Ennemies.Behaviors
             }
             else
             {
-                isChasing = false;
-                isPatrolling = true;
+                // Perte de vue - investigation
+                detectionState = DetectionState.Investigating;
+                investigationTimer = settings.investigationTime;
+                agent.SetDestination(lastKnownPlayerPosition);
+                agent.isStopped = false;
                 canAttack = false;
-                agent.speed = settings.patrolSpeed;
-
-                ExecutePatrol();
             }
+        }
+
+        private void HandleInvestigatingState(bool canSeePlayer)
+        {
+            canAttack = false;
+
+            if (canSeePlayer)
+            {
+                StartChasing();
+                return;
+            }
+
+            if (!HasReachedLastKnownPosition())
+            {
+                agent.SetDestination(lastKnownPlayerPosition);
+                agent.isStopped = false;
+            }
+            else
+            {
+                agent.isStopped = true;
+                if (UpdateInvestigationTimer())
+                {
+                    detectionState = DetectionState.Lost;
+                    ResetAlertState();
+                }
+            }
+        }
+
+        private void HandleLostState(bool canSeePlayer)
+        {
+            canAttack = false;
+
+            if (canSeePlayer)
+            {
+                StartChasing();
+            }
+            else
+            {
+                // Retour à la patrouille
+                detectionState = DetectionState.Idle;
+                agent.speed = settings.patrolSpeed;
+            }
+        }
+
+        private void StartChasing()
+        {
+            detectionState = DetectionState.Chasing;
+            agent.speed = settings.chaseSpeed;
+            agent.isStopped = false;
+            UpdateLastKnownPosition();
         }
 
         private void ExecutePatrol()
         {
+            agent.speed = settings.patrolSpeed;
+
             if (waypointPath == null || waypointPath.WaypointCount == 0)
             {
+                // Pas de waypoints, rester au spawn
                 if (Vector3.Distance(owner.position, spawnPosition) > 0.5f)
                 {
                     agent.isStopped = false;
@@ -131,7 +196,7 @@ namespace Ennemies.Behaviors
                 return;
             }
 
-            // Phase d'attente au waypoint
+            // Phase d'attente
             if (isWaiting)
             {
                 agent.isStopped = true;
@@ -145,7 +210,7 @@ namespace Ennemies.Behaviors
                 return;
             }
 
-            // Phase de déplacement vers le waypoint actuel
+            // Déplacement vers le waypoint
             Transform targetWaypoint = waypointPath.GetWaypoint(currentWaypointIndex);
             if (targetWaypoint == null) return;
 
@@ -186,59 +251,47 @@ namespace Ennemies.Behaviors
             }
         }
 
-        private void RotateTowardsPlayer()
-        {
-            Vector3 direction = (player.position - owner.position).normalized;
-            direction.y = 0;
+        public override bool CanAttack() => canAttack;
+        public override bool IsChasing() => detectionState == DetectionState.Chasing;
+        public override bool IsPatrolling() => detectionState == DetectionState.Idle;
 
-            if (direction != Vector3.zero)
+        public override void OnDamageTaken()
+        {
+            // Touché = alerte immédiate et poursuite
+            if (player != null && detectionState != DetectionState.Chasing)
             {
-                Quaternion lookRotation = Quaternion.LookRotation(direction);
-                owner.rotation = Quaternion.Slerp(owner.rotation, lookRotation, Time.deltaTime * settings.rotationSpeed);
+                UpdateLastKnownPosition();
+                StartChasing();
             }
         }
 
-        private bool CheckLineOfSight()
-        {
-            Vector3 eyePosition = owner.position + Vector3.up * settings.eyeHeight;
-            Vector3 targetPosition = player.position + Vector3.up * 1f;
-            Vector3 direction = targetPosition - eyePosition;
-            float distance = direction.magnitude;
-
-            if (Physics.Raycast(eyePosition, direction.normalized, out RaycastHit hit, distance, settings.obstacleLayer))
-            {
-                return hit.transform == player || hit.transform.IsChildOf(player);
-            }
-            
-            return true;
-        }
-
-        public bool CanAttack() => canAttack;
-        public bool IsChasing() => isChasing;
-        public bool IsPatrolling() => isPatrolling;
-
-        public void OnDamageTaken()
-        {
-            // Quand l'ennemi est touché, il devient alerté et poursuit le joueur
-            isAlerted = true;
-            alertTimer = ALERT_DURATION;
-        }
-
-        public void DrawGizmos()
+        public override void DrawGizmos()
         {
             if (settings == null) return;
 
             Vector3 zoneCenter = Application.isPlaying ? spawnPosition : (owner != null ? owner.position : Vector3.zero);
+            
+            // Zone de patrouille
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(zoneCenter, settings.patrolRadius);
 
             if (owner != null)
             {
+                // Détection
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(owner.position, settings.detectionRange);
 
+                // Attaque
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(owner.position, settings.attackRange);
+
+                // Cône de vision
+                float halfAngle = settings.viewAngle / 2f;
+                Vector3 leftDir = Quaternion.Euler(0, -halfAngle, 0) * owner.forward;
+                Vector3 rightDir = Quaternion.Euler(0, halfAngle, 0) * owner.forward;
+                Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+                Gizmos.DrawRay(owner.position + Vector3.up * settings.eyeHeight, leftDir * settings.detectionRange);
+                Gizmos.DrawRay(owner.position + Vector3.up * settings.eyeHeight, rightDir * settings.detectionRange);
             }
 
             if (Application.isPlaying)
@@ -246,7 +299,16 @@ namespace Ennemies.Behaviors
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawSphere(spawnPosition, 0.3f);
                 
-                if (waypointPath != null && waypointPath.WaypointCount > 0)
+                // Dernière position connue
+                if (detectionState == DetectionState.Investigating)
+                {
+                    Gizmos.color = Color.magenta;
+                    Gizmos.DrawWireSphere(lastKnownPlayerPosition, 0.5f);
+                    Gizmos.DrawLine(owner.position, lastKnownPlayerPosition);
+                }
+
+                // Waypoint actuel
+                if (waypointPath != null && waypointPath.WaypointCount > 0 && detectionState == DetectionState.Idle)
                 {
                     Transform currentWP = waypointPath.GetWaypoint(currentWaypointIndex);
                     if (currentWP != null && owner != null)
@@ -259,4 +321,3 @@ namespace Ennemies.Behaviors
         }
     }
 }
-

@@ -28,6 +28,6 @@ public class ArenaSetter : MonoBehaviour
     public void TriggerWave()
     {
         waveStarted = true;
-        if (door != null) door.isOpen = false;
+        if (door != null) door.isClosed = true;
     }
 }

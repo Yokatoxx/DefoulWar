@@ -79,8 +79,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16bb0ed92c0240aa9cddb09695e8ee2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
+  maxHealth: 300
   currentHealth: 0
+  bulletDamageMultiplier: 0
+  dashDamageMultiplier: 1
+  electricDamageMultiplier: 1
   spawnInvulnerabilityDuration: 0
   spawnInvulnerableAllDamage: 0
   OnDeath:
@@ -148,9 +151,7 @@ MonoBehaviour:
   magicBulletPrefab: {fileID: 0}
   reflectEffectPrefab: {fileID: 0}
   reflectEffectDuration: 0.5
-  healAmount: 30
-  healEffectPrefab: {fileID: 0}
-  healEffectDuration: 1
+  ammoAmount: 12
   magicShieldEffect: {fileID: 0}
   hitScanFx: {fileID: 7108234100319031770}
 --- !u!114 &7108234100319031770
@@ -271,7 +272,7 @@ Transform:
   m_GameObject: {fileID: 463622794186511725}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.084, z: 0.486}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0.486}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -329,7 +330,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ebc5ba2f3818d9d4696db231285fc9c3, type: 2}
+  - {fileID: 2100000, guid: e9360cb2bf0187b48a398456ccc9fd36, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -477,8 +478,8 @@ Transform:
   m_GameObject: {fileID: 7108478021694863082}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 0.6158, z: 1}
+  m_LocalPosition: {x: 0, y: 1.25, z: 0}
+  m_LocalScale: {x: 1, y: 0.86581486, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2657800489959688396}

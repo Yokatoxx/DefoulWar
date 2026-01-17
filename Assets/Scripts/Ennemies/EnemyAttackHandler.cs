@@ -44,11 +44,30 @@ namespace Ennemies
             }
         }
 
+        // Position cible override (pour système de charge sniper)
+        private Vector3? targetPositionOverride = null;
+
         /// <summary>
         /// Tente d'effectuer une attaque si le cooldown est terminé.
         /// </summary>
         /// <returns>True si l'attaque a été effectuée</returns>
         public bool TryAttack()
+        {
+            return TryAttackInternal();
+        }
+
+        /// <summary>
+        /// Tente d'effectuer une attaque vers une position spécifique (pour système sniper).
+        /// </summary>
+        public bool TryAttackAtPosition(Vector3 targetPosition)
+        {
+            targetPositionOverride = targetPosition;
+            bool result = TryAttackInternal();
+            targetPositionOverride = null;
+            return result;
+        }
+
+        private bool TryAttackInternal()
         {
             if (settings == null || player == null) return false;
 
@@ -58,9 +77,6 @@ namespace Ennemies
             }
 
             lastAttackTime = Time.time;
-
-            // Trigger animation d'attaque
-            // animator?.SetTrigger("OnAttack");
 
             switch (settings.attackType)
             {
@@ -113,12 +129,20 @@ namespace Ennemies
         {
             Vector3 origin = shootPoint.position;
 
-            // Viser le centre du joueur
-            Vector3 targetPoint = player.position + Vector3.up * 1f;
-            Collider playerCollider = player.GetComponentInChildren<Collider>();
-            if (playerCollider != null)
+            // Utiliser la position override (système sniper) ou viser le joueur
+            Vector3 targetPoint;
+            if (targetPositionOverride.HasValue)
             {
-                targetPoint = playerCollider.bounds.center;
+                targetPoint = targetPositionOverride.Value;
+            }
+            else
+            {
+                targetPoint = player.position + Vector3.up * 1f;
+                Collider playerCollider = player.GetComponentInChildren<Collider>();
+                if (playerCollider != null)
+                {
+                    targetPoint = playerCollider.bounds.center;
+                }
             }
 
             Vector3 direction = (targetPoint - origin).normalized;
