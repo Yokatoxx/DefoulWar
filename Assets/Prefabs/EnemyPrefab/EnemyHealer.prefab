@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 6348895224033040618}
   - component: {fileID: 634873112719374832}
   - component: {fileID: 9116389384450429012}
+  - component: {fileID: 5195460515959347227}
   m_Layer: 7
   m_Name: EnemyHealer
   m_TagString: Enemy
@@ -42,7 +43,6 @@ Transform:
   - {fileID: 6596681278480451813}
   - {fileID: 9125597042352771045}
   - {fileID: 5979755068541550699}
-  - {fileID: 5743799630026415703}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &1654310326663819305
@@ -222,6 +222,22 @@ MonoBehaviour:
   enableAutoSearchFallback: 1
   autoSearchRange: 25
   searchInterval: 1
+--- !u!114 &5195460515959347227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78bdb05f29246f74597174e382e9a0c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healAmount: 30
+  healEffectPrefab: {fileID: 0}
+  healZonePrefab: {fileID: 3080169361055456811, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
+  healEffectDuration: 1
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
@@ -555,69 +571,3 @@ MonoBehaviour:
   baseDamageMultiplier: 1
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
---- !u!1001 &6378359495037337242
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 2657800489959688396}
-    m_Modifications:
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3080169361055456811, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: m_Name
-      value: Healzone
-      objectReference: {fileID: 0}
-    - target: {fileID: 8583090071080262807, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-      propertyPath: healPerSecond
-      value: 50
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
---- !u!4 &5743799630026415703 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1671521000003346637, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
-  m_PrefabInstance: {fileID: 6378359495037337242}
-  m_PrefabAsset: {fileID: 0}

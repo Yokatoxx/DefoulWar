@@ -15,7 +15,10 @@ namespace Ennemies.Effect
         
         [Tooltip("Effet visuel de soin (optionnel)")]
         [SerializeField] private GameObject healEffectPrefab;
-        
+
+
+        [SerializeField] private GameObject healZonePrefab;
+
         [Tooltip("Durée de l'effet visuel de soin")]
         [SerializeField] private float healEffectDuration = 1f;
 
@@ -41,9 +44,17 @@ namespace Ennemies.Effect
         private void OnDeath()
         {
             // Vérifier si l'ennemi a été tué par un dash
-            if (health != null && health.LastKillType == DamageType.Dash)
+            if (health != null)
             {
-                HealPlayer();
+                if (health.LastKillType == DamageType.Dash)
+                {
+                    HealPlayer();
+                }
+                else if (health.LastKillType == DamageType.Bullet)
+                {
+                    SpawnHealZone();
+                }
+
             }
         }
 
@@ -61,6 +72,14 @@ namespace Ennemies.Effect
                     GameObject effect = Instantiate(healEffectPrefab, player.transform.position, Quaternion.identity);
                     Destroy(effect, healEffectDuration);
                 }
+            }
+        }
+
+        private void SpawnHealZone()
+        {
+            if (healZonePrefab != null)
+            {
+                Instantiate(healZonePrefab, transform.position, Quaternion.identity);
             }
         }
     }
