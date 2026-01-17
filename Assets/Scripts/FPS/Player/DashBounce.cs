@@ -5,20 +5,19 @@ namespace FPS
 {
     /// <summary>
     /// Gère le rebond (bounce) après un dash réussi.
-    /// Extrait de DashCible pour simplifier la logique.
+    /// Utilise BounceSettings pour la configuration via DashSettings.
     /// </summary>
     public class DashBounce : MonoBehaviour
     {
-        [Header("Bounce Configurations")]
-        [SerializeField] private BounceDefinition groundBounce;
-        [SerializeField] private BounceDefinition airBounce;
+        private BounceSettings groundBounce;
+        private BounceSettings airBounce;
         
         private FPSMovement fpsMovement;
         private Rigidbody rb;
         private Coroutine bounceCoroutine;
+        private Vector3 lastDashDirection;
         
-        public BounceDefinition GroundBounce => groundBounce;
-        public BounceDefinition AirBounce => airBounce;
+        public bool IsBouncing => bounceCoroutine != null;
         
         private void Awake()
         {
@@ -27,18 +26,18 @@ namespace FPS
         }
         
         /// <summary>
-        /// Configure les définitions de rebond.
+        /// Configure le module avec les paramètres Bounce depuis DashSettings.
         /// </summary>
-        public void Configure(BounceDefinition ground, BounceDefinition air)
+        public void Configure(BounceSettings ground, BounceSettings air)
         {
             groundBounce = ground;
             airBounce = air;
         }
         
         /// <summary>
-        /// Retourne la configuration de rebond appropriée selon l'état du joueur.
+        /// Retourne la configuration appropriée selon l'état du joueur.
         /// </summary>
-        public BounceDefinition GetCurrentBounce()
+        public BounceSettings GetCurrentBounce()
         {
             bool grounded = fpsMovement == null || fpsMovement.IsGrounded;
             return grounded ? (groundBounce ?? airBounce) : (airBounce ?? groundBounce);
@@ -49,6 +48,8 @@ namespace FPS
         /// </summary>
         public void StartBounce(Vector3 dashDirection)
         {
+            lastDashDirection = dashDirection;
+            
             if (bounceCoroutine != null)
             {
                 StopCoroutine(bounceCoroutine);
@@ -68,7 +69,7 @@ namespace FPS
             }
         }
         
-        private IEnumerator ApplyBounceOverTime(Vector3 dashDirection, BounceDefinition config)
+        private IEnumerator ApplyBounceOverTime(Vector3 dashDirection, BounceSettings config)
         {
             if (config == null || config.force <= 0f)
             {
@@ -83,7 +84,7 @@ namespace FPS
                 yield break;
             }
 
-            // Application instantanée si pas de durée ou pas de courbe
+            // Impulsion instantanée si pas de durée ou pas de courbe
             if (config.duration <= 0f || config.forceOverTime == null)
             {
                 Vector3 instantImpulse = dir.normalized * config.force;
@@ -92,7 +93,7 @@ namespace FPS
                 yield break;
             }
 
-            // Application sur la durée avec la courbe
+            // Application progressive avec la courbe
             float elapsed = 0f;
             float duration = config.duration;
             Vector3 direction = dir.normalized;
@@ -105,7 +106,7 @@ namespace FPS
                 
                 ApplyMomentum(velocity);
 
-                elapsed += Time.deltaTime;
+                elapsed += Time.unscaledDeltaTime;
                 yield return null;
             }
 
@@ -128,9 +129,32 @@ namespace FPS
             }
         }
 
-        private Vector3 ResolveBounceDirection(Vector3 fallbackDashDirection, BounceDefinition config)
+        private Vector3 ResolveBounceDirection(Vector3 fallbackDashDirection, BounceSettings config)
         {
-            Vector3 dir = config.directionIsLocal ? transform.TransformDirection(config.direction) : config.direction;
+            Vector3 dir;
+            
+            // Mode dynamique: utilise l'inverse de la direction du dash + composante verticale
+            if (config.useDashDirectionAsBounce)
+            {
+                Vector3 inverseDash = -fallbackDashDirection.normalized;
+                inverseDash.y = 0f;
+                if (inverseDash.sqrMagnitude > 1e-4f)
+                {
+                    inverseDash = inverseDash.normalized;
+                }
+                else
+                {
+                    inverseDash = -transform.forward;
+                }
+                
+                dir = inverseDash + Vector3.up * config.verticalComponent;
+            }
+            else
+            {
+                // Mode statique: direction configurée
+                dir = config.directionIsLocal ? transform.TransformDirection(config.direction) : config.direction;
+            }
+            
             if (dir.sqrMagnitude <= 1e-4f)
                 dir = -fallbackDashDirection;
             if (dir.sqrMagnitude <= 1e-4f)

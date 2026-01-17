@@ -7,6 +7,7 @@ namespace FPS
     /// <summary>
     /// Gère le knockback physique des ennemis lors d'un dash.
     /// Utilise un Rigidbody pour la physique et réactive le NavMeshAgent après le knockback.
+    /// Supporte l'effet domino (repousse les ennemis sur le passage).
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class EnemyKnockback : MonoBehaviour
@@ -14,6 +15,20 @@ namespace FPS
         [Header("Knockback Settings")]
         [Tooltip("Si true, cet ennemi résiste au knockback (ne sera pas repoussé)")]
         [SerializeField] private bool resistToKnockback = false;
+        
+        [Header("Effet Domino")]
+        [Tooltip("Si true, cet ennemi peut repousser d'autres ennemis quand il est projeté")]
+        [SerializeField] private bool canPushOtherEnemies = true;
+        
+        [Tooltip("Force transmise aux autres ennemis (multiplicateur de la force reçue)")]
+        [Range(0.1f, 1f)]
+        [SerializeField] private float dominoForceMultiplier = 0.6f;
+        
+        [Tooltip("Rayon de détection des autres ennemis pour l'effet domino")]
+        [SerializeField] private float dominoPushRadius = 1.2f;
+        
+        [Tooltip("Layer des ennemis pour la détection domino")]
+        [SerializeField] private LayerMask enemyLayer;
         
         [Header("Visual Feedback")]
         [Tooltip("Particule d'impact à instancier lors du knockback")]
@@ -37,14 +52,13 @@ namespace FPS
         private bool isKnockbackActive;
         private Coroutine knockbackCoroutine;
         
-        /// <summary>
-        /// Indique si cet ennemi résiste au knockback
-        /// </summary>
-        public bool ResistToKnockback => resistToKnockback;
+        // Pour éviter les boucles infinies de knockback domino
+        private float lastDominoTime;
+        private const float DOMINO_COOLDOWN = 0.3f;
         
-        /// <summary>
-        /// Indique si un knockback est actuellement en cours
-        /// </summary>
+        private static readonly Collider[] DominoBuffer = new Collider[8];
+        
+        public bool ResistToKnockback => resistToKnockback;
         public bool IsKnockbackActive => isKnockbackActive;
         
         private void Awake()
@@ -54,13 +68,11 @@ namespace FPS
             visualFeedback = GetComponent<EnemyVisualFeedback>();
             enemyHealth = GetComponent<EnemyHealth>();
             
-            // Configuration initiale du Rigidbody
             if (rb != null)
             {
                 rb.isKinematic = true;
                 rb.interpolation = RigidbodyInterpolation.Interpolate;
                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-                // Bloquer la rotation pour éviter que l'ennemi tourne pendant le knockback
                 rb.constraints = RigidbodyConstraints.FreezeRotation;
             }
         }
@@ -68,66 +80,69 @@ namespace FPS
         /// <summary>
         /// Applique un knockback à l'ennemi dans la direction spécifiée.
         /// </summary>
-        /// <param name="direction">Direction du knockback (normalisée)</param>
-        /// <param name="force">Force du knockback</param>
-        /// <param name="duration">Durée du knockback avant de réactiver l'IA</param>
-        /// <param name="affectsYAxis">Si true, applique aussi la force sur l'axe Y</param>
         public void ApplyKnockback(Vector3 direction, float force, float duration, bool affectsYAxis = false)
         {
-            // Vérifier la résistance au knockback
+            ApplyKnockbackInternal(direction, force, duration, affectsYAxis, true);
+        }
+        
+        /// <summary>
+        /// Applique un knockback domino (avec force réduite, pas de propagation).
+        /// </summary>
+        public void ApplyDominoKnockback(Vector3 direction, float force, float duration, bool affectsYAxis = false)
+        {
+            // Éviter les boucles de knockback domino
+            if (Time.unscaledTime - lastDominoTime < DOMINO_COOLDOWN) return;
+            
+            ApplyKnockbackInternal(direction, force, duration, affectsYAxis, false);
+        }
+        
+        private void ApplyKnockbackInternal(Vector3 direction, float force, float duration, bool affectsYAxis, bool canTriggerDomino)
+        {
             if (resistToKnockback) return;
-            
-            // Vérifier si l'ennemi est mort
             if (enemyHealth != null && enemyHealth.IsDead) return;
-            
-            // Vérifier les composants nécessaires
             if (rb == null) return;
             
-            // Si un knockback est déjà en cours, l'interrompre
             if (knockbackCoroutine != null)
             {
                 StopCoroutine(knockbackCoroutine);
             }
             
-            knockbackCoroutine = StartCoroutine(KnockbackCoroutine(direction, force, duration, affectsYAxis));
+            knockbackCoroutine = StartCoroutine(KnockbackCoroutine(direction, force, duration, affectsYAxis, canTriggerDomino));
         }
         
-        private IEnumerator KnockbackCoroutine(Vector3 direction, float force, float duration, bool affectsYAxis)
+        private IEnumerator KnockbackCoroutine(Vector3 direction, float force, float duration, bool affectsYAxis, bool canTriggerDomino)
         {
             isKnockbackActive = true;
             
-            // Normaliser la direction
             direction = direction.normalized;
             
-            // Optionnellement ignorer l'axe Y
             if (!affectsYAxis)
             {
                 direction.y = 0f;
                 direction = direction.normalized;
             }
             
-            // Désactiver le NavMeshAgent
             if (agent != null && agent.enabled)
             {
                 agent.isStopped = true;
                 agent.enabled = false;
             }
             
-            // Activer la physique du Rigidbody
             rb.isKinematic = false;
-            
-            // Appliquer l'impulsion de knockback
-            rb.linearVelocity = Vector3.zero; // Reset velocity
+            rb.linearVelocity = Vector3.zero;
             rb.AddForce(direction * force, ForceMode.VelocityChange);
             
-            // Jouer les feedbacks
             PlayImpactFeedback();
             
-            // Attendre la durée du knockback (utiliser unscaledDeltaTime pour ignorer le slow-mo)
+            // Effet domino : repousser les ennemis proches
+            if (canTriggerDomino && canPushOtherEnemies)
+            {
+                TryPushNearbyEnemies(direction, force, duration);
+            }
+            
             float elapsed = 0f;
             while (elapsed < duration)
             {
-                // Vérifier si l'ennemi est mort pendant le knockback
                 if (enemyHealth != null && enemyHealth.IsDead)
                 {
                     isKnockbackActive = false;
@@ -138,18 +153,13 @@ namespace FPS
                 yield return null;
             }
             
-            // Arrêter le mouvement
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            
-            // Réactiver le Rigidbody en mode kinématique
             rb.isKinematic = true;
             
-            // Réactiver le NavMeshAgent avec Warp pour éviter les problèmes de position
             if (agent != null)
             {
-                // Trouver la position valide la plus proche sur le NavMesh
-                if (NavMesh.SamplePosition(rb.position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+                if (NavMesh.SamplePosition(rb.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
                 {
                     agent.enabled = true;
                     agent.Warp(hit.position);
@@ -157,7 +167,6 @@ namespace FPS
                 }
                 else
                 {
-                    // Si pas de position NavMesh trouvée, activer quand même l'agent
                     agent.enabled = true;
                     agent.isStopped = false;
                 }
@@ -167,21 +176,51 @@ namespace FPS
             knockbackCoroutine = null;
         }
         
+        private void TryPushNearbyEnemies(Vector3 knockbackDirection, float originalForce, float duration)
+        {
+            lastDominoTime = Time.unscaledTime;
+            
+            int count = Physics.OverlapSphereNonAlloc(
+                transform.position, 
+                dominoPushRadius, 
+                DominoBuffer, 
+                enemyLayer, 
+                QueryTriggerInteraction.Ignore
+            );
+            
+            for (int i = 0; i < count; i++)
+            {
+                var col = DominoBuffer[i];
+                if (col == null || col.gameObject == gameObject) continue;
+                
+                var otherKnockback = col.GetComponentInParent<EnemyKnockback>();
+                if (otherKnockback == null) continue;
+                if (otherKnockback.ResistToKnockback) continue;
+                if (otherKnockback.IsKnockbackActive) continue;
+                
+                // Direction depuis cet ennemi vers l'autre
+                Vector3 pushDir = (col.transform.position - transform.position).normalized;
+                if (pushDir.sqrMagnitude < 1e-4f) pushDir = knockbackDirection;
+                
+                float dominoForce = originalForce * dominoForceMultiplier;
+                float dominoDuration = duration * 0.7f;
+                
+                otherKnockback.ApplyDominoKnockback(pushDir, dominoForce, dominoDuration, false);
+            }
+        }
+        
         private void PlayImpactFeedback()
         {
-            // Feedback visuel (flash)
             if (visualFeedback != null)
             {
                 visualFeedback.ShowHitFeedback();
             }
             
-            // Particule d'impact
             if (impactParticlePrefab != null)
             {
                 Vector3 spawnPos = transform.position + particleOffset;
                 GameObject particle = Instantiate(impactParticlePrefab, spawnPos, Quaternion.identity);
                 
-                // Auto-destruction de la particule
                 var ps = particle.GetComponent<ParticleSystem>();
                 if (ps != null)
                 {
@@ -193,16 +232,12 @@ namespace FPS
                 }
             }
             
-            // Son d'impact
             if (impactSound != null)
             {
                 AudioSource.PlayClipAtPoint(impactSound, transform.position, impactVolume);
             }
         }
         
-        /// <summary>
-        /// Force l'arrêt du knockback en cours (utile si l'ennemi meurt)
-        /// </summary>
         public void CancelKnockback()
         {
             if (knockbackCoroutine != null)
@@ -213,10 +248,12 @@ namespace FPS
             
             isKnockbackActive = false;
             
-            // Remettre le Rigidbody en mode kinématique
             if (rb != null)
             {
-                rb.linearVelocity = Vector3.zero;
+                if (!rb.isKinematic)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                }
                 rb.isKinematic = true;
             }
         }
@@ -227,4 +264,3 @@ namespace FPS
         }
     }
 }
-

@@ -40,6 +40,9 @@ namespace FPS
         [Range(1f, 1.5f)]
         private float popScale = 1.2f;
         
+        [SerializeField, Tooltip("Délai entre chaque icône lors du pop (effet cascade)")]
+        private float popStagger = 0.08f;
+        
         [Header("Pulse Effect (Slow-Mo)")]
         [SerializeField, Tooltip("Activer la pulsation pendant le slow-mo")]
         private bool enablePulse = true;
@@ -127,9 +130,24 @@ namespace FPS
             if (dashCible == null || dashIcons.Count == 0 || !isInitialized) return;
             
             int totalCharges = Mathf.Max(1, dashCible.CountDash);
-            int availableCharges = dashCible.IsChainActive 
-                ? Mathf.Clamp(dashCible.RemainingChains, 0, totalCharges) 
-                : totalCharges;
+            
+            // Calculer les charges disponibles en tenant compte de l'attente d'atterrissage
+            int availableCharges;
+            if (dashCible.IsChainActive)
+            {
+                // Pendant une chaîne, afficher les charges restantes
+                availableCharges = Mathf.Clamp(dashCible.RemainingChains, 0, totalCharges);
+            }
+            else if (dashCible.IsWaitingForLanding || dashCible.IsCooldownActive)
+            {
+                // En attente d'atterrissage ou en cooldown = 0 charges
+                availableCharges = 0;
+            }
+            else
+            {
+                // Dash prêt = toutes les charges
+                availableCharges = totalCharges;
+            }
             
             bool isSlowMo = dashCible.IsSlowMoActive;
             
@@ -162,10 +180,13 @@ namespace FPS
             }
             else if (newCharges > oldCharges)
             {
-                // Des charges sont revenues - pop les icônes rechargées
+                // Des charges sont revenues - pop les icônes rechargées avec effet cascade
+                int popCount = 0;
                 for (int i = oldCharges; i < newCharges && i < dashIcons.Count; i++)
                 {
-                    PopIcon(i);
+                    float delay = popCount * popStagger;
+                    PopIcon(i, delay);
+                    popCount++;
                 }
             }
         }
@@ -194,7 +215,7 @@ namespace FPS
             iconIsActive[index] = false;
         }
 
-        private void PopIcon(int index)
+        private void PopIcon(int index, float delay = 0f)
         {
             if (index < 0 || index >= dashIcons.Count) return;
             
@@ -208,11 +229,13 @@ namespace FPS
             // Réactiver et préparer
             icon.gameObject.SetActive(true);
             icon.transform.localScale = iconOriginalScales[index] * 0.5f;
-            icon.color = readyColor;
+            icon.color = new Color(readyColor.r, readyColor.g, readyColor.b, 0f);
             
-            // Effet pop : apparaît puis grossit puis revient
+            // Effet pop avec délai : apparaît puis grossit puis revient
             Sequence seq = DOTween.Sequence();
-            seq.Append(icon.transform.DOScale(iconOriginalScales[index], popDuration * 0.5f).SetEase(Ease.OutBack));
+            seq.SetDelay(delay);
+            seq.Append(icon.DOFade(1f, popDuration * 0.3f).SetEase(Ease.OutQuad));
+            seq.Join(icon.transform.DOScale(iconOriginalScales[index], popDuration * 0.5f).SetEase(Ease.OutBack));
             seq.Append(icon.transform.DOScale(iconOriginalScales[index] * popScale, popDuration * 0.25f).SetEase(Ease.OutQuad));
             seq.Append(icon.transform.DOScale(iconOriginalScales[index], popDuration * 0.25f).SetEase(Ease.OutBounce));
             seq.SetUpdate(true);

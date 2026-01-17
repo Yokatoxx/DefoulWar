@@ -11080,6 +11080,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 741815712}
     - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: settings
+      value: 
+      objectReference: {fileID: 11400000, guid: 2954bef560f17cb4eac4a5137c05c465, type: 2}
+    - target: {fileID: 3469333960817140672, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: dashDefinition
       value: 
       objectReference: {fileID: 11400000, guid: 2b47f3fd0b85066439d0eb830e64087f, type: 2}
@@ -29343,6 +29347,7 @@ MonoBehaviour:
   depopScale: 1.3
   popDuration: 0.2
   popScale: 1.2
+  popStagger: 0.08
   enablePulse: 1
   pulseIntensity: 0.5
   pulseDuration: 0.3

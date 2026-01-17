@@ -18,13 +18,13 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1024
-  maxAimAngle: 30
+  maxAimAngle: 2
   countDash: 4
   slowMoTime: 1.1
   slowMoScale: 0.2
   distanceDash: 10
   cooldown: 1
-  dashDamage: 50
+  dashDamage: 150
   dashTravelTime: 0.065
   capsuleRadius: 0.4
   stopOffset: 1

@@ -81,7 +81,8 @@ namespace FPS
         {
             externalMomentum = momentum;
             externalMomentumGroundTimer = externalMomentumGroundGrace;
-            moveSpeed = Mathf.Max(moveSpeed, momentum.magnitude);
+            // Limiter à speedLimit pour ne pas dépasser la vitesse max
+            moveSpeed = Mathf.Min(speedLimit, Mathf.Max(moveSpeed, momentum.magnitude));
         }
         
         // Désactiver le mouvement normal (pendant le dash)
