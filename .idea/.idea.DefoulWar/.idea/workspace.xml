@@ -95,7 +95,7 @@
 }</component>
   <component name="RunManager" selected="Standalone Player.Start Unity">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\6000.0.58f2\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="E:\Unity\6000.0.58f2\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath &quot;E:\Documents\Projet Unity\DefoulWar&quot; -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="E:\Documents\Projet Unity\DefoulWar" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -105,7 +105,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\6000.0.58f2\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="E:\Unity\6000.0.58f2\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath &quot;E:\Documents\Projet Unity\DefoulWar&quot; -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="E:\Documents\Projet Unity\DefoulWar" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -167,6 +167,7 @@
       <workItem from="1767371511284" duration="3000" />
       <workItem from="1767456508078" duration="8000" />
       <workItem from="1768387555523" duration="3523000" />
+      <workItem from="1768692986209" duration="6000" />
     </task>
     <servers />
   </component>
