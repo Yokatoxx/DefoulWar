@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 namespace FPS
 {
@@ -17,32 +18,38 @@ namespace FPS
         [SerializeField, Tooltip("Liste ordonnée des icônes représentant chaque charge")]
         private List<Image> dashIcons = new();
 
-        [Header("Visual Settings")] [SerializeField, Tooltip("Couleur quand le dash est en cours de charge")]
-        private Color cooldownColor;
+        [Header("Visual Settings")]
         [SerializeField, Tooltip("Couleur quand le dash est complètement chargé")]
-        private Color readyColor;
+        private Color readyColor = Color.white;
 
         [SerializeField, Tooltip("Couleur lorsqu'un slow-mo est actif")]
-        private Color slowMoColor;
+        private Color slowMoColor = Color.yellow;
         
-        [SerializeField, Tooltip("Durée de l'animation de transition")]
-        private float transitionSpeed = 5f;
+        [Header("Animation Settings")]
+        [SerializeField, Tooltip("Durée du depop quand on utilise un dash")]
+        private float depopDuration = 0.05f;
+        
+        [SerializeField, Tooltip("Scale du depop (1.3 = 30% plus grand avant de disparaître)")]
+        [Range(1f, 1.5f)]
+        private float depopScale = 1.3f;
+        
+        [SerializeField, Tooltip("Durée du pop quand une charge revient")]
+        private float popDuration = 0.15f;
+        
+        [SerializeField, Tooltip("Scale du pop (1.2 = 20% plus grand)")]
+        [Range(1f, 1.5f)]
+        private float popScale = 1.2f;
         
         [Header("Pulse Effect (Slow-Mo)")]
-        [SerializeField, Tooltip("Intensité de la pulsation pendant le slow-mo (0.1 à 0.3 recommandé)")]
+        [SerializeField, Tooltip("Activer la pulsation pendant le slow-mo")]
+        private bool enablePulse = true;
+        
+        [SerializeField, Tooltip("Intensité de la pulsation pendant le slow-mo")]
         [Range(0f, 0.5f)]
         private float pulseIntensity = 0.15f;
         
-        [SerializeField, Tooltip("Vitesse de la pulsation pendant le slow-mo")]
-        private float pulseSpeed = 4f;
-        
-        [Header("Pop Effect (Recharge)")]
-        [SerializeField, Tooltip("Intensité du pop quand une bulle se remplit complètement (0.2 à 0.5 recommandé)")]
-        [Range(0f, 1f)]
-        private float popIntensity = 0.3f;
-        
-        [SerializeField, Tooltip("Durée de l'animation de pop en secondes")]
-        private float popDuration = 0.2f;
+        [SerializeField, Tooltip("Durée d'un cycle de pulsation")]
+        private float pulseDuration = 0.3f;
         
         [SerializeField, Tooltip("Afficher le texte de pourcentage")]
         private bool showPercentageText = true;
@@ -51,15 +58,14 @@ namespace FPS
         private bool hideWhenReady = false;
 
         private CanvasGroup canvasGroup;
-        private readonly List<float> iconFillAmounts = new();
         private readonly List<Vector3> iconOriginalScales = new();
-        private readonly List<float> iconPopTimers = new();
-        private readonly List<bool> iconWasFilled = new();
+        private readonly List<bool> iconIsActive = new();
+        private readonly List<Tweener> pulseTweens = new();
         private Color initialTextColor;
         private bool warnedAboutSlotShortage;
-        private float pulseTimer;
-        private bool wasCooldownActive;
-        
+        private int lastAvailableCharges = -1;
+        private bool isInitialized;
+
         private void Awake()
         {
             canvasGroup = GetComponent<CanvasGroup>();
@@ -68,7 +74,7 @@ namespace FPS
                 canvasGroup = gameObject.AddComponent<CanvasGroup>();
             }
             
-            SyncFillBuffer();
+            CacheOriginalScales();
             
             if (showPercentageText && cooldownText == null)
             {
@@ -81,191 +87,223 @@ namespace FPS
             }
         }
         
-        private void SyncFillBuffer()
+        private void CacheOriginalScales()
         {
-            iconFillAmounts.Clear();
             iconOriginalScales.Clear();
-            iconPopTimers.Clear();
-            iconWasFilled.Clear();
+            iconIsActive.Clear();
+            pulseTweens.Clear();
+            
             for (int i = 0; i < dashIcons.Count; i++)
             {
-                iconFillAmounts.Add(0f);
-                iconPopTimers.Add(0f);
-                iconWasFilled.Add(false);
                 if (dashIcons[i] != null)
+                {
                     iconOriginalScales.Add(dashIcons[i].transform.localScale);
+                    iconIsActive.Add(true);
+                }
                 else
+                {
                     iconOriginalScales.Add(Vector3.one);
+                    iconIsActive.Add(false);
+                }
+                pulseTweens.Add(null);
+            }
+        }
+
+        private void Start()
+        {
+            if (dashCible == null)
+                dashCible = FindFirstObjectByType<DashCible>();
+            
+            if (dashCible != null)
+            {
+                lastAvailableCharges = dashCible.CountDash;
+                RefreshAllIcons(lastAvailableCharges, false);
+                isInitialized = true;
             }
         }
         
         private void Update()
         {
-            if (dashCible == null || dashIcons.Count == 0) return;
-            if (iconFillAmounts.Count != dashIcons.Count)
-            {
-                SyncFillBuffer();
-            }
+            if (dashCible == null || dashIcons.Count == 0 || !isInitialized) return;
             
             int totalCharges = Mathf.Max(1, dashCible.CountDash);
-            int availableCharges = dashCible.IsChainActive ? Mathf.Clamp(dashCible.RemainingChains, 0, totalCharges) : totalCharges;
+            int availableCharges = dashCible.IsChainActive 
+                ? Mathf.Clamp(dashCible.RemainingChains, 0, totalCharges) 
+                : totalCharges;
             
             bool isSlowMo = dashCible.IsSlowMoActive;
-            bool isCooldown = dashCible.IsCooldownActive;
-            float cooldownProgress = dashCible.CooldownProgress;
             
-            UpdateDashIcons(totalCharges, availableCharges, isSlowMo, isCooldown, cooldownProgress);
-            UpdateCooldownText(availableCharges, totalCharges, isSlowMo, isCooldown, cooldownProgress);
+            // Détecter les changements de charges
+            if (availableCharges != lastAvailableCharges)
+            {
+                HandleChargesChanged(lastAvailableCharges, availableCharges, totalCharges);
+                lastAvailableCharges = availableCharges;
+            }
+            
+            // Gérer la pulsation pendant le slow-mo
+            HandleSlowMoPulse(isSlowMo, availableCharges);
+            
+            // Mise à jour du texte
+            UpdateCooldownText(availableCharges, totalCharges, isSlowMo);
+            
+            // Visibilité
             UpdateVisibility(availableCharges, totalCharges);
-            
-            wasCooldownActive = isCooldown;
         }
-        
-        private void UpdateDashIcons(int totalCharges, int availableCharges, bool isSlowMo, bool isCooldown, float cooldownProgress)
+
+        private void HandleChargesChanged(int oldCharges, int newCharges, int totalCharges)
+        {
+            if (newCharges < oldCharges)
+            {
+                // On a utilisé des dashes - depop les icônes consommées
+                for (int i = newCharges; i < oldCharges && i < dashIcons.Count; i++)
+                {
+                    DepopIcon(i);
+                }
+            }
+            else if (newCharges > oldCharges)
+            {
+                // Des charges sont revenues - pop les icônes rechargées
+                for (int i = oldCharges; i < newCharges && i < dashIcons.Count; i++)
+                {
+                    PopIcon(i);
+                }
+            }
+        }
+
+        private void DepopIcon(int index)
+        {
+            if (index < 0 || index >= dashIcons.Count) return;
+            
+            Image icon = dashIcons[index];
+            if (icon == null) return;
+            
+            // Kill les animations en cours
+            icon.DOKill();
+            icon.transform.DOKill();
+            StopPulseTween(index);
+            
+            // Effet depop : grossit puis disparaît
+            Sequence seq = DOTween.Sequence();
+            seq.Append(icon.transform.DOScale(iconOriginalScales[index] * depopScale, depopDuration).SetEase(Ease.OutQuad));
+            seq.AppendCallback(() => {
+                icon.gameObject.SetActive(false);
+                icon.transform.localScale = iconOriginalScales[index];
+            });
+            seq.SetUpdate(true);
+            
+            iconIsActive[index] = false;
+        }
+
+        private void PopIcon(int index)
+        {
+            if (index < 0 || index >= dashIcons.Count) return;
+            
+            Image icon = dashIcons[index];
+            if (icon == null) return;
+            
+            // Kill les animations en cours
+            icon.DOKill();
+            icon.transform.DOKill();
+            
+            // Réactiver et préparer
+            icon.gameObject.SetActive(true);
+            icon.transform.localScale = iconOriginalScales[index] * 0.5f;
+            icon.color = readyColor;
+            
+            // Effet pop : apparaît puis grossit puis revient
+            Sequence seq = DOTween.Sequence();
+            seq.Append(icon.transform.DOScale(iconOriginalScales[index], popDuration * 0.5f).SetEase(Ease.OutBack));
+            seq.Append(icon.transform.DOScale(iconOriginalScales[index] * popScale, popDuration * 0.25f).SetEase(Ease.OutQuad));
+            seq.Append(icon.transform.DOScale(iconOriginalScales[index], popDuration * 0.25f).SetEase(Ease.OutBounce));
+            seq.SetUpdate(true);
+            
+            iconIsActive[index] = true;
+        }
+
+        private void HandleSlowMoPulse(bool isSlowMo, int availableCharges)
+        {
+            for (int i = 0; i < dashIcons.Count; i++)
+            {
+                Image icon = dashIcons[i];
+                if (icon == null || !iconIsActive[i]) continue;
+                
+                bool shouldPulse = enablePulse && isSlowMo && i < availableCharges;
+                
+                if (shouldPulse && pulseTweens[i] == null)
+                {
+                    // Démarrer la pulsation
+                    icon.DOColor(slowMoColor, 0.1f).SetUpdate(true);
+                    pulseTweens[i] = icon.transform
+                        .DOScale(iconOriginalScales[i] * (1f + pulseIntensity), pulseDuration)
+                        .SetEase(Ease.InOutSine)
+                        .SetLoops(-1, LoopType.Yoyo)
+                        .SetUpdate(true);
+                }
+                else if (!shouldPulse && pulseTweens[i] != null)
+                {
+                    // Arrêter la pulsation
+                    StopPulseTween(i);
+                    icon.transform.DOScale(iconOriginalScales[i], 0.1f).SetUpdate(true);
+                    icon.DOColor(readyColor, 0.1f).SetUpdate(true);
+                }
+            }
+        }
+
+        private void StopPulseTween(int index)
+        {
+            if (index < pulseTweens.Count && pulseTweens[index] != null)
+            {
+                pulseTweens[index].Kill();
+                pulseTweens[index] = null;
+            }
+        }
+
+        private void RefreshAllIcons(int availableCharges, bool animate)
         {
             int iconCap = dashIcons.Count;
-            if (totalCharges > iconCap && !warnedAboutSlotShortage)
+            if (dashCible != null && dashCible.CountDash > iconCap && !warnedAboutSlotShortage)
             {
-                Debug.LogWarning($"DashCooldownUI: {name} n'a que {iconCap} icônes mais DashCible en demande {totalCharges}. Seules les premières seront utilisées.");
+                Debug.LogWarning($"DashCooldownUI: {name} n'a que {iconCap} icônes mais DashCible en demande {dashCible.CountDash}.");
                 warnedAboutSlotShortage = true;
             }
-            int activeIcons = Mathf.Min(totalCharges, iconCap);
             
-            // Mise à jour du timer de pulsation (en temps non-scalé pour fonctionner pendant le slow-mo)
-            if (isSlowMo)
-            {
-                pulseTimer += Time.unscaledDeltaTime * pulseSpeed;
-            }
-            else
-            {
-                pulseTimer = 0f;
-            }
-        
             for (int i = 0; i < dashIcons.Count; i++)
             {
                 Image icon = dashIcons[i];
                 if (icon == null) continue;
-                bool active = i < activeIcons;
-                if (icon.gameObject.activeSelf != active)
-                {
-                    icon.gameObject.SetActive(active);
-                }
-                if (!active) continue;
                 
-                float targetFill;
-                Color targetColor;
-                float pulseScale = 1f;
+                bool shouldBeActive = i < availableCharges;
                 
-                if (isSlowMo)
+                if (animate)
                 {
-                    // Pendant le slow-mo : bulles consommées vides, bulles restantes pleines et jaunes avec pulsation
-                    targetFill = i < availableCharges ? 1f : 0f;
-                    targetColor = slowMoColor;
-                    
-                    // Effet de pulsation sur les bulles restantes
-                    if (i < availableCharges)
-                    {
-                        pulseScale = 1f + Mathf.Sin(pulseTimer) * pulseIntensity;
-                    }
-                }
-                else if (isCooldown)
-                {
-                    // Pendant le cooldown : rechargement progressif en cascade
-                    // Chaque bulle se remplit l'une après l'autre
-                    float progressPerIcon = 1f / activeIcons;
-                    float iconStartProgress = i * progressPerIcon;
-                    float iconEndProgress = (i + 1) * progressPerIcon;
-                    
-                    // Calcul du remplissage pour cette bulle spécifique
-                    if (cooldownProgress >= iconEndProgress)
-                    {
-                        targetFill = 1f;
-                    }
-                    else if (cooldownProgress <= iconStartProgress)
-                    {
-                        targetFill = 0f;
-                    }
-                    else
-                    {
-                        // Remplissage progressif de cette bulle
-                        targetFill = (cooldownProgress - iconStartProgress) / progressPerIcon;
-                    }
-                    
-                    targetColor = targetFill >= 0.999f ? readyColor : cooldownColor;
+                    if (shouldBeActive && !iconIsActive[i])
+                        PopIcon(i);
+                    else if (!shouldBeActive && iconIsActive[i])
+                        DepopIcon(i);
                 }
                 else
                 {
-                    // État normal : toutes les bulles sont pleines et prêtes
-                    targetFill = 1f;
-                    targetColor = readyColor;
-                }
-                
-                // Snap instantané pendant le cooldown et à la fin du cooldown, animation fluide sinon
-                if (isCooldown || wasCooldownActive)
-                {
-                    iconFillAmounts[i] = targetFill;
-                }
-                else
-                {
-                    iconFillAmounts[i] = Mathf.Lerp(iconFillAmounts[i], targetFill, Time.unscaledDeltaTime * transitionSpeed);
-                }
-                icon.fillAmount = iconFillAmounts[i];
-                icon.color = targetColor;
-                
-                // Détection du remplissage complet pour déclencher le pop
-                bool isFilled = iconFillAmounts[i] >= 0.999f;
-                if (isFilled && !iconWasFilled[i] && (isCooldown || wasCooldownActive))
-                {
-                    // Déclencher l'animation de pop
-                    iconPopTimers[i] = popDuration;
-                }
-                iconWasFilled[i] = isFilled;
-                
-                // Mise à jour du timer de pop
-                if (iconPopTimers[i] > 0f)
-                {
-                    iconPopTimers[i] -= Time.unscaledDeltaTime;
-                }
-                
-                // Calcul du scale final avec pulsation et/ou pop
-                float popScale = 1f;
-                if (iconPopTimers[i] > 0f)
-                {
-                    // Animation de pop : scale up puis retour à la normale
-                    float popProgress = 1f - (iconPopTimers[i] / popDuration);
-                    // Courbe de pop : monte vite puis redescend doucement
-                    popScale = 1f + popIntensity * Mathf.Sin(popProgress * Mathf.PI);
-                }
-                
-                // Application de l'effet de pulsation et pop (scale)
-                if (i < iconOriginalScales.Count)
-                {
-                    icon.transform.localScale = iconOriginalScales[i] * pulseScale * popScale;
+                    // Setup immédiat sans animation
+                    icon.gameObject.SetActive(shouldBeActive);
+                    icon.transform.localScale = iconOriginalScales[i];
+                    icon.color = readyColor;
+                    iconIsActive[i] = shouldBeActive;
                 }
             }
         }
         
-        private void UpdateCooldownText(int availableCharges, int totalCharges, bool isSlowMo, bool isCooldown, float cooldownProgress)
+        private void UpdateCooldownText(int availableCharges, int totalCharges, bool isSlowMo)
         {
             if (!showPercentageText || cooldownText == null) return;
         
-            float percent;
+            float percent = totalCharges > 0 ? (availableCharges / (float)totalCharges) * 100f : 0f;
+            
             if (isSlowMo)
             {
-                // Pendant le slow-mo, afficher le pourcentage de charges restantes
-                percent = totalCharges > 0 ? (availableCharges / (float)totalCharges) * 100f : 0f;
                 cooldownText.color = slowMoColor;
-            }
-            else if (isCooldown)
-            {
-                // Pendant le cooldown, afficher la progression du rechargement
-                percent = cooldownProgress * 100f;
-                cooldownText.color = cooldownColor;
             }
             else
             {
-                // État normal : 100%
-                percent = 100f;
                 cooldownText.color = initialTextColor;
             }
             
@@ -282,12 +320,30 @@ namespace FPS
         
             bool allReady = availableCharges >= totalCharges;
             float targetAlpha = allReady ? 0f : 1f;
-            canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, targetAlpha, Time.deltaTime * transitionSpeed);
+            canvasGroup.DOFade(targetAlpha, 0.2f).SetUpdate(true);
         }
         
         public void SetDashCible(DashCible cible)
         {
             dashCible = cible;
+        }
+
+        private void OnDestroy()
+        {
+            // Nettoyer tous les tweens
+            foreach (var icon in dashIcons)
+            {
+                if (icon != null)
+                {
+                    icon.DOKill();
+                    icon.transform.DOKill();
+                }
+            }
+            
+            for (int i = 0; i < pulseTweens.Count; i++)
+            {
+                StopPulseTween(i);
+            }
         }
     }
 }

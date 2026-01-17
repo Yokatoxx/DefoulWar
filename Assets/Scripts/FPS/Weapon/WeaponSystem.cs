@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class WeaponSystem : MonoBehaviour
 {
@@ -37,6 +38,13 @@ public class WeaponSystem : MonoBehaviour
     [Tooltip("Vie minimum requise pour pouvoir tirer (ne peut pas se suicider)")]
     [SerializeField] private float minHealthToShoot = 1f;
     [SerializeField] private PlayerHealth playerHealth;
+
+    [Header("Events")]
+    [Tooltip("Déclenché après chaque tir (paramètre: munitions restantes dans le chargeur)")]
+    public UnityEvent<int> OnMagazineChanged;
+    
+    [Tooltip("Déclenché quand le reload est terminé")]
+    public UnityEvent OnReloadComplete;
 
     // Runtime
     private int currentMagazine;
@@ -243,6 +251,7 @@ public class WeaponSystem : MonoBehaviour
         }
 
         UpdateAmmoUI();
+        OnMagazineChanged?.Invoke(currentMagazine);
     }
     
     private void ConsumeHealthForBullet()
@@ -428,6 +437,7 @@ public class WeaponSystem : MonoBehaviour
         isReloading = false;
         if (animator != null) animator.SetBool("isReloading", false);
         UpdateAmmoUI();
+        OnReloadComplete?.Invoke();
     }
 
     private void UpdateAmmoUI()
