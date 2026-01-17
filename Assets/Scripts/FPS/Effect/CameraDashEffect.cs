@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Serialization;
 
 namespace FPS.Effect
@@ -8,38 +8,44 @@ namespace FPS.Effect
     public class CameraDashEffect : MonoBehaviour
     {
         [SerializeField] private Volume volume;
-        [FormerlySerializedAs("pillarDashSystem")] [SerializeField] private DashCible dashSystem;
+        [FormerlySerializedAs("pillarDashSystem")][SerializeField] private DashCible dashSystem;
 
         [Header("Lens Distortion")]
         [SerializeField] private float dashEffectLensIntensity = -0.5f;
         [SerializeField] private float dashEffectDuration = 0.2f;
 
-        [Header("Depth Of Field - Bokeh")]
-        [Tooltip("f-stop pendant le dash (plus petit = plus de flou). Utilis� si le DoF est en mode Bokeh.")]
-        [SerializeField] private float dashBokehAperture = 0.4f;
-        [Tooltip("Distance de mise au point pendant le dash (m�tres). Utilis� si le DoF est en mode Bokeh.")]
-        [SerializeField] private float dashBokehFocusDistance = 0.5f;
+        [Header("Depth Of Field - HDRP")]
+        [Tooltip("Distance de mise au point pendant le dash (mètres).")]
+        [SerializeField] private float dashFocusDistance = 0.5f;
+        [Tooltip("Début du flou proche pendant le dash (mètres).")]
+        [SerializeField] private float dashNearFocusStart = 0.0f;
+        [Tooltip("Fin du flou proche pendant le dash (mètres).")]
+        [SerializeField] private float dashNearFocusEnd = 0.3f;
+        [Tooltip("Début du flou éloigné pendant le dash (mètres).")]
+        [SerializeField] private float dashFarFocusStart = 0.5f;
+        [Tooltip("Fin du flou éloigné pendant le dash (mètres).")]
+        [SerializeField] private float dashFarFocusEnd = 2.0f;
 
-        [Header("Depth Of Field - Gaussian")]
-        [Tooltip("D�but du flou pendant le dash (m�tres). Utilis� si le DoF est en mode Gaussian.")]
-        [SerializeField] private float dashGaussianStart = 0.1f;
-        [Tooltip("Fin du flou pendant le dash (m�tres). Utilis� si le DoF est en mode Gaussian.")]
-        [SerializeField] private float dashGaussianEnd = 0.5f;
+        [Header("Vignette")]
+        [SerializeField] private float dashVignetteIntensity = 0.4f;
+        [SerializeField] private float dashVignetteDuration = 0.2f;
 
         [Header("Dash Particles")]
-        [Tooltip("Particle System � jouer au d�but du dash.")]
+        [Tooltip("Particle System à jouer au début du dash.")]
         [SerializeField] private ParticleSystem dashParticleSystem;
-        [Tooltip("D�sactiver le GameObject du particle system apr�s l'arr�t.")]
+        [Tooltip("Désactiver le GameObject du particle system après l'arrêt.")]
         [SerializeField] private bool deactivateParticleGOOnStop = false;
 
         private LensDistortion lensDistortion;
         private DepthOfField depthOfField;
+        private Vignette vignette;
 
-        // Sauvegarde des valeurs d�origine DoF
-        private float initialAperture;
+        // Sauvegarde des valeurs d'origine DoF
         private float initialFocusDistance;
-        private float initialGaussianStart;
-        private float initialGaussianEnd;
+        private float initialNearFocusStart;
+        private float initialNearFocusEnd;
+        private float initialFarFocusStart;
+        private float initialFarFocusEnd;
 
         private bool wasDashing;
         private Coroutine currentRoutine;
@@ -61,29 +67,33 @@ namespace FPS.Effect
             }
             else
             {
-                Debug.LogError("LensDistortion non trouv� dans le Volume profile.");
+                Debug.LogError("LensDistortion non trouvé dans le Volume profile.");
             }
 
             if (volume.profile.TryGet(out depthOfField))
             {
-                // Stocker les valeurs initiales selon le mode actif
-                if (depthOfField.mode.value == DepthOfFieldMode.Bokeh)
-                {
-                    initialAperture = depthOfField.aperture.value;
-                    initialFocusDistance = depthOfField.focusDistance.value;
-                }
-                else if (depthOfField.mode.value == DepthOfFieldMode.Gaussian)
-                {
-                    initialGaussianStart = depthOfField.gaussianStart.value;
-                    initialGaussianEnd = depthOfField.gaussianEnd.value;
-                }
+                // Stocker les valeurs initiales pour HDRP
+                initialFocusDistance = depthOfField.focusDistance.value;
+                initialNearFocusStart = depthOfField.nearFocusStart.value;
+                initialNearFocusEnd = depthOfField.nearFocusEnd.value;
+                initialFarFocusStart = depthOfField.farFocusStart.value;
+                initialFarFocusEnd = depthOfField.farFocusEnd.value;
             }
             else
             {
-                Debug.LogWarning("DepthOfField non trouv� dans le Volume profile (le blur ne sera pas appliqu�).");
+                Debug.LogWarning("DepthOfField non trouvé dans le Volume profile (le blur ne sera pas appliqué).");
             }
 
-            // S'assurer que le particle system est � l'arr�t au d�part
+            if(volume.profile.TryGet(out vignette))
+            {
+                vignette.intensity.value = 0f;
+            }
+            else
+            {
+                Debug.LogWarning("Vignette non trouvé dans le Volume profile (la vignette ne sera pas appliquée).");
+            }
+
+            // S'assurer que le particle system est à l'arrêt au départ
             StopParticles(forceClear: true);
         }
 
@@ -91,7 +101,7 @@ namespace FPS.Effect
         {
             bool nowDashing = dashSystem != null && (dashSystem.isDashing || dashSystem.slowMoApplied);
 
-            // Front montant: d�marrage des effets
+            // Front montant: démarrage des effets
             if (nowDashing && !wasDashing)
             {
                 if (currentRoutine != null)
@@ -101,7 +111,7 @@ namespace FPS.Effect
                 currentRoutine = StartCoroutine(PlayDashEffect());
             }
 
-            // Front descendant: arr�t des particules
+            // Front descendant: arrêt des particules
             if (!nowDashing && wasDashing)
             {
                 StopParticles(forceClear: false);
@@ -114,7 +124,7 @@ namespace FPS.Effect
         {
             float elapsed = 0f;
 
-            // Lerp depuis la valeur "dash" vers les valeurs neutres sur la dur�e
+            // Lerp depuis la valeur "dash" vers les valeurs neutres sur la durée
             while (elapsed < dashEffectDuration)
             {
                 elapsed += Time.deltaTime;
@@ -125,62 +135,56 @@ namespace FPS.Effect
 
                 if (depthOfField != null)
                 {
-                    if (depthOfField.mode.value == DepthOfFieldMode.Bokeh)
-                    {
-                        // Plus petit f-stop = plus de flou
-                        depthOfField.aperture.value = Mathf.Lerp(dashBokehAperture, initialAperture, t);
-                        depthOfField.focusDistance.value = Mathf.Lerp(dashBokehFocusDistance, initialFocusDistance, t);
-                    }
-                    else if (depthOfField.mode.value == DepthOfFieldMode.Gaussian)
-                    {
-                        depthOfField.gaussianStart.value = Mathf.Lerp(dashGaussianStart, initialGaussianStart, t);
-                        depthOfField.gaussianEnd.value = Mathf.Lerp(dashGaussianEnd, initialGaussianEnd, t);
-                    }
+                    // HDRP utilise focusDistance + nearFocus/farFocus ranges
+                    depthOfField.focusDistance.value = Mathf.Lerp(dashFocusDistance, initialFocusDistance, t);
+                    depthOfField.nearFocusStart.value = Mathf.Lerp(dashNearFocusStart, initialNearFocusStart, t);
+                    depthOfField.nearFocusEnd.value = Mathf.Lerp(dashNearFocusEnd, initialNearFocusEnd, t);
+                    depthOfField.farFocusStart.value = Mathf.Lerp(dashFarFocusStart, initialFarFocusStart, t);
+                    depthOfField.farFocusEnd.value = Mathf.Lerp(dashFarFocusEnd, initialFarFocusEnd, t);
                 }
+
+                if (vignette != null)
+                    vignette.intensity.value = Mathf.Lerp(dashVignetteIntensity, 0f, t);
 
                 yield return null;
             }
 
-            // R�initialisation stricte
+            // Réinitialisation stricte
             if (lensDistortion != null)
                 lensDistortion.intensity.value = 0f;
 
             if (depthOfField != null)
             {
-                if (depthOfField.mode.value == DepthOfFieldMode.Bokeh)
-                {
-                    depthOfField.aperture.value = initialAperture;
-                    depthOfField.focusDistance.value = initialFocusDistance;
-                }
-                else if (depthOfField.mode.value == DepthOfFieldMode.Gaussian)
-                {
-                    depthOfField.gaussianStart.value = initialGaussianStart;
-                    depthOfField.gaussianEnd.value = initialGaussianEnd;
-                }
+                depthOfField.focusDistance.value = initialFocusDistance;
+                depthOfField.nearFocusStart.value = initialNearFocusStart;
+                depthOfField.nearFocusEnd.value = initialNearFocusEnd;
+                depthOfField.farFocusStart.value = initialFarFocusStart;
+                depthOfField.farFocusEnd.value = initialFarFocusEnd;
             }
+
+            if(vignette != null)
+                vignette.intensity.value = 0f;
 
             currentRoutine = null;
         }
 
         private void OnDisable()
         {
-            // S�curit�: remettre les valeurs d�origine si le script est d�sactiv�
+            // Sécurité: remettre les valeurs d'origine si le script est désactivé
             if (lensDistortion != null)
                 lensDistortion.intensity.value = 0f;
 
             if (depthOfField != null)
             {
-                if (depthOfField.mode.value == DepthOfFieldMode.Bokeh)
-                {
-                    depthOfField.aperture.value = initialAperture;
-                    depthOfField.focusDistance.value = initialFocusDistance;
-                }
-                else if (depthOfField.mode.value == DepthOfFieldMode.Gaussian)
-                {
-                    depthOfField.gaussianStart.value = initialGaussianStart;
-                    depthOfField.gaussianEnd.value = initialGaussianEnd;
-                }
+                depthOfField.focusDistance.value = initialFocusDistance;
+                depthOfField.nearFocusStart.value = initialNearFocusStart;
+                depthOfField.nearFocusEnd.value = initialNearFocusEnd;
+                depthOfField.farFocusStart.value = initialFarFocusStart;
+                depthOfField.farFocusEnd.value = initialFarFocusEnd;
             }
+
+            if (vignette != null)
+                vignette.intensity.value = 0f;
 
             StopParticles(forceClear: true);
         }

@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/HDRPDefaultResources/DefaultLookDevProfile.asset.meta
 guid: c45baf1a0dc3b6e45a79301d62e6cdea
+========
+guid: 8f22843b30478af418779d596d3142be
+>>>>>>>> main:Assets/Scene_ART/LD_ART/NavMesh-Navmesh.asset.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 11400000
