@@ -182,5 +182,7 @@ namespace Ennemies.Behaviors
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(owner.position, Mathf.Max(0.25f, settings.keepDistance));
         }
+
+        public Transform GetCompanionTarget() => companionTarget;
     }
 }
