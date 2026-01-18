@@ -2,6 +2,7 @@ using UnityEngine;
 using Ennemies.Settings;
 using Ennemies; // EnemyBehaviour
 using Ennemies.Behaviors; // FollowCompanionBehavior
+using FPS; // EnemyHealth
 
 namespace Ennemies.Effect
 {
@@ -17,6 +18,12 @@ namespace Ennemies.Effect
         [SerializeField] private float autoSearchRange = 25f;
         [SerializeField] private float searchInterval = 1.0f;
 
+        [Header("Healing")]
+        [Tooltip("PV par seconde rendus au compagnon (si à portée).")]
+        [SerializeField] private float healPerSecond = 10f;
+        [Tooltip("Intervalle de tick du soin (secondes).")]
+        [SerializeField] private float tickInterval = 0.25f;
+
         private GameObject activeCompanionLine;
         private LineRenderer activeLineRenderer;
 
@@ -27,6 +34,10 @@ namespace Ennemies.Effect
         private FollowCompanionBehavior followBehavior; // comportement suivi à lire
         private Transform currentCompanion;             // cible effective (mise à jour chaque frame)
 
+        // Healing runtime
+        private EnemyHealth companionHealth;
+        private float nextHealTickTime;
+
         private void Awake()
         {
             owner = transform;
@@ -35,7 +46,6 @@ namespace Ennemies.Effect
 
         private void Start()
         {
-            // Binder après Start pour laisser EnemyBehaviour créer son currentBehavior
             controller = GetComponent<EnemyBehaviour>();
             StartCoroutine(BindFollowBehaviorWhenReady());
         }
@@ -60,7 +70,7 @@ namespace Ennemies.Effect
 
         private void Update()
         {
-            // Si le contrôleur change de settings à runtime, re-binder
+            // Rebind si settings changés
             if (controller != null &&
                 controller.Settings != null &&
                 controller.Settings.behaviorType == EnemyBehaviorType.CompanionFollower &&
@@ -69,7 +79,7 @@ namespace Ennemies.Effect
                 TryBindFollowBehavior();
             }
 
-            // 1) Utiliser la cible du FollowCompanionBehavior si présent
+            // 1) Déterminer le compagnon via FollowBehavior, sinon fallback
             if (followBehavior != null)
             {
                 currentCompanion = followBehavior.GetCompanionTarget();
@@ -88,8 +98,11 @@ namespace Ennemies.Effect
                 }
             }
 
-            // 2) Mettre à jour l’effet de ligne
+            // 2) Mettre à jour la ligne
             UpdateCompanionLine();
+
+            // 3) Mettre à jour le healing périodique
+            UpdateCompanionHealing();
         }
 
         private void TryBindFollowBehavior()
@@ -140,18 +153,14 @@ namespace Ennemies.Effect
             {
                 activeCompanionLine = Instantiate(companionLinePrefab);
                 activeLineRenderer = activeCompanionLine.GetComponent<LineRenderer>();
-                if (activeLineRenderer == null)
-                {
-                    Debug.LogWarning($"[HealEnemyPower] Le prefab '{companionLinePrefab.name}' ne contient pas de LineRenderer.");
-                }
-                else
+                if (activeLineRenderer != null)
                 {
                     activeLineRenderer.useWorldSpace = true;
                     activeLineRenderer.enabled = true;
-                    if (activeLineRenderer.sharedMaterial == null)
-                    {
-                        Debug.LogWarning("[HealEnemyPower] LineRenderer n’a pas de material. Assignez-en un au prefab pour voir la ligne.");
-                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"[HealEnemyPower] Le prefab '{companionLinePrefab.name}' ne contient pas de LineRenderer.");
                 }
             }
 
@@ -170,6 +179,41 @@ namespace Ennemies.Effect
             {
                 activeCompanionLine.transform.position = (start + end) * 0.5f;
                 activeCompanionLine.transform.rotation = Quaternion.LookRotation(end - start);
+            }
+        }
+
+        private void UpdateCompanionHealing()
+        {
+            // Conditions: cible valide, à portée, santé récupérée
+            if (currentCompanion == null || !currentCompanion.gameObject.activeInHierarchy)
+            {
+                companionHealth = null;
+                return;
+            }
+
+            float dist = Vector3.Distance(owner.position, currentCompanion.position);
+            if (dist > Mathf.Max(0.01f, companionLineShowDistance))
+            {
+                // Trop loin => pas de heal (et pas de ligne)
+                return;
+            }
+
+            // Récupérer/mémoriser EnemyHealth du compagnon
+            if (companionHealth == null)
+            {
+                companionHealth = currentCompanion.GetComponentInParent<EnemyHealth>() ?? currentCompanion.GetComponent<EnemyHealth>();
+                nextHealTickTime = Time.time + tickInterval;
+            }
+
+            if (companionHealth == null || companionHealth.IsDead)
+                return;
+
+            // Tick périodique
+            if (Time.time >= nextHealTickTime)
+            {
+                nextHealTickTime = Time.time + Mathf.Max(0.01f, tickInterval);
+                float amount = Mathf.Max(0f, healPerSecond) * Mathf.Max(0.01f, tickInterval);
+                companionHealth.Heal(amount);
             }
         }
 
@@ -215,11 +259,13 @@ namespace Ennemies.Effect
         private void OnDisable()
         {
             CleanupCompanionLine();
+            companionHealth = null;
         }
 
         private void OnDestroy()
         {
             CleanupCompanionLine();
+            companionHealth = null;
         }
     }
 }

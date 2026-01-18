@@ -222,6 +222,8 @@ MonoBehaviour:
   enableAutoSearchFallback: 0
   autoSearchRange: 25
   searchInterval: 1
+  healPerSecond: 40
+  tickInterval: 0.25
 --- !u!114 &5195460515959347227
 MonoBehaviour:
   m_ObjectHideFlags: 0

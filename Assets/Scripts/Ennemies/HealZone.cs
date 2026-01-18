@@ -6,7 +6,7 @@ using FPS; // Pour EnemyHealth
 public class HealZone : MonoBehaviour
 {
     [Header("Paramètres de soin")]
-    [SerializeField] private float healPerSecond = 10f;
+    [SerializeField] private float healPerSecond = 50f;
     [SerializeField] private float tickInterval = 0.2f; // intervalle de tick du soin
 
     [Header("Filtrage (optionnel)")]
