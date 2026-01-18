@@ -219,7 +219,7 @@ MonoBehaviour:
   companionLinePrefab: {fileID: 5977431652019704396, guid: 9d7ab1d414e046e43b2bfd92ad883748, type: 3}
   companionLineShowDistance: 12
   companionLineYOffset: 0.5
-  enableAutoSearchFallback: 1
+  enableAutoSearchFallback: 0
   autoSearchRange: 25
   searchInterval: 1
 --- !u!114 &5195460515959347227

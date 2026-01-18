@@ -1,6 +1,6 @@
 using UnityEngine;
 using Ennemies.Settings;
-using Ennemies; // EnnemiBehaviour
+using Ennemies; // EnemyBehaviour
 using Ennemies.Behaviors; // FollowCompanionBehavior
 
 namespace Ennemies.Effect
@@ -23,19 +23,53 @@ namespace Ennemies.Effect
         private Transform owner;
         private float nextSearchTime;
 
-        private FollowCompanionBehavior followBehavior; // comportement suiveur à partir duquel on lit la cible
+        private EnemyBehaviour controller;              // contrôleur modulaire
+        private FollowCompanionBehavior followBehavior; // comportement suivi à lire
         private Transform currentCompanion;             // cible effective (mise à jour chaque frame)
 
         private void Awake()
         {
             owner = transform;
             nextSearchTime = Time.time + Random.Range(0f, Mathf.Max(0.01f, searchInterval));
+        }
+
+        private void Start()
+        {
+            // Binder après Start pour laisser EnemyBehaviour créer son currentBehavior
+            controller = GetComponent<EnemyBehaviour>();
+            StartCoroutine(BindFollowBehaviorWhenReady());
+        }
+
+        private System.Collections.IEnumerator BindFollowBehaviorWhenReady()
+        {
+            // Attendre au moins une frame que EnemyBehaviour.InitializeBehavior s’exécute
+            yield return null;
+
             TryBindFollowBehavior();
+
+            // Si pas trouvé, réessayer quelques fois (dans le cas de settings réassignés tardivement)
+            const int maxTries = 10;
+            int tries = 0;
+            while (followBehavior == null && tries < maxTries)
+            {
+                yield return new WaitForSeconds(0.1f);
+                TryBindFollowBehavior();
+                tries++;
+            }
         }
 
         private void Update()
         {
-            // 1) Si FollowCompanionBehavior est présent: utiliser sa cible
+            // Si le contrôleur change de settings à runtime, re-binder
+            if (controller != null &&
+                controller.Settings != null &&
+                controller.Settings.behaviorType == EnemyBehaviorType.CompanionFollower &&
+                followBehavior == null)
+            {
+                TryBindFollowBehavior();
+            }
+
+            // 1) Utiliser la cible du FollowCompanionBehavior si présent
             if (followBehavior != null)
             {
                 currentCompanion = followBehavior.GetCompanionTarget();
@@ -60,25 +94,19 @@ namespace Ennemies.Effect
 
         private void TryBindFollowBehavior()
         {
-            // Récupérer le contrôleur modulaire
-            var controller = GetComponent<EnemyBehaviour>();
             if (controller == null) return;
+            var settings = controller.Settings;
+            if (settings == null || settings.behaviorType != EnemyBehaviorType.CompanionFollower)
+                return;
 
-            // Si le type configuré est CompanionFollower, essayer de récupérer le comportement
-            if (controller.Settings != null && controller.Settings.behaviorType == EnemyBehaviorType.CompanionFollower)
+            // Lire le champ privé 'currentBehavior' via réflexion (EnemyBehaviour instancie IEnemyBehavior dans Start)
+            var field = typeof(EnemyBehaviour).GetField("currentBehavior",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (field != null)
             {
-                // Essayer via réflexion de lire le champ privé 'currentBehavior' et le caster
-                var field = typeof(EnemyBehaviour).GetField("currentBehavior",
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-                if (field != null)
-                {
-                    var beh = field.GetValue(controller) as IEnemyBehavior;
-                    followBehavior = beh as FollowCompanionBehavior;
-                }
-
-                // Si le contrôleur expose une API publique à l’avenir, remplacer par:
-                // followBehavior = controller.GetCurrentBehavior() as FollowCompanionBehavior;
+                var beh = field.GetValue(controller) as IEnemyBehavior;
+                followBehavior = beh as FollowCompanionBehavior;
             }
         }
 
@@ -116,6 +144,15 @@ namespace Ennemies.Effect
                 {
                     Debug.LogWarning($"[HealEnemyPower] Le prefab '{companionLinePrefab.name}' ne contient pas de LineRenderer.");
                 }
+                else
+                {
+                    activeLineRenderer.useWorldSpace = true;
+                    activeLineRenderer.enabled = true;
+                    if (activeLineRenderer.sharedMaterial == null)
+                    {
+                        Debug.LogWarning("[HealEnemyPower] LineRenderer n’a pas de material. Assignez-en un au prefab pour voir la ligne.");
+                    }
+                }
             }
 
             // Mettre à jour les positions de la ligne
@@ -124,7 +161,8 @@ namespace Ennemies.Effect
 
             if (activeLineRenderer != null)
             {
-                activeLineRenderer.positionCount = 2;
+                if (activeLineRenderer.positionCount != 2)
+                    activeLineRenderer.positionCount = 2;
                 activeLineRenderer.SetPosition(0, start);
                 activeLineRenderer.SetPosition(1, end);
             }
@@ -157,7 +195,6 @@ namespace Ennemies.Effect
                 var t = eb.transform;
                 if (t == owner) continue;
 
-                // Exclure ceux configurés en CompanionFollower (on ne trace pas vers eux)
                 var s = eb.Settings;
                 if (s != null && s.behaviorType == EnemyBehaviorType.CompanionFollower)
                     continue;
