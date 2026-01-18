@@ -26679,7 +26679,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: bobFrequency
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4112391027481370878, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: weaponCamera
