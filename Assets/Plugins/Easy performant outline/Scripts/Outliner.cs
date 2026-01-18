@@ -370,6 +370,15 @@ namespace EPOOutline
 
         private void OnDisable()
         {
+            // Skip command buffer operations when using SRP (HDRP/URP)
+            if (GraphicsSettings.defaultRenderPipeline != null)
+            {
+#if UNITY_EDITOR
+                outliners.Remove(this);
+#endif
+                return;
+            }
+
             if (targetCamera != null)
                 UpdateBuffer(targetCamera, parameters.Buffer, true);
 
@@ -392,6 +401,10 @@ namespace EPOOutline
 
         private void UpdateBuffer(Camera targetCamera, CommandBuffer buffer, bool removeOnly)
         {
+            // Skip for SRP (HDRP/URP)
+            if (GraphicsSettings.defaultRenderPipeline != null)
+                return;
+
             targetCamera.RemoveCommandBuffer(CameraEvent.BeforeImageEffects, buffer);
             targetCamera.RemoveCommandBuffer(CameraEvent.AfterForwardOpaque, buffer);
             if (removeOnly)
@@ -443,6 +456,10 @@ namespace EPOOutline
 #if UNITY_EDITOR
         private void RemoveFromAllSceneViews()
         {
+            // Skip for SRP (HDRP/URP)
+            if (GraphicsSettings.defaultRenderPipeline != null)
+                return;
+
             foreach (var view in UnityEditor.SceneView.sceneViews)
             {
                 var viewToUpdate = (UnityEditor.SceneView)view;
@@ -457,6 +474,10 @@ namespace EPOOutline
 
         private void LateUpdate()
         {
+            // Skip command buffer operations when using SRP (HDRP/URP)
+            if (GraphicsSettings.defaultRenderPipeline != null)
+                return;
+
             if (lastSelectedOutliner == null && outliners.Count > 0)
                 lastSelectedOutliner = outliners[0].gameObject;
 

@@ -1,42 +1,59 @@
-using FPS;
+ï»¿using FPS;
 using UnityEngine;
 
 public class CrosshairAnim : MonoBehaviour
 {
-    [Header("Références")]
+    [Header("RÃ©fÃ©rences")]
     [SerializeField] private Animator animator;
     [SerializeField] private FPSMovement playerMovement;
 
-    [Header("Paramètres Animator Mouvement")]
+    [Header("ParamÃ¨tres Animator Mouvement")]
     [SerializeField] private string moveBool = "IsMoving";
 
     [Header("Tir")]
-    [Tooltip("Utiliser un Trigger (recommandé). Si désactivé, on utilisera un Bool (shootBoolName) qui sera auto-reset.")]
+    [Tooltip("Utiliser un Trigger (recommande). Si dÃ©sactivÃ©, on utilisera un Bool (shootBoolName) qui sera auto-reset.")]
     [SerializeField] private bool useShootTrigger = true;
     [SerializeField] private string shootTrigger = "Shoot";
     [SerializeField] private string shootBoolName = "IsShooting";
-    [Tooltip("Durée avant reset auto du bool de tir si useShootTrigger = false.")]
+    [Tooltip("DurÃ©e avant reset auto du bool de tir si useShootTrigger = false.")]
     [SerializeField] private float shootBoolAutoResetTime = 0.12f;
-    [Tooltip("Forcer un reset du bool si l'état d'anim change (sécurité).")]
+    [Tooltip("Forcer un reset du bool si l'Ã©tat d'anim change (securitÃ©).")]
     [SerializeField] private bool forceResetOnStateChange = true;
 
     private float shootBoolResetAt = -1f;
     private int lastStateHash;
+    private bool hasMoveBool;
 
     private void Awake()
     {
         if (animator == null) animator = GetComponent<Animator>();
         if (playerMovement == null) playerMovement = FindAnyObjectByType<FPSMovement>();
+        
+        // Verifier si le paramÃ¨tre existe dans l'animator
+        hasMoveBool = false;
+        if (animator != null && !string.IsNullOrEmpty(moveBool))
+        {
+            foreach (var param in animator.parameters)
+            {
+                if (param.name == moveBool && param.type == AnimatorControllerParameterType.Bool)
+                {
+                    hasMoveBool = true;
+                    break;
+                }
+            }
+        }
     }
 
     private void Update()
     {
         if (animator == null) return;
 
-        // Mouvement -> Idle/Walk
-        bool isMoving = playerMovement != null && playerMovement.IsMoving;
-        if (!string.IsNullOrEmpty(moveBool))
+        // Mouvement -> Idle/Walk (seulement si le paramÃ¨tre existe)
+        if (hasMoveBool)
+        {
+            bool isMoving = playerMovement != null && playerMovement.IsMoving;
             animator.SetBool(moveBool, isMoving);
+        }
 
         // Gestion reset auto du bool de tir
         if (!useShootTrigger && !string.IsNullOrEmpty(shootBoolName))
@@ -53,7 +70,6 @@ public class CrosshairAnim : MonoBehaviour
                 int currentHash = state.fullPathHash;
                 if (currentHash != lastStateHash)
                 {
-                    // Si on a quitté l’état de tir, on remet le bool à false
                     if (shootBoolResetAt > 0f)
                     {
                         animator.SetBool(shootBoolName, false);
@@ -65,7 +81,6 @@ public class CrosshairAnim : MonoBehaviour
         }
     }
 
-    // Appelé lors d’un tir
     public void PlayShoot()
     {
         if (animator == null) return;
@@ -85,7 +100,6 @@ public class CrosshairAnim : MonoBehaviour
         }
     }
 
-    // Animation Event à placer à la fin de l’anim de tir si tu veux un reset précis
     public void EndShoot()
     {
         if (!useShootTrigger && !string.IsNullOrEmpty(shootBoolName))

@@ -60,6 +60,7 @@ public class WeaponSystem : MonoBehaviour
     // Nouveau: contrôle de la possibilité de tirer
     private bool canShoot = true;
     private Coroutine disableShootingRoutine;
+    private bool hasShootingParam; // Vérifie si le param isShooting existe
 
     public bool IsReloading => isReloading;
 
@@ -85,6 +86,20 @@ public class WeaponSystem : MonoBehaviour
         
         if (playerHealth == null)
             playerHealth = GetComponentInParent<PlayerHealth>();
+        
+        // Vérifier si le paramètre isShooting existe
+        hasShootingParam = false;
+        if (animator != null)
+        {
+            foreach (var param in animator.parameters)
+            {
+                if (param.name == "isShooting" && param.type == AnimatorControllerParameterType.Bool)
+                {
+                    hasShootingParam = true;
+                    break;
+                }
+            }
+        }
     }
 
     private void OnDisable()
@@ -227,7 +242,7 @@ public class WeaponSystem : MonoBehaviour
             shots = Mathf.Min(weaponSettings.bulletsPerShot, currentMagazine);
         }
 
-        if (animator != null) animator.SetBool("isShooting", true);
+        if (hasShootingParam) animator.SetBool("isShooting", true);
         if (crosshair != null) crosshair.PlayShoot();
         if (weaponShake != null) weaponShake.Shake();
         if (soundPlayer != null && weaponSettings.shootSound != null)
@@ -386,7 +401,7 @@ public class WeaponSystem : MonoBehaviour
             Instantiate(weaponSettings.ImpactParticleSystem, endPoint, Quaternion.LookRotation(normal));
         }
 
-        if (animator != null) animator.SetBool("isShooting", false);
+        if (hasShootingParam) animator.SetBool("isShooting", false);
         Destroy(trail.gameObject, trail.time);
     }
 
