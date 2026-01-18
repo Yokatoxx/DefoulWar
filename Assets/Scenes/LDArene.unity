@@ -16603,7 +16603,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba4c934c6de451044a3f1a141a71c609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 0}
 --- !u!114 &385247076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24449,7 +24448,7 @@ PrefabInstance:
     - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: weaponSettings
       value: 
-      objectReference: {fileID: 11400000, guid: 21ab4b6ddf29bb548aa076cef8fd13d3, type: 2}
+      objectReference: {fileID: 11400000, guid: d26f4c83c96e2874fabe3ce7dcca72d2, type: 2}
     - target: {fileID: 2920386777163252129, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: bulletSpawnPoint
       value: 
@@ -24567,9 +24566,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4673607940017463061, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1575957746}
-    - targetCorrespondingSourceObject: {fileID: 4673607940017463061, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1575957745}
     - targetCorrespondingSourceObject: {fileID: 4673607940017463061, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1575957744}
@@ -95916,19 +95912,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   showDebugInfo: 0
---- !u!114 &1575957745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1575957734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba4c934c6de451044a3f1a141a71c609, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cam: {fileID: 0}
 --- !u!114 &1575957746
 MonoBehaviour:
   m_ObjectHideFlags: 0

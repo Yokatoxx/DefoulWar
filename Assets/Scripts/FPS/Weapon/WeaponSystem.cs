@@ -235,18 +235,20 @@ public class WeaponSystem : MonoBehaviour
     
     /// <summary>
     /// Vérifie et active/désactive le mode Blood Bullet selon l'état des munitions.
+    /// Le mode s'active quand on est à court de munitions et qu'on peut utiliser les blood bullets.
+    /// Le mode se désactive uniquement quand on récupère des munitions.
     /// </summary>
     private void CheckBloodBulletMode()
     {
-        bool shouldBeInBloodMode = IsOutOfAmmo && CanUseBloodBullets();
-        
-        if (shouldBeInBloodMode && !isUsingBloodBullets)
+        // Activer le mode si on est à court de munitions et qu'on peut l'utiliser
+        if (IsOutOfAmmo && CanUseBloodBullets() && !isUsingBloodBullets)
         {
             isUsingBloodBullets = true;
             OnBloodBulletModeChanged?.Invoke(true);
             UpdateAmmoUI();
         }
-        else if (!shouldBeInBloodMode && isUsingBloodBullets)
+        // Désactiver le mode uniquement si on a récupéré des munitions
+        else if (!IsOutOfAmmo && isUsingBloodBullets)
         {
             isUsingBloodBullets = false;
             OnBloodBulletModeChanged?.Invoke(false);
