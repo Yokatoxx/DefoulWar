@@ -48,6 +48,9 @@ public class WeaponSystem : MonoBehaviour
     
     [Tooltip("Déclenché quand le reload est terminé")]
     public UnityEvent OnReloadComplete;
+    
+    [Tooltip("Déclenché quand on entre/sort du mode blood bullet (true = actif)")]
+    public UnityEvent<bool> OnBloodBulletModeChanged;
 
     // Runtime
     private int currentMagazine;
@@ -63,6 +66,7 @@ public class WeaponSystem : MonoBehaviour
     private bool hasShootingParam; // Vérifie si le param isShooting existe
 
     public bool IsReloading => isReloading;
+    public bool IsUsingBloodBullets => isUsingBloodBullets;
 
     private void Awake()
     {
@@ -203,17 +207,29 @@ public class WeaponSystem : MonoBehaviour
             // Plus de munitions du tout - tenter le tir avec la vie
             if (CanUseBloodBullets())
             {
-                isUsingBloodBullets = true;
+                if (!isUsingBloodBullets)
+                {
+                    isUsingBloodBullets = true;
+                    OnBloodBulletModeChanged?.Invoke(true);
+                }
             }
             else
             {
-                isUsingBloodBullets = false;
+                if (isUsingBloodBullets)
+                {
+                    isUsingBloodBullets = false;
+                    OnBloodBulletModeChanged?.Invoke(false);
+                }
                 return;
             }
         }
         else
         {
-            isUsingBloodBullets = false;
+            if (isUsingBloodBullets)
+            {
+                isUsingBloodBullets = false;
+                OnBloodBulletModeChanged?.Invoke(false);
+            }
         }
 
         lastShootTime = Time.time;
@@ -489,7 +505,6 @@ public class WeaponSystem : MonoBehaviour
     
     // Propriétés publiques pour l'état des munitions
     public bool IsOutOfAmmo => currentMagazine <= 0 && currentReserve <= 0;
-    public bool IsUsingBloodBullets => isUsingBloodBullets && IsOutOfAmmo;
     public int CurrentMagazine => currentMagazine;
     public int CurrentReserve => currentReserve;
 

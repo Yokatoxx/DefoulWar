@@ -36,6 +36,9 @@ namespace Ennemies.Behaviors
         protected float investigationTimer;
         private bool hasAlertedOthers;
         
+        // Mode arène : les ennemis connaissent toujours la position du joueur
+        protected bool isInArenaMode = false;
+        
         /// <summary>
         /// Angle en degrés en dessous duquel on considère que l'ennemi fait face au joueur.
         /// </summary>
@@ -98,11 +101,14 @@ namespace Ennemies.Behaviors
 
         /// <summary>
         /// Vérifie si le joueur est dans le champ de vision (distance + angle + raycast).
-        /// Optimisé : vérifie distance → angle → raycast (du moins au plus coûteux).
+        /// En mode arène, retourne toujours true.
         /// </summary>
         protected bool IsPlayerInFieldOfView()
         {
             if (player == null) return false;
+            
+            // En mode arène, le joueur est toujours "visible"
+            if (isInArenaMode) return true;
 
             float distance = Vector3.Distance(owner.position, player.position);
 
@@ -125,6 +131,26 @@ namespace Ennemies.Behaviors
             if (settings.requireLineOfSight && !CheckLineOfSight()) return false;
 
             return true;
+        }
+        
+        /// <summary>
+        /// Active ou désactive le mode arène (bypass de la détection).
+        /// </summary>
+        public void SetArenaMode(bool active)
+        {
+            isInArenaMode = active;
+            
+            // Si on active le mode arène, forcer l'état de poursuite et démarrer le mouvement
+            if (active && player != null && agent != null)
+            {
+                detectionState = DetectionState.Chasing;
+                lastKnownPlayerPosition = player.position;
+                
+                // Démarrer immédiatement la poursuite
+                agent.isStopped = false;
+                agent.speed = settings.chaseSpeed;
+                agent.SetDestination(player.position);
+            }
         }
 
         /// <summary>
