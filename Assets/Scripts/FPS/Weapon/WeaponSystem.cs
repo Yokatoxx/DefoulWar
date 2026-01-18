@@ -41,6 +41,16 @@ public class WeaponSystem : MonoBehaviour
     [Tooltip("Vie minimum requise pour pouvoir tirer (ne peut pas se suicider)")]
     [SerializeField] private float minHealthToShoot = 1f;
     [SerializeField] private PlayerHealth playerHealth;
+    
+    [Header("Camera Shake - Tir")]
+    [Tooltip("Activer le screenshake quand on tire")]
+    [SerializeField] private bool enableShootShake = true;
+    [Tooltip("Durée du shake par tir")]
+    [SerializeField] private float shootShakeDuration = 0.08f;
+    [Tooltip("Intensité du déplacement")]
+    [SerializeField] private float shootShakePositionMag = 0.02f;
+    [Tooltip("Intensité de la rotation")]
+    [SerializeField] private float shootShakeRotationMag = 0.5f;
 
     [Header("Events")]
     [Tooltip("Déclenché après chaque tir (paramètre: munitions restantes dans le chargeur)")]
@@ -263,6 +273,12 @@ public class WeaponSystem : MonoBehaviour
         if (weaponShake != null) weaponShake.Shake();
         if (soundPlayer != null && weaponSettings.shootSound != null)
             soundPlayer.PlayOneShot(weaponSettings.shootSound, 1f, Random.Range(0.95f, 1.05f));
+        
+        // Camera shake pour sentir la puissance du tir
+        if (enableShootShake && CameraShake.Instance != null)
+        {
+            CameraShake.Instance.ShakeWithRotation(shootShakeDuration, shootShakePositionMag, shootShakeRotationMag);
+        }
 
         for (int i = 0; i < shots; i++)
         {

@@ -126,7 +126,7 @@ MonoBehaviour:
   overrideAutoFireInterval: 1
   stunAutoFireInterval: 0.2
   electricDischargeRadius: 3
-  electricDamage: 15
+  electricDamage: 25
   electricEffectPrefab: {fileID: 0}
   effectDuration: 0.5
   dischargeCooldown: 0.2
@@ -207,7 +207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2030f32c3d80c714eafbe896f5e2d80f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settings: {fileID: 11400000, guid: 4fed8d948b75f3f439dbbc13506b989d, type: 2}
+  settings: {fileID: 11400000, guid: 3f7a4f77408ecf349ab86ba60bc21ffa, type: 2}
   waypointPath: {fileID: 0}
   shootPoint: {fileID: 0}
   showDebugGizmos: 1
@@ -227,7 +227,7 @@ MonoBehaviour:
   drawingMode: 1
   outlineLayer: 0
   outlineTargets:
-  - IsVisible: 0
+  - IsVisible: 1
     CutoutMask: 8
     edgeDilateAmount: 5
     frontEdgeDilateAmount: 5
@@ -243,7 +243,7 @@ MonoBehaviour:
     cutoutTextureName: 
     DilateRenderingMode: 0
     cutoutTextureIndex: 0
-  - IsVisible: 0
+  - IsVisible: 1
     CutoutMask: 8
     edgeDilateAmount: 5
     frontEdgeDilateAmount: 5
@@ -15424,6 +15424,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 279363931926887754, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 433632373410999867, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
       propertyPath: m_Layer
       value: 7
@@ -15577,6 +15581,10 @@ PrefabInstance:
       value: -0.029
       objectReference: {fileID: 0}
     - target: {fileID: 6260870924592338900, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: EmissionModule.enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6260870924592338900, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
       propertyPath: SizeModule.curve.scalar
       value: 0.68
       objectReference: {fileID: 0}
@@ -15599,6 +15607,26 @@ PrefabInstance:
     - target: {fileID: 6260870924592338900, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
       propertyPath: InitialModule.startSize.minScalar
       value: 6.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 6260870924592338900, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 1.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 6260870924592338900, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6260870924592338900, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0.9528302
+      objectReference: {fileID: 0}
+    - target: {fileID: 6260870924592338900, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.53115433
+      objectReference: {fileID: 0}
+    - target: {fileID: 6260870924592338900, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 0.26517445
       objectReference: {fileID: 0}
     - target: {fileID: 8610121173949400231, guid: c50f9e2c685970e4c8ebcd5fc8c7b3e4, type: 3}
       propertyPath: m_Materials.Array.size

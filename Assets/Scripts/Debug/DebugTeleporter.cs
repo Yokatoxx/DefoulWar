@@ -71,6 +71,13 @@ public class DebugTeleporter : MonoBehaviour
             cc.enabled = true;
         }
 
+        // Réinitialiser les effets caméra pour éviter le décalage du headbob
+        var cameraEffects = player.GetComponentInChildren<FPS.FPSCameraEffects>();
+        if (cameraEffects != null)
+        {
+            cameraEffects.ResetDefaultPosition();
+        }
+
         Debug.Log($"[DebugTeleporter] Téléporté à {pendingTeleportPosition}");
         hasPendingTeleport = false;
     }
