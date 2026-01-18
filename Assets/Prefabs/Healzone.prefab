@@ -51,7 +51,7 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 10.5
+      - m_Value: 14
         m_Name: Size
         m_Overridden: 1
     m_Vector2f:
@@ -171,7 +171,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 5
+  m_Radius: 5.69
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8583090071080262807
 MonoBehaviour:
@@ -191,6 +191,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   onlyAlive: 1
+  destroyDelay: 6
 --- !u!1 &3923705404649607578
 GameObject:
   m_ObjectHideFlags: 0
@@ -478,7 +479,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.1
+      scalar: 0.2
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -942,7 +943,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 5
+      value: 5.7
       mode: 0
       spread: 0
       speed:

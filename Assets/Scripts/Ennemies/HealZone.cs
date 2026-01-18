@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using FPS; // Pour EnemyHealth
+using FPS;
 
 [RequireComponent(typeof(Collider))]
 public class HealZone : MonoBehaviour
@@ -13,9 +13,14 @@ public class HealZone : MonoBehaviour
     [SerializeField] private LayerMask targetLayers = ~0; // couches autorisées, ~0 = toutes
     [SerializeField] private bool onlyAlive = true;       // soigner uniquement les vivants
 
+    [Header("Durée de vie")]
+    [Tooltip("Si > 0, détruit automatiquement la zone après ce délai (secondes).")]
+    [SerializeField] private float destroyDelay = 0f;
+
     // Cache des cibles dans la zone
     private readonly HashSet<EnemyHealth> targetsInZone = new HashSet<EnemyHealth>();
     private float nextTickTime;
+    private float destroyAtTime;
 
     private void Awake()
     {
@@ -25,10 +30,26 @@ public class HealZone : MonoBehaviour
             col.isTrigger = true; // s'assurer que le collider est un trigger
         }
         nextTickTime = Time.time + tickInterval;
+
+        if (destroyDelay > 0f)
+        {
+            destroyAtTime = Time.time + destroyDelay;
+        }
+        else
+        {
+            destroyAtTime = float.PositiveInfinity;
+        }
     }
 
     private void Update()
     {
+        // Auto-destruction après délai
+        if (Time.time >= destroyAtTime)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         // Tick de soin à intervalle fixe
         if (Time.time >= nextTickTime)
         {
