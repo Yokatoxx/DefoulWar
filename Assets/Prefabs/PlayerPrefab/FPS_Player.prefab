@@ -72,6 +72,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8703966557384231457}
   - component: {fileID: 3469333960817140672}
+  - component: {fileID: 2920386777163252129}
   - component: {fileID: 1442011852720692160}
   - component: {fileID: 8291640835560598057}
   - component: {fileID: 4379777072623147912}
@@ -80,7 +81,6 @@ GameObject:
   - component: {fileID: 8826018477589334518}
   - component: {fileID: 6005410421240447297}
   - component: {fileID: 9097555686013398260}
-  - component: {fileID: 2920386777163252129}
   - component: {fileID: 4496668197879187442}
   - component: {fileID: 2359903377046822170}
   - component: {fileID: 1347673265557315538}
@@ -124,10 +124,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d614e6ab84d4eef44aecfc75d8424ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  settings: {fileID: 0}
   aimCamera: {fileID: 3725817409442096485}
-  dashDefinition: {fileID: 11400000, guid: a52eadeeb91d02e4f929b40420cb8892, type: 2}
-  groundBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
-  airBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
   activationKey: 324
   steerMaxAngle: 30
   steerSamples: 4
@@ -136,6 +134,51 @@ MonoBehaviour:
   rb: {fileID: 0}
   fpsMovement: {fileID: 4379777072623147912}
   isDashing: 0
+--- !u!114 &2920386777163252129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad10986b331ce024f8de44517166fc57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponSettings: {fileID: 11400000, guid: d26f4c83c96e2874fabe3ce7dcca72d2, type: 2}
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  bulletSpawnPoint: {fileID: 0}
+  aimCamera: {fileID: 3725817409442096485}
+  crosshair: {fileID: 0}
+  soundPlayer: {fileID: 0}
+  textAmmo: {fileID: 0}
+  enemyTag: Enemy
+  animator: {fileID: 0}
+  weaponShake: {fileID: 0}
+  weaponReloadRotation: {fileID: 0}
+  zoneDamageMultipliers:
+  - zoneName: Body
+    multiplier: 1
+  - zoneName: Head
+    multiplier: 2
+  - zoneName: Shield
+    multiplier: 0
+  enableBloodBullets: 1
+  healthCostPerBullet: 5
+  minHealthToShoot: 1
+  playerHealth: {fileID: 0}
+  OnMagazineChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReloadComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  OnBloodBulletModeChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1442011852720692160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,10 +299,13 @@ MonoBehaviour:
   dashSystem: {fileID: 3469333960817140672}
   dashEffectLensIntensity: -0.7
   dashEffectDuration: 0.5
-  dashBokehAperture: 0.4
-  dashBokehFocusDistance: 0.5
-  dashGaussianStart: 0.1
-  dashGaussianEnd: 0.5
+  dashFocusDistance: 0.5
+  dashNearFocusStart: 0
+  dashNearFocusEnd: 0.3
+  dashFarFocusStart: 0.5
+  dashFarFocusEnd: 2
+  dashVignetteIntensity: 0.4
+  dashVignetteDuration: 0.2
   dashParticleSystem: {fileID: 5996498839720484243}
   deactivateParticleGOOnStop: 1
 --- !u!114 &6005410421240447297
@@ -302,38 +348,6 @@ MonoBehaviour:
   shakeDuration: 0.08
   shakePositionMagnitude: 0.02
   shakeRotationMagnitude: 0.5
---- !u!114 &2920386777163252129
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4622188377374526642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad10986b331ce024f8de44517166fc57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponSettings: {fileID: 11400000, guid: d26f4c83c96e2874fabe3ce7dcca72d2, type: 2}
-  hitMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  bulletSpawnPoint: {fileID: 0}
-  aimCamera: {fileID: 3725817409442096485}
-  crosshair: {fileID: 0}
-  soundPlayer: {fileID: 0}
-  textAmmo: {fileID: 0}
-  enemyTag: Enemy
-  animator: {fileID: 0}
-  weaponShake: {fileID: 0}
-  weaponReloadRotation: {fileID: 0}
-  zoneDamageMultipliers:
-  - zoneName: Body
-    multiplier: 1
-  - zoneName: Head
-    multiplier: 2
-  - zoneName: Shield
-    multiplier: 0
 --- !u!54 &4496668197879187442
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -373,8 +387,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89ac13a1db8fee94295c02ebd01c1de6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slowMoScale: 0.2
-  slowMoDuration: 0.75
 --- !u!114 &1347673265557315538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -387,8 +399,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5a44fb276e3f244cbdabed44d058327, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
-  airBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
 --- !u!114 &2667271215102757460
 MonoBehaviour:
   m_ObjectHideFlags: 0

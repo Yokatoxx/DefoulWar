@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73f0560723004024b9ed32e4785b641d, type: 3}
-  m_Name: Pistol
+  m_Name: Pistol LowAmmo
   m_EditorClassIdentifier: 
   shotDelay: 0.35
   reloadTime: 0.5
@@ -18,7 +18,7 @@ MonoBehaviour:
   shootTrailWidth: 0.5
   bulletsPerShot: 1
   magazineSize: 6
-  maxAmmo: 36
+  maxAmmo: 0
   bulletDammage: 50
   shakeAmount: 5
   recoilAmount: 5
