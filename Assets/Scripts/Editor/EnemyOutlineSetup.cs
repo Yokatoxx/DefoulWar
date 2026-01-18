@@ -1,18 +1,18 @@
 using UnityEngine;
 using UnityEditor;
 using FPS;
+using EPOOutline;
 
 namespace Utils.Editor
 {
     /// <summary>
-    /// Outil d'éditeur pour ajouter automatiquement les composants Outline et TargetOutline
-    /// aux prefabs ennemis sélectionnés.
+    /// Outil d'éditeur pour ajouter automatiquement les composants Outlinable et TargetOutline
+    /// aux prefabs ennemis sélectionnés. Utilise Easy Performant Outline.
     /// </summary>
     public class EnemyOutlineSetup : EditorWindow
     {
         private Color outlineColor = Color.yellow;
-        private float outlineWidth = 2f;
-        private Outline.Mode outlineMode = Outline.Mode.OutlineAll;
+        private float dilateShift = 1f;
         
         [MenuItem("Tools/Enemy Outline Setup")]
         public static void ShowWindow()
@@ -23,12 +23,12 @@ namespace Utils.Editor
         private void OnGUI()
         {
             GUILayout.Label("Configuration de l'Outline pour les ennemis", EditorStyles.boldLabel);
+            GUILayout.Label("Utilise Easy Performant Outline", EditorStyles.miniLabel);
             
             EditorGUILayout.Space();
             
             outlineColor = EditorGUILayout.ColorField("Couleur de l'Outline", outlineColor);
-            outlineWidth = EditorGUILayout.Slider("Épaisseur de l'Outline", outlineWidth, 0f, 10f);
-            outlineMode = (Outline.Mode)EditorGUILayout.EnumPopup("Mode de l'Outline", outlineMode);
+            dilateShift = EditorGUILayout.Slider("Dilate Shift", dilateShift, 0f, 1f);
             
             EditorGUILayout.Space();
             
@@ -36,7 +36,7 @@ namespace Utils.Editor
             
             EditorGUILayout.Space();
             
-            if (GUILayout.Button("Ajouter Outline + TargetOutline aux prefabs sélectionnés"))
+            if (GUILayout.Button("Ajouter Outlinable + TargetOutline aux prefabs sélectionnés"))
             {
                 AddOutlineToSelectedPrefabs();
             }
@@ -119,27 +119,29 @@ namespace Utils.Editor
                 return false;
             }
             
-            // Ouvrir le prefab pour modification
             string prefabAssetPath = prefabPath;
             GameObject prefabInstance = PrefabUtility.LoadPrefabContents(prefabAssetPath);
             
             bool modified = false;
             
-            // Ajouter Outline s'il n'existe pas
-            Outline outline = prefabInstance.GetComponent<Outline>();
-            if (outline == null)
+            // Ajouter Outlinable (Easy Performant Outline) s'il n'existe pas
+            Outlinable outlinable = prefabInstance.GetComponent<Outlinable>();
+            if (outlinable == null)
             {
-                outline = prefabInstance.AddComponent<Outline>();
-                outline.OutlineColor = outlineColor;
-                outline.OutlineWidth = outlineWidth;
-                outline.OutlineMode = outlineMode;
-                outline.enabled = false; // Désactivé par défaut
+                outlinable = prefabInstance.AddComponent<Outlinable>();
+                outlinable.OutlineParameters.Color = outlineColor;
+                outlinable.OutlineParameters.DilateShift = dilateShift;
+                outlinable.OutlineParameters.Enabled = false;
+                
+                // Ajouter tous les renderers enfants
+                outlinable.AddAllChildRenderersToRenderingList(RenderersAddingMode.MeshRenderer | RenderersAddingMode.SkinnedMeshRenderer);
+                
                 modified = true;
-                Debug.Log($"[EnemyOutlineSetup] Outline ajouté à {prefab.name}");
+                Debug.Log($"[EnemyOutlineSetup] Outlinable (EPO) ajouté à {prefab.name}");
             }
             else
             {
-                Debug.Log($"[EnemyOutlineSetup] {prefab.name} a déjà un Outline.");
+                Debug.Log($"[EnemyOutlineSetup] {prefab.name} a déjà un Outlinable.");
             }
             
             // Ajouter TargetOutline s'il n'existe pas
@@ -155,7 +157,6 @@ namespace Utils.Editor
                 Debug.Log($"[EnemyOutlineSetup] {prefab.name} a déjà un TargetOutline.");
             }
             
-            // Sauvegarder les modifications
             if (modified)
             {
                 PrefabUtility.SaveAsPrefabAsset(prefabInstance, prefabAssetPath);
@@ -167,4 +168,3 @@ namespace Utils.Editor
         }
     }
 }
-

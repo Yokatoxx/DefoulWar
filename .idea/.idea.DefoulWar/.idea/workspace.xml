@@ -4,11 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="" />
+    <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/EnemyPrefab/EnemyShield.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/EnemyPrefab/EnemyShield.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/LDSerrerScene 1/Sky and Fog Settings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/LDSerrerScene 1/Sky and Fog Settings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/EnemyScreenDetector.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/EnemyScreenDetector.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/EnemyScreenDetector.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/EnemyScreenDetector.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/EnemyAttackHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/EnemyAttackHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/EnemyController.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_E:/Documents/Projet Unity/DefoulWar" value="34bpBg6gTItnPAQxE5WjD7M5H6O" />
+    </persistenceIdMap>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -168,6 +181,7 @@
       <workItem from="1767456508078" duration="8000" />
       <workItem from="1768387555523" duration="3523000" />
       <workItem from="1768692986209" duration="6000" />
+      <workItem from="1768693214075" duration="641000" />
     </task>
     <servers />
   </component>

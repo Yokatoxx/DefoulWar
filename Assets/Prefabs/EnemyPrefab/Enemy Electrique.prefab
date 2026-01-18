@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 1619272842727892379}
   - component: {fileID: 7316351646241182328}
   - component: {fileID: 1752050273636664775}
+  - component: {fileID: 2535758025684249478}
   m_Layer: 7
   m_Name: Enemy Electrique
   m_TagString: Enemy
@@ -170,6 +171,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resistToKnockback: 1
+  canPushOtherEnemies: 1
+  dominoForceMultiplier: 0.6
+  dominoPushRadius: 1.2
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
   impactParticlePrefab: {fileID: 0}
   particleOffset: {x: 0, y: 0.5, z: 0}
   impactSound: {fileID: 0}
@@ -186,6 +193,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a6396c44267481183db83553bd89f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  defaultDilateShift: 1
 --- !u!114 &1752050273636664775
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,6 +211,79 @@ MonoBehaviour:
   waypointPath: {fileID: 0}
   shootPoint: {fileID: 0}
   showDebugGizmos: 1
+--- !u!114 &2535758025684249478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fe91dc294731a9428c0941ea7579110, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  complexMaskingMode: 0
+  drawingMode: 1
+  outlineLayer: 0
+  outlineTargets:
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 1597362537128985916}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 2797102046993378888}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  renderStyle: 1
+  outlineParameters:
+    enabled: 0
+    color: {r: 1, g: 0.015686274, b: 0.061687518, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  backParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  frontParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
 --- !u!1 &239489394515532336
 GameObject:
   m_ObjectHideFlags: 0
@@ -5106,6 +5188,7 @@ GameObject:
   - component: {fileID: 5333951548045206057}
   - component: {fileID: 2797102046993378888}
   - component: {fileID: 1006435175190009992}
+  - component: {fileID: 8088167501024573863}
   m_Layer: 7
   m_Name: Head
   m_TagString: Enemy
@@ -5218,6 +5301,18 @@ MonoBehaviour:
   baseDamageMultiplier: 1
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
+--- !u!114 &8088167501024573863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463622794186511725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &823878041786373671
 GameObject:
   m_ObjectHideFlags: 0
@@ -15088,6 +15183,7 @@ GameObject:
   - component: {fileID: 4590870555706604448}
   - component: {fileID: 1597362537128985916}
   - component: {fileID: 2651874369235720882}
+  - component: {fileID: 9163573605906805405}
   m_Layer: 7
   m_Name: Body
   m_TagString: Enemy
@@ -15202,6 +15298,18 @@ MonoBehaviour:
   baseDamageMultiplier: 1
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
+--- !u!114 &9163573605906805405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7108478021694863082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8445468394170356053
 GameObject:
   m_ObjectHideFlags: 0

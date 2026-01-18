@@ -154,5 +154,21 @@ namespace Ennemies.Settings
 
         [Tooltip("Rayon de recherche des points en hauteur")]
         [Min(1f)] public float highGroundSearchRadius = 20f;
+
+        [Header("Dodge Settings")]
+        [Tooltip("Active l'esquive pour ce type d'ennemi")]
+        public bool canDodge = false;
+
+        [Tooltip("Probabilité d'esquive (0-1), 0.1 = 10%")]
+        [Range(0f, 1f)] public float dodgeChance = 0.1f;
+
+        [Tooltip("Force du bond latéral")]
+        [Min(1f)] public float dodgeForce = 8f;
+
+        [Tooltip("Durée de l'esquive en secondes")]
+        [Min(0.01f)] public float dodgeDuration = 0.3f;
+
+        [Tooltip("Cooldown entre deux esquives")]
+        [Min(0.5f)] public float dodgeCooldown = 2f;
     }
 }

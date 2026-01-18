@@ -7,6 +7,9 @@ using UnityEngine.Events;
 
 public class WeaponSystem : MonoBehaviour
 {
+    // Delegate pour l'event d'esquive avec possibilité d'annuler les dégâts
+    public delegate void PlayerAimAtEnemyHandler(GameObject target, ref bool cancelDamage);
+    public static event PlayerAimAtEnemyHandler OnPlayerAimAtEnemy;
     [Header("Settings")]
     [SerializeField] private WeaponSettings weaponSettings;
     [SerializeField] private LayerMask hitMask = ~0;
@@ -305,7 +308,21 @@ public class WeaponSystem : MonoBehaviour
             SpawnTrail(endPoint, normal, hit ? hitInfo.collider : null);
 
         if (hit)
-            ApplyDamage(hitInfo.collider);
+        {
+            // Notifier l'ennemi ciblé AVANT d'appliquer les dégâts (permet l'esquive)
+            bool cancelDamage = false;
+            var enemyHealth = hitInfo.collider.GetComponentInParent<EnemyHealth>();
+            if (enemyHealth != null)
+            {
+                OnPlayerAimAtEnemy?.Invoke(enemyHealth.gameObject, ref cancelDamage);
+            }
+            
+            // Si l'ennemi a esquivé, ne pas appliquer de dégâts
+            if (!cancelDamage)
+            {
+                ApplyDamage(hitInfo.collider);
+            }
+        }
     }
 
     private Vector3 ApplyRadialAngularSpread(Vector3 baseDir)

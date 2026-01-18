@@ -1,27 +1,30 @@
 using UnityEngine;
 using FPS;
+using EPOOutline;
 
 namespace Utils
 {
     /// <summary>
     /// Wrapper pour gérer l'outline d'un ennemi ciblé.
-    /// Expose Show() et Hide() pour activer/désactiver l'outline proprement.
-    /// S'abonne à EnemyHealth.OnDeath pour cacher l'outline automatiquement.
+    /// Utilise Easy Performant Outline (EPOOutline.Outlinable).
+    /// Active/désactive le composant Outlinable pour afficher/cacher l'outline.
     /// </summary>
     public class TargetOutline : MonoBehaviour
     {
-        private Outline outline;
+        [Header("Default Outline Settings")]
+        [SerializeField] private Color defaultColor = Color.yellow;
+        [SerializeField] [Range(0f, 1f)] private float defaultDilateShift = 1f;
+        
+        private Outlinable outlinable;
         private EnemyHealth enemyHealth;
         private bool isShowing;
 
         private void Awake()
         {
-            // Chercher l'Outline sur cet objet ou ses enfants
-            outline = GetComponent<Outline>();
-            if (outline == null)
-                outline = GetComponentInChildren<Outline>();
+            outlinable = GetComponent<Outlinable>();
+            if (outlinable == null)
+                outlinable = GetComponentInChildren<Outlinable>();
 
-            // S'abonner à la mort de l'ennemi pour cacher l'outline
             enemyHealth = GetComponent<EnemyHealth>();
             if (enemyHealth == null)
                 enemyHealth = GetComponentInParent<EnemyHealth>();
@@ -31,10 +34,10 @@ namespace Utils
                 enemyHealth.OnDeath.AddListener(OnEnemyDeath);
             }
 
-            // Désactiver l'outline par défaut au démarrage
-            if (outline != null)
+            // Désactiver le composant Outlinable par défaut
+            if (outlinable != null)
             {
-                outline.enabled = false;
+                outlinable.enabled = false;
             }
         }
 
@@ -43,12 +46,16 @@ namespace Utils
         /// </summary>
         public void Show(Color color, float width)
         {
-            if (outline == null)
+            if (outlinable == null)
                 return;
 
-            outline.OutlineColor = color;
-            outline.OutlineWidth = width;
-            outline.enabled = true;
+            // Configurer les paramètres
+            outlinable.OutlineParameters.Color = color;
+            outlinable.OutlineParameters.DilateShift = Mathf.Clamp01(width / 10f);
+            outlinable.OutlineParameters.Enabled = true;
+            
+            // Activer le composant pour afficher l'outline
+            outlinable.enabled = true;
             isShowing = true;
         }
 
@@ -57,16 +64,14 @@ namespace Utils
         /// </summary>
         public void Hide()
         {
-            if (outline == null)
+            if (outlinable == null)
                 return;
 
-            outline.enabled = false;
+            // Désactiver le composant pour cacher l'outline
+            outlinable.enabled = false;
             isShowing = false;
         }
 
-        /// <summary>
-        /// Retourne true si l'outline est actuellement visible.
-        /// </summary>
         public bool IsShowing => isShowing;
 
         private void OnEnemyDeath()
@@ -76,13 +81,11 @@ namespace Utils
 
         private void OnDisable()
         {
-            // Cacher l'outline si l'objet est désactivé (pooling)
             Hide();
         }
 
         private void OnDestroy()
         {
-            // Se désabonner de l'événement
             if (enemyHealth != null)
             {
                 enemyHealth.OnDeath.RemoveListener(OnEnemyDeath);
@@ -90,4 +93,3 @@ namespace Utils
         }
     }
 }
-

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4701364012931773978}
   - component: {fileID: 3351474583499771530}
   - component: {fileID: 4793837826633410294}
+  - component: {fileID: 5752154969192611940}
   m_Layer: 7
   m_Name: Body
   m_TagString: Enemy
@@ -127,6 +128,18 @@ MonoBehaviour:
   baseDamageMultiplier: 0
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
+--- !u!114 &5752154969192611940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 254311255190136594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &525026324071530389
 GameObject:
   m_ObjectHideFlags: 0
@@ -140,6 +153,7 @@ GameObject:
   - component: {fileID: 7795808518942882505}
   - component: {fileID: 3074746511472831467}
   - component: {fileID: 513269025639763915}
+  - component: {fileID: 3743385645414856099}
   m_Layer: 7
   m_Name: WeakPoint
   m_TagString: Enemy
@@ -252,6 +266,18 @@ MonoBehaviour:
   currentHealth: 1
   destroyOnDepleted: 1
   destroyVfx: {fileID: 0}
+--- !u!114 &3743385645414856099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525026324071530389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1002595663098007612
 GameObject:
   m_ObjectHideFlags: 0
@@ -345,6 +371,7 @@ GameObject:
   - component: {fileID: 7994179154030387157}
   - component: {fileID: 4479012537968092976}
   - component: {fileID: 2153664801392327130}
+  - component: {fileID: 8368533264521215233}
   m_Layer: 7
   m_Name: EnemyBoss
   m_TagString: Enemy
@@ -412,6 +439,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 1500
   currentHealth: 0
+  bulletDamageMultiplier: 1
+  dashDamageMultiplier: 1
+  electricDamageMultiplier: 1
   spawnInvulnerabilityDuration: 0
   spawnInvulnerableAllDamage: 0
   OnDeath:
@@ -482,6 +512,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resistToKnockback: 0
+  canPushOtherEnemies: 1
+  dominoForceMultiplier: 0.6
+  dominoPushRadius: 1.2
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
   impactParticlePrefab: {fileID: 2645094815069657699, guid: 8f13fc9cc01025e4fa45c1149bdb4104, type: 3}
   particleOffset: {x: 0, y: 0.5, z: 0}
   impactSound: {fileID: 0}
@@ -516,6 +552,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a6396c44267481183db83553bd89f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  defaultDilateShift: 1
 --- !u!114 &4479012537968092976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -552,6 +590,143 @@ MonoBehaviour:
   - {fileID: 6839175410680298282}
   - {fileID: 7139053529593930541}
   countHitWhenBlocked: 1
+--- !u!114 &8368533264521215233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807755940922956229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fe91dc294731a9428c0941ea7579110, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  complexMaskingMode: 0
+  drawingMode: 1
+  outlineLayer: 0
+  outlineTargets:
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 3351474583499771530}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 3074746511472831467}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 3323291062069124604}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 4264313842057802985}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 6614041554582463573}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 8789214881847119326}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  renderStyle: 1
+  outlineParameters:
+    enabled: 0
+    color: {r: 1, g: 0.015686274, b: 0.061687518, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  backParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  frontParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
 --- !u!1 &2273048955482783354
 GameObject:
   m_ObjectHideFlags: 0
@@ -565,6 +740,7 @@ GameObject:
   - component: {fileID: 4264084427862151070}
   - component: {fileID: 8789214881847119326}
   - component: {fileID: 7139053529593930541}
+  - component: {fileID: 5444030159449504595}
   m_Layer: 7
   m_Name: WeakPoint_04
   m_TagString: Enemy
@@ -677,6 +853,18 @@ MonoBehaviour:
   currentHealth: 1
   destroyOnDepleted: 1
   destroyVfx: {fileID: 0}
+--- !u!114 &5444030159449504595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2273048955482783354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2414515843113044376
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,6 +878,7 @@ GameObject:
   - component: {fileID: 2616872057691633529}
   - component: {fileID: 6614041554582463573}
   - component: {fileID: 6839175410680298282}
+  - component: {fileID: 8532864277627350675}
   m_Layer: 7
   m_Name: WeakPoint_03
   m_TagString: Enemy
@@ -802,6 +991,18 @@ MonoBehaviour:
   currentHealth: 1
   destroyOnDepleted: 1
   destroyVfx: {fileID: 0}
+--- !u!114 &8532864277627350675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2414515843113044376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2993599514881638352
 GameObject:
   m_ObjectHideFlags: 0
@@ -815,6 +1016,7 @@ GameObject:
   - component: {fileID: 4533164000047428271}
   - component: {fileID: 4264313842057802985}
   - component: {fileID: 4491897421584607921}
+  - component: {fileID: 3076840991950903500}
   m_Layer: 7
   m_Name: WeakPoint_02
   m_TagString: Enemy
@@ -927,6 +1129,18 @@ MonoBehaviour:
   currentHealth: 1
   destroyOnDepleted: 1
   destroyVfx: {fileID: 0}
+--- !u!114 &3076840991950903500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2993599514881638352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3358510579907376131
 GameObject:
   m_ObjectHideFlags: 0
@@ -1015,6 +1229,7 @@ GameObject:
   - component: {fileID: 6620282890931019125}
   - component: {fileID: 3323291062069124604}
   - component: {fileID: 6137806586934875916}
+  - component: {fileID: 1562193993419317144}
   m_Layer: 7
   m_Name: WeakPoint_01
   m_TagString: Enemy
@@ -1127,6 +1342,18 @@ MonoBehaviour:
   currentHealth: 1
   destroyOnDepleted: 1
   destroyVfx: {fileID: 0}
+--- !u!114 &1562193993419317144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6430829600165726592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7277404602049207658
 GameObject:
   m_ObjectHideFlags: 0
