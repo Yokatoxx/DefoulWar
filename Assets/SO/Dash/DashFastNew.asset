@@ -19,7 +19,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   maxAimAngle: 2
-  distanceDash: 10
+  distanceDash: 15
   countDash: 4
   cooldown: 1
   dashDamage: 150
