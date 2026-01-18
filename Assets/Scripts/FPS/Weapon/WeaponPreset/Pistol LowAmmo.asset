@@ -18,7 +18,7 @@ MonoBehaviour:
   shootTrailWidth: 0.5
   bulletsPerShot: 1
   magazineSize: 6
-  maxAmmo: 0
+  maxAmmo: 6
   bulletDammage: 50
   shakeAmount: 5
   recoilAmount: 5

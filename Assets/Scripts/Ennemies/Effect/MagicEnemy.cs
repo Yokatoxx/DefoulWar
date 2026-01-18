@@ -191,11 +191,15 @@ namespace Ennemies.Effect
         // Donne des munitions au joueur
         private void GiveAmmoToPlayer()
         {
-            var weaponSystem = FindFirstObjectByType<WeaponSystem>();
-            if (weaponSystem != null && ammoAmount > 0)
+            var playerHealth = FindFirstObjectByType<PlayerHealth>();
+            if (playerHealth == null) return;
+            
+            var weaponSystem = playerHealth.GetComponentInChildren<WeaponSystem>();
+            if (weaponSystem == null) return;
+            
+            if (ammoAmount > 0)
             {
                 weaponSystem.AddAmmo(ammoAmount);
-                Debug.Log($"[MagicEnemy] Le joueur a récupéré {ammoAmount} munitions !");
             }
         }
         

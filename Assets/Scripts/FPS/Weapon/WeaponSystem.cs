@@ -214,31 +214,10 @@ public class WeaponSystem : MonoBehaviour
                 return;
             }
             
-            // Plus de munitions du tout - tenter le tir avec la vie
-            if (CanUseBloodBullets())
+            // Plus de munitions - on doit être en mode blood bullet pour tirer
+            if (!isUsingBloodBullets || !CanUseBloodBullets())
             {
-                if (!isUsingBloodBullets)
-                {
-                    isUsingBloodBullets = true;
-                    OnBloodBulletModeChanged?.Invoke(true);
-                }
-            }
-            else
-            {
-                if (isUsingBloodBullets)
-                {
-                    isUsingBloodBullets = false;
-                    OnBloodBulletModeChanged?.Invoke(false);
-                }
                 return;
-            }
-        }
-        else
-        {
-            if (isUsingBloodBullets)
-            {
-                isUsingBloodBullets = false;
-                OnBloodBulletModeChanged?.Invoke(false);
             }
         }
 
@@ -252,6 +231,27 @@ public class WeaponSystem : MonoBehaviour
         if (playerHealth == null) return false;
         if (playerHealth.IsDead) return false;
         return playerHealth.CurrentHealth > minHealthToShoot;
+    }
+    
+    /// <summary>
+    /// Vérifie et active/désactive le mode Blood Bullet selon l'état des munitions.
+    /// </summary>
+    private void CheckBloodBulletMode()
+    {
+        bool shouldBeInBloodMode = IsOutOfAmmo && CanUseBloodBullets();
+        
+        if (shouldBeInBloodMode && !isUsingBloodBullets)
+        {
+            isUsingBloodBullets = true;
+            OnBloodBulletModeChanged?.Invoke(true);
+            UpdateAmmoUI();
+        }
+        else if (!shouldBeInBloodMode && isUsingBloodBullets)
+        {
+            isUsingBloodBullets = false;
+            OnBloodBulletModeChanged?.Invoke(false);
+            UpdateAmmoUI();
+        }
     }
 
     private void PerformShotBurst()
@@ -302,6 +302,9 @@ public class WeaponSystem : MonoBehaviour
 
         UpdateAmmoUI();
         OnMagazineChanged?.Invoke(currentMagazine);
+        
+        // Vérifier si on doit activer le mode Blood Bullet après avoir tiré
+        CheckBloodBulletMode();
     }
     
     private void ConsumeHealthForBullet()
@@ -530,7 +533,12 @@ public class WeaponSystem : MonoBehaviour
     public void AddAmmo(int amount)
     {
         if (weaponSettings == null) return;
+        
         currentReserve = Mathf.Min(currentReserve + amount, weaponSettings.maxAmmo);
+        
+        // Vérifier et mettre à jour le mode Blood Bullet
+        CheckBloodBulletMode();
+        
         UpdateAmmoUI();
     }
 
