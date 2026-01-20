@@ -84571,10 +84571,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waves:
-  - {fileID: 11400000, guid: e06b42564c9e5bc419d1b400c1d3d047, type: 2}
-  - {fileID: 11400000, guid: 4e6541e7f8cf2004c95455f5c08d6fbd, type: 2}
-  - {fileID: 11400000, guid: 27a52959075357549aa51d270a503d28, type: 2}
-  - {fileID: 11400000, guid: 9570828fffb11244ca6fb4a9227bcff1, type: 2}
+  - {fileID: 11400000, guid: d4f50aa77fc84bf4189c77efb309ee4c, type: 2}
+  - {fileID: 11400000, guid: 2e8ee5495643b4e49a8b8b0f7f6fffeb, type: 2}
+  - {fileID: 11400000, guid: 7ea56a583af09a34ca48e57d90264cec, type: 2}
+  - {fileID: 11400000, guid: dd9996ea97afb8e4ea2685b9a06c393e, type: 2}
   spawnpoints:
   - {fileID: 362487774}
   - {fileID: 1523436765}
