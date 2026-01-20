@@ -24,6 +24,14 @@ namespace Ennemies.Effect
         [Tooltip("Intervalle de tick du soin (secondes).")]
         [SerializeField] private float tickInterval = 0.25f;
 
+        [Header("Fallback: Blink + Spawn si aucun compagnon")]
+        [Tooltip("Composant responsable de l'effet de clignotement (doit exposer StartBlink(float)).")]
+        [SerializeField] private MonoBehaviour blinkEffectScript; // ex: EnemyBlinkEffect
+        [Tooltip("Durée du clignotement avant le spawn (secondes).")]
+        [SerializeField] private float blinkDuration = 1.5f;
+        [Tooltip("Temps sans compagnon avant de déclencher le blink (secondes).")]
+        [SerializeField] private float noCompanionTimeout = 3f;
+
         private GameObject activeCompanionLine;
         private LineRenderer activeLineRenderer;
 
@@ -37,6 +45,9 @@ namespace Ennemies.Effect
         // Healing runtime
         private EnemyHealth companionHealth;
         private float nextHealTickTime;
+
+        private float noCompanionSince = -1f;
+        private bool fallbackStarted = false;
 
         private void Awake()
         {
@@ -97,6 +108,8 @@ namespace Ennemies.Effect
                     currentCompanion = FindClosestEligibleCompanion(owner.position, Mathf.Max(0.01f, autoSearchRange));
                 }
             }
+
+            HandleNoCompanionTimer();
 
             // 2) Mettre à jour la ligne
             UpdateCompanionLine();
@@ -254,6 +267,54 @@ namespace Ennemies.Effect
             }
 
             return best;
+        }
+
+        private void HandleNoCompanionTimer()
+        {
+            if (currentCompanion != null)
+            {
+                noCompanionSince = -1f;
+                fallbackStarted = false;
+                return;
+            }
+
+            if (noCompanionSince < 0f)
+            {
+                noCompanionSince = Time.time;
+            }
+            else
+            {
+                float timeSpent = Time.time - noCompanionSince;
+                if (!fallbackStarted && timeSpent >= noCompanionTimeout)
+                {
+                    fallbackStarted = true;
+                    StartBlinkAndSpawnFallback();
+                }
+            }
+        }
+
+        private void StartBlinkAndSpawnFallback()
+        {
+            if (blinkEffectScript != null)
+            {
+                // Démarrer le clignotement
+                var blinkMethod = blinkEffectScript.GetType().GetMethod("StartBlink",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+                if (blinkMethod != null)
+                {
+                    // Appeler la méthode de clignotement avec la durée spécifiée
+                    blinkMethod.Invoke(blinkEffectScript, new object[] { blinkDuration });
+                }
+                else
+                {
+                    Debug.LogWarning($"[HealEnemyPower] La méthode 'StartBlink' n'a pas été trouvée dans {blinkEffectScript.GetType().Name}.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[HealEnemyPower] Composant de clignotement manquant sur {gameObject.name}.");
+            }
         }
 
         private void OnDisable()

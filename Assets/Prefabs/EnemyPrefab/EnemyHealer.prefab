@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 634873112719374832}
   - component: {fileID: 9116389384450429012}
   - component: {fileID: 5195460515959347227}
+  - component: {fileID: 4758446326151995938}
   m_Layer: 7
   m_Name: EnemyHealer
   m_TagString: Enemy
@@ -224,6 +225,9 @@ MonoBehaviour:
   searchInterval: 1
   healPerSecond: 80
   tickInterval: 0.05
+  blinkEffectScript: {fileID: 2188955753850171073}
+  blinkDuration: 1.5
+  noCompanionTimeout: 3
 --- !u!114 &5195460515959347227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,6 +244,31 @@ MonoBehaviour:
   healEffectPrefab: {fileID: 0}
   healZonePrefab: {fileID: 3080169361055456811, guid: 49d9de0964a53544097c89fcd3497700, type: 3}
   healEffectDuration: 1
+--- !u!114 &4758446326151995938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b81163e1ae3a763419ac524b11e8a34e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableAutoSearchFallback: 1
+  companionDetectRange: 20
+  searchInterval: 1
+  blinkEffectScript: {fileID: 2188955753850171073}
+  blinkDuration: 5
+  noCompanionTimeout: 5
+  enemyPrefabs:
+  - {fileID: 1807755940922956229, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
+  spawnCount: 3
+  spawnRadius: 6
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
