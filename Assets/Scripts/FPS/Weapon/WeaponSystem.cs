@@ -219,6 +219,13 @@ public class WeaponSystem : MonoBehaviour
             {
                 return;
             }
+            
+            // Empêcher les blood bullets quand le joueur est stunné (ne pas consommer sa vie contre son gré)
+            var stunComp = GetComponentInParent<FPS.PlayerStunAutoFire>();
+            if (stunComp != null && stunComp.IsStunned)
+            {
+                return;
+            }
         }
 
         lastShootTime = Time.time;
