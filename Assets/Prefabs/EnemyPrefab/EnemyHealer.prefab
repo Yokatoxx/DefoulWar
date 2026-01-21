@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 9116389384450429012}
   - component: {fileID: 5195460515959347227}
   - component: {fileID: 4758446326151995938}
+  - component: {fileID: 6625965002628555201}
   m_Layer: 7
   m_Name: EnemyHealer
   m_TagString: Enemy
@@ -269,6 +270,20 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &6625965002628555201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83455b7d94bda564b9b311988fa7e5ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blinkEmissionColor: {r: 1, g: 1, b: 1, a: 1}
+  flashes: 6
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0

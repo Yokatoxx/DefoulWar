@@ -16,8 +16,8 @@ namespace Ennemies.Effect
         [SerializeField] private float searchInterval = 1.0f;
 
         [Header("Clignotement + Invocation")]
-        [Tooltip("Composant responsable de l'effet de clignotement (doit exposer StartBlink(float)).")]
-        [SerializeField] private MonoBehaviour blinkEffectScript; // ex: EnemyBlinkEffect
+        [Tooltip("Composant responsable de l'effet de clignotement.")]
+        [SerializeField] private EnemyBlinkEffect blinkEffectScript; // ex: EnemyBlinkEffect
         [Tooltip("Durée de l'effet de clignotement avant le spawn.")]
         [SerializeField] private float blinkDuration = 1.5f;
         [Tooltip("Temps sans compagnon avant de déclencher le clignotement/invocation.")]
@@ -141,14 +141,14 @@ namespace Ennemies.Effect
 
         private IEnumerator BlinkSpawnDestroySequence()
         {
-            // Jouer le clignotement si disponible
+            // Jouer le clignotement si disponible (appel direct, sans réflexion)
             if (blinkEffectScript != null)
             {
-                var method = blinkEffectScript.GetType().GetMethod("StartBlink", new System.Type[] { typeof(float) });
-                if (method != null)
-                {
-                    method.Invoke(blinkEffectScript, new object[] { Mathf.Max(0.01f, blinkDuration) });
-                }
+                blinkEffectScript.StartBlink(Mathf.Max(0.01f, blinkDuration));
+            }
+            else
+            {
+                Debug.LogWarning("[SpawnOnNoCompanion] Aucun EnemyBlinkEffect assigné.");
             }
 
             // Attendre la fin du clignotement
@@ -221,6 +221,13 @@ namespace Ennemies.Effect
             }
 
             return best;
+        }
+
+        // Ajoutez ce helper pour auto-renseigner la référence en Editor
+        private void OnValidate()
+        {
+            if (blinkEffectScript == null)
+                blinkEffectScript = GetComponentInChildren<EnemyBlinkEffect>();
         }
     }
 }
