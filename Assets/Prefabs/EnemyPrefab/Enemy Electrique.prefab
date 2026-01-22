@@ -126,7 +126,7 @@ MonoBehaviour:
   overrideAutoFireInterval: 1
   stunAutoFireInterval: 0.2
   electricDischargeRadius: 3
-  electricDamage: 25
+  electricDamage: 50
   electricEffectPrefab: {fileID: 0}
   effectDuration: 0.5
   dischargeCooldown: 0.2
