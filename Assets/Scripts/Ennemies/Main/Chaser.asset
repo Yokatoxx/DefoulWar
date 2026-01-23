@@ -52,7 +52,7 @@ MonoBehaviour:
   sniperLockDuration: 0.5
   highGroundSearchRadius: 20
   canDodge: 1
-  dodgeChance: 0.1
+  dodgeChance: 1
   dodgeForce: 50
   dodgeDuration: 0.01
   dodgeCooldown: 2
