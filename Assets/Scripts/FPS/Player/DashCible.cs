@@ -440,6 +440,9 @@ namespace FPS
                 // Bounce joueur - IMMÉDIAT à l'impact
                 bounce?.StartBounce(dirToTarget);
                 
+                // ScreenShake à l'impact
+                ApplyScreenShake();
+                
                 // Knockback ennemi - IMMÉDIAT à l'impact
                 ApplyEnemyKnockback(target, dirToTarget);
                 
@@ -466,6 +469,18 @@ namespace FPS
                 Config.knockback.force,
                 Config.knockback.duration,
                 Config.knockback.affectsYAxis
+            );
+        }
+        
+        private void ApplyScreenShake()
+        {
+            if (Config?.screenShake == null || !Config.screenShake.enabled) return;
+            if (CameraShake.Instance == null) return;
+            
+            CameraShake.Instance.ShakeWithRotation(
+                Config.screenShake.duration,
+                Config.screenShake.positionMagnitude,
+                Config.screenShake.rotationMagnitude
             );
         }
         

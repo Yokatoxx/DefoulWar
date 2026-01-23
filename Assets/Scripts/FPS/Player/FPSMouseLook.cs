@@ -3,7 +3,7 @@ using UnityEngine;
 namespace FPS
 {
     /// <summary>
-    /// Gère la rotation de la caméra et le lean (inclinaison)
+    /// Gère la rotation de la caméra
     /// </summary>
     public class FPSMouseLook : MonoBehaviour
     {
@@ -13,13 +13,7 @@ namespace FPS
         [SerializeField] private float minVerticalAngle = -80f;
         [SerializeField] private float maxVerticalAngle = 80f;
 
-        [Header("Lean Settings")]
-        [SerializeField] private float leanAngle = 15f;
-        [SerializeField] private float leanInputAngle = 20f;
-        [SerializeField] private float leanSpeed = 8f;
-
         private float verticalRotation;
-        private float currentLean;
         private float yaw;
 
         private void Awake()
@@ -45,9 +39,9 @@ namespace FPS
             verticalRotation = 0f;
         }
 
-        public void Look(Vector2 lookInput, Vector2 moveInput, bool leanLeft, bool leanRight)
+        public void Look(Vector2 lookInput)
         {
-            // Rotation horizontale (corps du joueur) - appliquée directement au transform
+            // Rotation horizontale (corps du joueur)
             float mouseX = lookInput.x * mouseSensitivity;
             yaw += mouseX;
             transform.rotation = Quaternion.Euler(0f, yaw, 0f);
@@ -57,19 +51,8 @@ namespace FPS
             verticalRotation -= mouseY;
             verticalRotation = Mathf.Clamp(verticalRotation, minVerticalAngle, maxVerticalAngle);
             
-            // Lean (inclinaison)
-            float targetLean = 0f;
-            if (Mathf.Abs(moveInput.x) > 0.01f)
-            {
-                targetLean = Mathf.Clamp(moveInput.x, -1f, 1f) * leanAngle;
-            }
-            if (leanLeft) targetLean = leanInputAngle;
-            if (leanRight) targetLean = -leanInputAngle;
-            
-            currentLean = Mathf.Lerp(currentLean, targetLean, Time.deltaTime * leanSpeed);
-            
-            // Appliquer les rotations à la caméra
-            cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, currentLean);
+            // Appliquer la rotation à la caméra
+            cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
         }
 
         public Transform CameraTransform => cameraTransform;

@@ -125,15 +125,34 @@ namespace FPS
         {
             Vector3 right = transform.right;
             Vector3 left = -transform.right;
+            Vector3 back = -transform.forward;
+            Vector3 backRight = (back + right).normalized;
+            Vector3 backLeft = (back + left).normalized;
             
-            Vector3 preferredDir = Random.value > 0.5f ? right : left;
-            Vector3 alternativeDir = preferredDir == right ? left : right;
+            // Toutes les directions possibles (priorise latérales puis diagonales arrière)
+            Vector3[] directions = new Vector3[]
+            {
+                right, left, backRight, backLeft, back
+            };
             
-            if (IsDirectionClear(preferredDir))
-                return preferredDir;
+            // Mélanger les 2 premières (gauche/droite) pour du hasard
+            if (Random.value > 0.5f)
+            {
+                (directions[0], directions[1]) = (directions[1], directions[0]);
+            }
             
-            if (IsDirectionClear(alternativeDir))
-                return alternativeDir;
+            // Mélanger les diagonales arrière aussi
+            if (Random.value > 0.5f)
+            {
+                (directions[2], directions[3]) = (directions[3], directions[2]);
+            }
+            
+            // Trouver la première direction libre
+            foreach (Vector3 dir in directions)
+            {
+                if (IsDirectionClear(dir))
+                    return dir;
+            }
             
             if (showDebugLogs)
                 Debug.Log($"[EnemyDodge] {gameObject.name}: Aucune direction d'esquive disponible");

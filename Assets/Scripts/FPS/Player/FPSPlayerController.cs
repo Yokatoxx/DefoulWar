@@ -37,8 +37,6 @@ namespace FPS
             Vector2 lookInput = inputHandler.LookInput;
             bool jump = inputHandler.JumpPressed;
             bool sprint = inputHandler.SprintPressed;
-            bool leanLeft = inputHandler.LeanLeftPressed;
-            bool leanRight = inputHandler.LeanRightPressed;
 
             // Si le joueur est stun, neutraliser déplacement et actions mais laisser la caméra
             var stun = GetComponent<PlayerStunAutoFire>();
@@ -47,8 +45,6 @@ namespace FPS
                 moveInput = Vector2.zero;
                 jump = false;
                 sprint = false;
-                leanLeft = false;
-                leanRight = false;
             }
 
             // Appliquer le mouvement
@@ -60,7 +56,7 @@ namespace FPS
                 inputHandler.ConsumeJump();
             }
             
-            mouseLook.Look(lookInput, moveInput, leanLeft, leanRight);
+            mouseLook.Look(lookInput);
             
             if (cameraEffects != null)
             {

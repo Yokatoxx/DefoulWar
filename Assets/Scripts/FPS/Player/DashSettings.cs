@@ -33,6 +33,9 @@ namespace FPS
 
         [Header("Knockback Ennemi")]
         public KnockbackSettings knockback = new KnockbackSettings();
+
+        [Header("ScreenShake Impact")]
+        public ScreenShakeSettings screenShake = new ScreenShakeSettings();
     }
 
     [System.Serializable]
@@ -123,5 +126,24 @@ namespace FPS
         
         [Tooltip("Le knockback affecte aussi l'axe Y")]
         public bool affectsYAxis = false;
+    }
+
+    [System.Serializable]
+    public class ScreenShakeSettings
+    {
+        [Tooltip("Active le screenshake à l'impact du dash")]
+        public bool enabled = true;
+        
+        [Min(0.01f)]
+        [Tooltip("Durée du screenshake en secondes")]
+        public float duration = 0.15f;
+        
+        [Min(0f)]
+        [Tooltip("Intensité du déplacement de la caméra")]
+        public float positionMagnitude = 0.1f;
+        
+        [Min(0f)]
+        [Tooltip("Intensité de la rotation de la caméra (en degrés)")]
+        public float rotationMagnitude = 2f;
     }
 }
