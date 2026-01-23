@@ -154,5 +154,11 @@ namespace Ennemies.Settings
 
         [Tooltip("Rayon de recherche des points en hauteur")]
         [Min(1f)] public float highGroundSearchRadius = 20f;
+
+        [Header("Companion Follower Settings")]
+        [Tooltip("Tags d’ennemis à prioriser pour le suivi (ordre de priorité).")]
+        public string[] preferredCompanionTags = new[] { "ShieldEnemy" };
+        [Tooltip("Si true, ne suit que les ennemis dont le tag est dans la liste. Sinon, fallback sur n’importe quel ennemi éligible.")]
+        public bool restrictToPreferredTagsOnly = false;
     }
 }

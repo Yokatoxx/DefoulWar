@@ -103,34 +103,67 @@ namespace Ennemies.Behaviors
             canAttack = false;
         }
 
-        private Transform FindClosestEligibleCompanion()
+// Remplacez FindClosestEligibleCompanion() par cette version orientée tags
+private Transform FindClosestEligibleCompanion()
+{
+    float maxRange = Mathf.Max(0.01f, settings.detectionRange);
+
+    // Essai par tags prioritaires (dans l'ordre)
+    if (settings.preferredCompanionTags != null && settings.preferredCompanionTags.Length > 0)
+    {
+        foreach (var tag in settings.preferredCompanionTags)
         {
-            float maxRange = Mathf.Max(0.01f, settings.detectionRange);
-            float bestDist = float.PositiveInfinity;
-            Transform best = null;
-
-            var enemies = Object.FindObjectsByType<Ennemies.EnemyBehaviour>(FindObjectsSortMode.None);
-            foreach (var eb in enemies)
+            var t = FindClosestByPredicate(maxRange, eb =>
             {
-                if (eb == null) continue;
-                if (eb.transform == owner) continue;
-
-                // Ne pas suivre ceux qui sont eux-memes CompanionFollower
-                if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower)
-                    continue;
-
-                float dist = Vector3.Distance(owner.position, eb.transform.position);
-                if (dist > maxRange) continue;
-
-                if (dist < bestDist)
-                {
-                    bestDist = dist;
-                    best = eb.transform;
-                }
-            }
-
-            return best;
+                if (eb == null || eb.transform == owner) return false;
+                if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+                return eb.gameObject.CompareTag(tag);
+            });
+            if (t != null) return t;
         }
+
+        // Fallback si pas strict: prendre n’importe quel éligible
+        if (!settings.restrictToPreferredTagsOnly)
+        {
+            var any = FindClosestByPredicate(maxRange, eb =>
+            {
+                if (eb == null || eb.transform == owner) return false;
+                if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+                return true;
+            });
+            if (any != null) return any;
+        }
+        return null;
+    }
+
+    // Pas de liste: comportement existant
+    return FindClosestByPredicate(maxRange, eb =>
+    {
+        if (eb == null || eb.transform == owner) return false;
+        if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+        return true;
+    });
+}
+
+private Transform FindClosestByPredicate(float maxRange, System.Func<Ennemies.EnemyBehaviour, bool> predicate)
+{
+    float bestDist = float.PositiveInfinity;
+    Transform best = null;
+
+    var enemies = Object.FindObjectsByType<Ennemies.EnemyBehaviour>(FindObjectsSortMode.None);
+    foreach (var eb in enemies)
+    {
+        if (!predicate(eb)) continue;
+        float dist = Vector3.Distance(owner.position, eb.transform.position);
+        if (dist > maxRange) continue;
+        if (dist < bestDist)
+        {
+            bestDist = dist;
+            best = eb.transform;
+        }
+    }
+    return best;
+}
 
         private void ClearCompanion()
         {
