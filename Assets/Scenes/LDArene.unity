@@ -12666,7 +12666,7 @@ MonoBehaviour:
   spatialBlend: 0
   clips:
   - key: Shoot
-    clip: {fileID: 8300000, guid: 6447f4df62cc993448d168aff9a645ed, type: 3}
+    clip: {fileID: 8300000, guid: 97e0a05451accd64eb0eaad8d9fe4b09, type: 3}
     defaultVolume: 1
   - key: HeadShot
     clip: {fileID: 8300000, guid: 74108232e43e3b5479c48f05fc66538d, type: 3}
@@ -12675,7 +12675,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 7b812e8afb7cb5a4ab34b48466939b0f, type: 3}
     defaultVolume: 1
   - key: Dash
-    clip: {fileID: 8300000, guid: 2803709d7ae8e41448dfdffce3f4fcfb, type: 3}
+    clip: {fileID: 8300000, guid: bbf3a4f4943dfde468f4fefb1a9955b4, type: 3}
     defaultVolume: 0.61
   - key: Taser
     clip: {fileID: 8300000, guid: d3e814819aeb7b045bab577ca2c89eef, type: 3}
