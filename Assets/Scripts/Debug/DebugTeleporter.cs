@@ -15,8 +15,20 @@ public class DebugTeleporter : MonoBehaviour
         public Transform destination;
     }
 
+    [System.Serializable]
+    public class SceneEntry
+    {
+        public string sceneName;
+        public KeyCode key = KeyCode.Alpha1;
+    }
+
     [Header("Teleport Points")]
     [SerializeField] private TeleportPoint[] teleportPoints;
+
+    [Header("Scene Switching")]
+    [SerializeField] private SceneEntry[] scenes;
+    [SerializeField] private KeyCode sceneMenuKey = KeyCode.F10;
+    private bool showSceneMenu = false;
 
     [Header("Settings")]
     [SerializeField] private bool showDebugUI = true;
@@ -84,16 +96,44 @@ public class DebugTeleporter : MonoBehaviour
 
     private void Update()
     {
-        if (teleportPoints == null) return;
-
-        foreach (var point in teleportPoints)
+        // Toggle du menu de scènes
+        if (Input.GetKeyDown(sceneMenuKey))
         {
-            if (point.destination != null && Input.GetKeyDown(point.key))
+            showSceneMenu = !showSceneMenu;
+        }
+
+        // Téléportation
+        if (teleportPoints != null)
+        {
+            foreach (var point in teleportPoints)
             {
-                TeleportAndReload(point);
-                break;
+                if (point.destination != null && Input.GetKeyDown(point.key))
+                {
+                    TeleportAndReload(point);
+                    return;
+                }
             }
         }
+
+        // Changement de scène par touche
+        if (scenes != null)
+        {
+            foreach (var scene in scenes)
+            {
+                if (!string.IsNullOrEmpty(scene.sceneName) && Input.GetKeyDown(scene.key))
+                {
+                    LoadScene(scene.sceneName);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void LoadScene(string sceneName)
+    {
+        Debug.Log($"[DebugTeleporter] Chargement de la scène: {sceneName}");
+        hasPendingTeleport = false;
+        SceneManager.LoadScene(sceneName);
     }
 
     private void TeleportAndReload(TeleportPoint point)
@@ -111,27 +151,57 @@ public class DebugTeleporter : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!showDebugUI || teleportPoints == null) return;
+        if (!showDebugUI) return;
 
         const int w = 220;
         const int h = 24;
         int x = 10;
         int y = 10;
 
+        // Titre principal
         GUI.Label(new Rect(x, y, w, h), "<b>Debug Teleporter</b>");
         y += h + 5;
 
-        foreach (var point in teleportPoints)
+        // Points de téléportation
+        if (teleportPoints != null)
         {
-            if (point.destination == null)
+            foreach (var point in teleportPoints)
             {
-                GUI.Label(new Rect(x, y, w, h), $"[{point.key}] {point.name} (MISSING)");
+                if (point.destination == null)
+                {
+                    GUI.Label(new Rect(x, y, w, h), $"[{point.key}] {point.name} (MISSING)");
+                }
+                else if (GUI.Button(new Rect(x, y, w, h), $"[{point.key}] {point.name}"))
+                {
+                    TeleportAndReload(point);
+                }
+                y += h + 2;
             }
-            else if (GUI.Button(new Rect(x, y, w, h), $"[{point.key}] {point.name}"))
+        }
+
+        // Séparateur et menu de scènes
+        y += 10;
+        if (GUI.Button(new Rect(x, y, w, h), $"[{sceneMenuKey}] Scènes {(showSceneMenu ? "▼" : "▶")}"))
+        {
+            showSceneMenu = !showSceneMenu;
+        }
+        y += h + 2;
+
+        if (showSceneMenu && scenes != null)
+        {
+            foreach (var scene in scenes)
             {
-                TeleportAndReload(point);
+                if (string.IsNullOrEmpty(scene.sceneName)) continue;
+                
+                bool isCurrentScene = SceneManager.GetActiveScene().name == scene.sceneName;
+                string label = isCurrentScene ? $"[{scene.key}] ► {scene.sceneName}" : $"[{scene.key}] {scene.sceneName}";
+                
+                if (GUI.Button(new Rect(x + 10, y, w - 10, h), label))
+                {
+                    LoadScene(scene.sceneName);
+                }
+                y += h + 2;
             }
-            y += h + 2;
         }
     }
 }

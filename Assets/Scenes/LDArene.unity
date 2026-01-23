@@ -16584,6 +16584,14 @@ MonoBehaviour:
   - name: Arena 4
     key: 260
     destination: {fileID: 864490999}
+  scenes:
+  - sceneName: LD_ART
+    key: 282
+  - sceneName: LDArene
+    key: 283
+  - sceneName: LDToyVista
+    key: 284
+  sceneMenuKey: 291
   showDebugUI: 1
 --- !u!4 &379262230
 Transform:

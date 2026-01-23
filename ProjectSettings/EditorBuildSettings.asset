@@ -6,23 +6,14 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Old Scene/Multiscene.unity
-    guid: 3c006375f9c52c943827cbf42ad4028f
+    path: Assets/Scenes/LDArene.unity
+    guid: 7b009159127c80d48bba7a8e7f902996
   - enabled: 1
-    path: Assets/Scenes/Old Scene/MainScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/LDToyVista.unity
+    guid: 7a2d13af3df55554eb55f32c3496c450
   - enabled: 1
-    path: Assets/Scenes/Old Scene/DebugScene.unity
-    guid: 316a9ad38410b5a49a1f625c9765c035
-  - enabled: 1
-    path: Assets/Scenes/Old Scene/NoahScene.unity
-    guid: 3b5ca090039b1524cb29992471017911
-  - enabled: 1
-    path: Assets/Scenes/Old Scene/InterieurScene.unity
-    guid: 92b828901aca5a24baba821e2eefda4f
-  - enabled: 1
-    path: Assets/Scenes/Old Scene/SolScene.unity
-    guid: fabf39899cce6404f8f93ab535402170
+    path: Assets/Scene_ART/LD_ART.unity
+    guid: 749ac9a5f44f3164d962285064328f13
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
