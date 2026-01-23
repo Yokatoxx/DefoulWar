@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Ennemies.Effect
@@ -7,36 +6,22 @@ namespace Ennemies.Effect
     [DisallowMultipleComponent]
     public class EnemyBlinkEffect : MonoBehaviour
     {
-        [Header("Blink")]
-        [SerializeField] private Color blinkEmissionColor = Color.white;
-        [SerializeField, Min(1)] private int flashes = 6;
+        [Header("Blink Object")]
+        [Tooltip("Prefab optionnel du visuel de blink. Si null, un simple Sphere primitive est créée.")]
+        [SerializeField] private GameObject blinkVisualPrefab;
+        [Tooltip("Taille minimale du blink (échelle locale).")]
+        [SerializeField] private float minScale = 0.8f;
+        [Tooltip("Taille maximale du blink (échelle locale).")]
+        [SerializeField] private float maxScale = 1.3f;
+        [Tooltip("Vitesse d’oscillation (cycles par seconde).")]
+        [SerializeField] private float pulseFrequency = 3f;
+        [Tooltip("Offset de position du visuel par rapport au centre de l’ennemi.")]
+        [SerializeField] private Vector3 visualOffset = new Vector3(0f, 1f, 0f);
+        [Tooltip("Couleur du visuel si primitive générée.")]
+        [SerializeField] private Color visualColor = new Color(1f, 1f, 1f, 0.35f);
 
-        private struct EmissionBackup
-        {
-            public Renderer r;
-            public bool hadEmission;
-            public Color baseEmission;
-        }
-
-        private readonly List<EmissionBackup> backups = new List<EmissionBackup>();
+        private GameObject spawnedVisual;
         private Coroutine routine;
-
-        private void Awake()
-        {
-            backups.Clear();
-            var renderers = GetComponentsInChildren<Renderer>(true);
-            foreach (var r in renderers)
-            {
-                if (r == null || r.sharedMaterial == null) continue;
-                var mat = r.sharedMaterial;
-                bool hasProp = mat.HasProperty("_EmissionColor");
-                if (!hasProp) continue;
-
-                bool hadEmission = mat.IsKeywordEnabled("_EMISSION");
-                Color baseEmission = mat.GetColor("_EmissionColor");
-                backups.Add(new EmissionBackup { r = r, hadEmission = hadEmission, baseEmission = baseEmission });
-            }
-        }
 
         public void StartBlink(float duration)
         {
@@ -47,57 +32,85 @@ namespace Ennemies.Effect
 
         private IEnumerator BlinkRoutine(float duration)
         {
-            if (backups.Count == 0) yield break;
+            SpawnVisualIfNeeded();
+            if (spawnedVisual == null) yield break;
 
-            // Activer l’émission pendant le blink
-            foreach (var b in backups)
-            {
-                if (b.r == null) continue;
-                foreach (var m in b.r.materials)
-                {
-                    if (m != null && m.HasProperty("_EmissionColor"))
-                        m.EnableKeyword("_EMISSION");
-                }
-            }
-
+            Transform vis = spawnedVisual.transform;
+            Vector3 baseScale = Vector3.one;
             float t = 0f;
-            float freq = Mathf.Max(1, flashes) / duration; // nb de flashs sur la durée
-            while (t < duration)
+            float twoPi = Mathf.PI * 2f;
+            float freq = Mathf.Max(0.1f, pulseFrequency);
+
+            while (t < duration && spawnedVisual != null)
             {
                 t += Time.deltaTime;
-                float s = 0.5f + 0.5f * Mathf.Sin(t * freq * Mathf.PI * 2f); // 0..1
-                Color target = blinkEmissionColor * Mathf.LinearToGammaSpace(s);
+                // Oscillation sinusoïdale entre minScale et maxScale
+                float s = 0.5f + 0.5f * Mathf.Sin(t * twoPi * freq);
+                float scale = Mathf.Lerp(minScale, maxScale, s);
+                vis.localScale = baseScale * scale;
 
-                foreach (var b in backups)
-                {
-                    if (b.r == null) continue;
-                    var mats = b.r.materials;
-                    for (int i = 0; i < mats.Length; i++)
-                    {
-                        var m = mats[i];
-                        if (m != null && m.HasProperty("_EmissionColor"))
-                            m.SetColor("_EmissionColor", target);
-                    }
-                }
-
+                // Suivre le transform parent (au cas où il bouge)
+                vis.position = transform.position + visualOffset;
                 yield return null;
             }
 
-            // Restaurer l’état initial
-            foreach (var b in backups)
+            CleanupVisual();
+            routine = null;
+        }
+
+        private void SpawnVisualIfNeeded()
+        {
+            CleanupVisual();
+
+            if (blinkVisualPrefab != null)
             {
-                if (b.r == null) continue;
-                var mats = b.r.materials;
-                for (int i = 0; i < mats.Length; i++)
+                spawnedVisual = Instantiate(blinkVisualPrefab, transform.position + visualOffset, Quaternion.identity);
+            }
+            else
+            {
+                // Fallback: créer une sphère translucide
+                spawnedVisual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                spawnedVisual.transform.position = transform.position + visualOffset;
+                var mr = spawnedVisual.GetComponent<MeshRenderer>();
+                if (mr != null)
                 {
-                    var m = mats[i];
-                    if (m == null || !m.HasProperty("_EmissionColor")) continue;
-                    m.SetColor("_EmissionColor", b.baseEmission);
-                    if (!b.hadEmission) m.DisableKeyword("_EMISSION");
+                    var mat = new Material(Shader.Find("HDRP/Lit"));
+                    mat.SetColor("_BaseColor", visualColor);
+                    mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                    mr.material = mat;
                 }
+                // Optional: retirer le collider
+                var col = spawnedVisual.GetComponent<Collider>();
+                if (col != null) Destroy(col);
             }
 
-            routine = null;
+            // Parenté pour faciliter le nettoyage
+            spawnedVisual.transform.SetParent(null); // en world pour éviter scaling parent
+            spawnedVisual.transform.localScale = Vector3.one * minScale;
+        }
+
+        private void CleanupVisual()
+        {
+            if (spawnedVisual != null)
+            {
+                Destroy(spawnedVisual);
+                spawnedVisual = null;
+            }
+        }
+
+        private void OnDisable()
+        {
+            CleanupVisual();
+            if (routine != null)
+            {
+                StopCoroutine(routine);
+                routine = null;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            CleanupVisual();
         }
     }
 }
