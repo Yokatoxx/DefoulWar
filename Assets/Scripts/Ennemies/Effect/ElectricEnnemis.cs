@@ -30,6 +30,14 @@ namespace Ennemies.Effect
         [Tooltip("Les ennemis électriques résistent au dash et ne meurent pas")]
         [SerializeField] private bool resistToDash = true;
 
+        [Header("Ralentissement du joueur")]
+        [Tooltip("Durée du ralentissement appliqué au joueur lors d'un contact")]
+        [SerializeField] private float slowDuration = 2f;
+        [Tooltip("Multiplicateur de vitesse pendant le ralentissement (0.5 = 50% de la vitesse)")]
+        [SerializeField, Range(0.1f, 1f)] private float slowAmount = 0.5f;
+        [Tooltip("Appliquer le ralentissement lors des attaques")]
+        [SerializeField] private bool applySlowOnAttack = true;
+
         private EnemyHealth health;
         private static readonly Collider[] DischargeBuffer = new Collider[32];
         private float lastDischargeTime = -999f;
@@ -110,5 +118,23 @@ namespace Ennemies.Effect
         public float ElectricDischargeRadius => electricDischargeRadius;
         public float ElectricDamage => electricDamage;
         public bool ResistToDash => resistToDash;
+        public float SlowDuration => slowDuration;
+        public float SlowAmount => slowAmount;
+        public bool ApplySlowOnAttack => applySlowOnAttack;
+        
+        /// <summary>
+        /// Applique l'effet de ralentissement électrique au joueur.
+        /// </summary>
+        public void ApplySlowToPlayer(Transform playerTransform)
+        {
+            if (playerTransform == null) return;
+            
+            var movement = playerTransform.GetComponent<FPSMovement>();
+            if (movement != null)
+            {
+                movement.ApplySlow(slowDuration, slowAmount);
+                Debug.Log($"[ElectricEnnemis] Ralentissement électrique appliqué au joueur: {slowAmount * 100}% pendant {slowDuration}s");
+            }
+        }
     }
 }

@@ -31,6 +31,23 @@ namespace Ennemies.Settings
     }
 
     /// <summary>
+    /// Type de trajectoire de déplacement de l'ennemi vers sa cible.
+    /// </summary>
+    public enum TrajectoryType
+    {
+        /// <summary>Trajectoire directe vers la cible.</summary>
+        Straight,
+        /// <summary>Trajectoire en zigzag latéral.</summary>
+        Zigzag,
+        /// <summary>Trajectoire sinusoïdale continue.</summary>
+        Sinusoidal,
+        /// <summary>Trajectoire avec changements de direction aléatoires.</summary>
+        Random,
+        /// <summary>Trajectoire en spirale vers la cible.</summary>
+        Spiral
+    }
+
+    /// <summary>
     /// ScriptableObject pour configurer le comportement d'un ennemi.
     /// </summary>
     [CreateAssetMenu(fileName = "EnemyBehavior", menuName = "Enemies/Behavior Settings")]
@@ -64,6 +81,22 @@ namespace Ennemies.Settings
 
         [Tooltip("Tolérance de distance avant de se repositionner (Distance)")]
         [Min(0f)] public float distanceTolerance = 1f;
+
+        [Header("Trajectory Settings")]
+        [Tooltip("Type de trajectoire lors de la poursuite")]
+        public TrajectoryType trajectoryType = TrajectoryType.Straight;
+
+        [Tooltip("Amplitude du décalage latéral de la trajectoire")]
+        [Min(0f)] public float trajectoryAmplitude = 3f;
+
+        [Tooltip("Fréquence des oscillations (zigzag/sinusoïdal) - plus élevé = plus rapide")]
+        [Min(0.1f)] public float trajectoryFrequency = 1f;
+
+        [Tooltip("Intervalle de temps entre les changements de direction (Random/Zigzag)")]
+        [Min(0.1f)] public float trajectoryChangeInterval = 0.5f;
+
+        [Tooltip("Distance minimale au joueur pour appliquer la trajectoire non-rectiligne")]
+        [Min(0f)] public float trajectoryMinDistance = 3f;
 
         [Header("Zone Patrol Settings")]
         [Tooltip("Rayon de la zone de patrouille (ZonePatrol)")]

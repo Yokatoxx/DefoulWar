@@ -131,6 +131,9 @@ MonoBehaviour:
   effectDuration: 0.5
   dischargeCooldown: 0.2
   resistToDash: 1
+  slowDuration: 1
+  slowAmount: 0.801
+  applySlowOnAttack: 1
 --- !u!54 &187447163467983752
 Rigidbody:
   m_ObjectHideFlags: 0

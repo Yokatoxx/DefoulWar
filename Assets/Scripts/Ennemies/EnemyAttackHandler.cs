@@ -143,6 +143,9 @@ namespace Ennemies
                 {
                     playerHealth.TakeDamage(settings.attackDamage);
                     Debug.Log($"[EnemyAttack] Melee attack: {settings.attackDamage} damage!");
+                    
+                    // Appliquer le ralentissement électrique si l'ennemi est électrique
+                    ApplyElectricSlow();
                 }
             }
 
@@ -215,6 +218,9 @@ namespace Ennemies
                     
                     // Notifier l'indicateur de hit
                     GetScreenDetector()?.RegisterHit(transform, settings.attackDamage);
+                    
+                    // Appliquer le ralentissement électrique si l'ennemi est électrique
+                    ApplyElectricSlow();
                     break;
                 }
                 else
@@ -326,6 +332,20 @@ namespace Ennemies
                 {
                     Gizmos.DrawLine(shootPoint.position, shootPoint.position + shootPoint.forward * settings.attackRange);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Applique le ralentissement électrique au joueur si cet ennemi est électrique.
+        /// </summary>
+        private void ApplyElectricSlow()
+        {
+            if (player == null) return;
+            
+            var electricEnemy = GetComponent<ElectricEnnemis>();
+            if (electricEnemy != null && electricEnemy.ApplySlowOnAttack)
+            {
+                electricEnemy.ApplySlowToPlayer(player);
             }
         }
 

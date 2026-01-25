@@ -175,6 +175,7 @@ namespace Ennemies.Behaviors
             agent.speed = settings.chaseSpeed;
             agent.isStopped = false;
             UpdateLastKnownPosition();
+            ResetTrajectory();
         }
 
         private void ExecutePatrol()

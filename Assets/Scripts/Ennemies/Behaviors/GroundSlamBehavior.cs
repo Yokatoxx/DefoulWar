@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 using UnityEngine.AI;
 using Ennemies.Settings;
 using Ennemies.Effect;
@@ -92,7 +92,8 @@ namespace Ennemies.Behaviors
                 {
                     agent.isStopped = false;
                     agent.speed = settings.chaseSpeed;
-                    agent.SetDestination(player.position);
+                    Vector3 destination = CalculateTrajectoryDestination(player.position);
+                    agent.SetDestination(destination);
                     canAttack = false;
                 }
             }
@@ -104,6 +105,7 @@ namespace Ennemies.Behaviors
                 agent.SetDestination(lastKnownPlayerPosition);
                 agent.isStopped = false;
                 canAttack = false;
+                ResetTrajectory();
             }
         }
 
@@ -155,6 +157,7 @@ namespace Ennemies.Behaviors
             agent.speed = settings.chaseSpeed;
             agent.isStopped = false;
             UpdateLastKnownPosition();
+            ResetTrajectory();
         }
 
         private void TriggerSlam()

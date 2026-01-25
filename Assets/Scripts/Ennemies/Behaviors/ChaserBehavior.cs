@@ -7,7 +7,7 @@ namespace Ennemies.Behaviors
 {
     /// <summary>
     /// Comportement d'ennemi qui poursuit le joueur.
-    /// Utilise le système de vision avec FOV et mémoire de position.
+    /// Utilise le systeme de vision avec FOV et memoire de position.
     /// </summary>
     public class ChaserBehavior : BaseEnemyBehavior
     {
@@ -55,7 +55,7 @@ namespace Ennemies.Behaviors
             
             if (canSeePlayer)
             {
-                // Joueur détecté - vérifier si on doit tourner d'abord
+                // Joueur detecte - verifier si on doit tourner d'abord
                 if (TryStartChaseWithTurn())
                 {
                     detectionState = DetectionState.Chasing;
@@ -76,17 +76,18 @@ namespace Ennemies.Behaviors
 
                 if (distanceToPlayer <= settings.attackRange)
                 {
-                    // À portée d'attaque
+                    // A portee d'attaque
                     agent.isStopped = true;
                     canAttack = true;
                     RotateTowardsPlayerSmooth();
                 }
                 else
                 {
-                    // Continuer la poursuite
+                    // Continuer la poursuite avec trajectoire configuree
                     agent.isStopped = false;
                     agent.speed = settings.chaseSpeed;
-                    agent.SetDestination(player.position);
+                    Vector3 destination = CalculateTrajectoryDestination(player.position);
+                    agent.SetDestination(destination);
                     canAttack = false;
                 }
             }
@@ -98,6 +99,7 @@ namespace Ennemies.Behaviors
                 agent.SetDestination(lastKnownPlayerPosition);
                 agent.isStopped = false;
                 canAttack = false;
+                ResetTrajectory();
             }
         }
 
@@ -107,12 +109,12 @@ namespace Ennemies.Behaviors
 
             if (canSeePlayer)
             {
-                // Joueur retrouvé !
+                // Joueur retrouve !
                 StartChasing();
                 return;
             }
 
-            // Aller vers la dernière position connue
+            // Aller vers la derniere position connue
             if (!HasReachedLastKnownPosition())
             {
                 agent.SetDestination(lastKnownPlayerPosition);
@@ -120,12 +122,12 @@ namespace Ennemies.Behaviors
             }
             else
             {
-                // Arrivé à la dernière position, regarder autour
+                // Arrive a la derniere position, regarder autour
                 agent.isStopped = true;
                 
                 if (UpdateInvestigationTimer())
                 {
-                    // Temps écoulé, perdre la cible
+                    // Temps ecoule, perdre la cible
                     detectionState = DetectionState.Lost;
                     ResetAlertState();
                 }
@@ -144,7 +146,7 @@ namespace Ennemies.Behaviors
             }
             else
             {
-                // Revenir à Idle après un court délai
+                // Revenir a Idle apres un court delai
                 detectionState = DetectionState.Idle;
             }
         }
@@ -155,6 +157,7 @@ namespace Ennemies.Behaviors
             agent.speed = settings.chaseSpeed;
             agent.isStopped = false;
             UpdateLastKnownPosition();
+            ResetTrajectory();
         }
 
         public override bool CanAttack() => canAttack;
@@ -163,7 +166,7 @@ namespace Ennemies.Behaviors
 
         public override void OnDamageTaken()
         {
-            // Quand touché, on sait où est le joueur
+            // Quand touche, on sait ou est le joueur
             if (player != null && detectionState != DetectionState.Chasing)
             {
                 UpdateLastKnownPosition();
@@ -175,22 +178,22 @@ namespace Ennemies.Behaviors
         {
             if (owner == null || settings == null) return;
 
-            // Zone de détection
+            // Zone de detection
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(owner.position, settings.detectionRange);
 
-            // Zone d'écoute (360°)
+            // Zone d'ecoute (360)
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(owner.position, settings.hearingRange);
 
-            // Portée d'attaque
+            // Portee d'attaque
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(owner.position, settings.attackRange);
 
-            // Dessiner le cône de vision
+            // Dessiner le cone de vision
             DrawFieldOfViewGizmo();
 
-            // Dernière position connue
+            // Derniere position connue
             if (detectionState == DetectionState.Investigating)
             {
                 Gizmos.color = Color.magenta;

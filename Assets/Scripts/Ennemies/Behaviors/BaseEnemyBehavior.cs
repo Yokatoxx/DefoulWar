@@ -39,6 +39,12 @@ namespace Ennemies.Behaviors
         // Mode arène : les ennemis connaissent toujours la position du joueur
         protected bool isInArenaMode = false;
         
+        // Système de trajectoire
+        protected float trajectoryTimer = 0f;
+        protected int trajectoryDirection = 1;
+        protected float lastTrajectoryChangeTime = 0f;
+        protected float spiralAngle = 0f;
+        
         /// <summary>
         /// Angle en degrés en dessous duquel on considère que l'ennemi fait face au joueur.
         /// </summary>
@@ -391,5 +397,129 @@ namespace Ennemies.Behaviors
         {
             return owner != null ? owner.position : Vector3.zero;
         }
+
+        #region Trajectory System
+
+        /// <summary>
+        /// Calcule une destination avec offset de trajectoire selon le type configuré.
+        /// </summary>
+        /// <param name="targetPosition">Position cible (généralement le joueur)</param>
+        /// <returns>Position modifiée selon la trajectoire configurée</returns>
+        protected Vector3 CalculateTrajectoryDestination(Vector3 targetPosition)
+        {
+            if (settings.trajectoryType == TrajectoryType.Straight)
+            {
+                return targetPosition;
+            }
+
+            float distanceToTarget = Vector3.Distance(owner.position, targetPosition);
+            
+            // Si trop proche, aller directement vers la cible
+            if (distanceToTarget <= settings.trajectoryMinDistance)
+            {
+                return targetPosition;
+            }
+
+            // Calculer la direction vers la cible
+            Vector3 directionToTarget = (targetPosition - owner.position).normalized;
+            
+            // Calculer le vecteur perpendiculaire (latéral)
+            Vector3 lateralDirection = Vector3.Cross(Vector3.up, directionToTarget).normalized;
+
+            float lateralOffset = 0f;
+
+            switch (settings.trajectoryType)
+            {
+                case TrajectoryType.Zigzag:
+                    lateralOffset = CalculateZigzagOffset();
+                    break;
+                    
+                case TrajectoryType.Sinusoidal:
+                    lateralOffset = CalculateSinusoidalOffset();
+                    break;
+                    
+                case TrajectoryType.Random:
+                    lateralOffset = CalculateRandomOffset();
+                    break;
+                    
+                case TrajectoryType.Spiral:
+                    return CalculateSpiralDestination(targetPosition, distanceToTarget);
+            }
+
+            // Appliquer l'offset latéral
+            Vector3 offsetPosition = targetPosition + lateralDirection * lateralOffset;
+            
+            return offsetPosition;
+        }
+
+        /// <summary>
+        /// Calcule un offset en zigzag qui alterne de gauche à droite.
+        /// </summary>
+        private float CalculateZigzagOffset()
+        {
+            trajectoryTimer += Time.deltaTime;
+            
+            // Changer de direction à intervalle régulier
+            if (trajectoryTimer >= settings.trajectoryChangeInterval)
+            {
+                trajectoryTimer = 0f;
+                trajectoryDirection *= -1;
+                lastTrajectoryChangeTime = Time.time;
+            }
+            
+            return settings.trajectoryAmplitude * trajectoryDirection;
+        }
+
+        /// <summary>
+        /// Calcule un offset sinusoïdal continu.
+        /// </summary>
+        private float CalculateSinusoidalOffset()
+        {
+            trajectoryTimer += Time.deltaTime * settings.trajectoryFrequency;
+            return Mathf.Sin(trajectoryTimer * Mathf.PI * 2f) * settings.trajectoryAmplitude;
+        }
+
+        /// <summary>
+        /// Calcule un offset aléatoire qui change à intervalle régulier.
+        /// </summary>
+        private float CalculateRandomOffset()
+        {
+            if (Time.time - lastTrajectoryChangeTime >= settings.trajectoryChangeInterval)
+            {
+                lastTrajectoryChangeTime = Time.time;
+                trajectoryDirection = Random.Range(-1f, 1f) > 0 ? 1 : -1;
+            }
+            
+            return settings.trajectoryAmplitude * trajectoryDirection * Random.Range(0.5f, 1f);
+        }
+
+        /// <summary>
+        /// Calcule une destination en spirale vers la cible.
+        /// </summary>
+        private Vector3 CalculateSpiralDestination(Vector3 targetPosition, float distanceToTarget)
+        {
+            spiralAngle += Time.deltaTime * settings.trajectoryFrequency * 90f;
+            
+            // Le rayon diminue à mesure qu'on se rapproche
+            float spiralRadius = (distanceToTarget / settings.detectionRange) * settings.trajectoryAmplitude;
+            
+            float offsetX = Mathf.Cos(spiralAngle * Mathf.Deg2Rad) * spiralRadius;
+            float offsetZ = Mathf.Sin(spiralAngle * Mathf.Deg2Rad) * spiralRadius;
+            
+            return targetPosition + new Vector3(offsetX, 0, offsetZ);
+        }
+
+        /// <summary>
+        /// Réinitialise le timer de trajectoire (à appeler lors des changements d'état).
+        /// </summary>
+        protected void ResetTrajectory()
+        {
+            trajectoryTimer = 0f;
+            trajectoryDirection = Random.Range(0, 2) == 0 ? -1 : 1;
+            lastTrajectoryChangeTime = Time.time;
+            spiralAngle = Random.Range(0f, 360f);
+        }
+
+        #endregion
     }
 }
