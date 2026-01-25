@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DefoulWar/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/EnemyPrefab/Enemy Electrique.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/EnemyPrefab/Enemy Electrique.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/BaseEnemyBehavior.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/BaseEnemyBehavior.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ChaserBehavior.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ChaserBehavior.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ChaserBehavior.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ChaserBehavior.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/GroundSlamBehavior.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/GroundSlamBehavior.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ZonePatrolBehavior.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Behaviors/ZonePatrolBehavior.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/ElectricEnnemis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Effect/ElectricEnnemis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/EnemyAttackHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/EnemyAttackHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Settings/EnemyBehaviorSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Ennemies/Settings/EnemyBehaviorSettings.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FPS/Player/FPSMovement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
-    </list>
+    <list default="true" id="109b0ca4-720b-48e6-be09-0575ee706ba4" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -191,7 +177,7 @@
       <workItem from="1768748340985" duration="296000" />
       <workItem from="1768935264397" duration="632000" />
       <workItem from="1769201535184" duration="336000" />
-      <workItem from="1769359284357" duration="1741000" />
+      <workItem from="1769359284357" duration="1782000" />
     </task>
     <servers />
   </component>

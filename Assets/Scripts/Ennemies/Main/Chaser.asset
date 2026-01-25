@@ -23,6 +23,11 @@ MonoBehaviour:
   patrolSpeed: 5
   keepDistance: 1
   distanceTolerance: 1
+  trajectoryType: 3
+  trajectoryAmplitude: 3
+  trajectoryFrequency: 1
+  trajectoryChangeInterval: 0.5
+  trajectoryMinDistance: 3
   patrolRadius: 20
   waypointWaitTime: 1
   attackType: 0

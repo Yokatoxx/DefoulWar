@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isPaused: 0
   isGameOver: 0
+  restartDelay: 1.5
 --- !u!4 &905150
 Transform:
   m_ObjectHideFlags: 0
