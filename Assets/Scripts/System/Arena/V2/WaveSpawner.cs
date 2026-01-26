@@ -1,4 +1,5 @@
 using FPS;
+using Ennemies;
 using System.Collections;
 using UnityEngine;
 
@@ -34,6 +35,9 @@ public class WaveSpawner : MonoBehaviour
 
         // Ferme toutes les portes au début de l'arène
         CloseDoors();
+        
+        // Active le mode arène : tous les ennemis connaissent la position du joueur
+        EnemyAlertSystem.Instance.SetAllEnemiesArenaMode(true);
 
         StartCoroutine(StartWaveAfterDelay(currentWave.TimeBeforeThisWave));
     }
@@ -196,6 +200,10 @@ public class WaveSpawner : MonoBehaviour
             if (door != null)
                 door.isClosed = false;
         }
-        Debug.Log("[WaveSpawner] All doors opened");
+        
+        // Désactive le mode arène : les ennemis retrouvent leur comportement normal
+        EnemyAlertSystem.Instance.SetAllEnemiesArenaMode(false);
+        
+        Debug.Log("[WaveSpawner] All doors opened, arena mode disabled");
     }
 }

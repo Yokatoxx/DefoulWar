@@ -1,6 +1,7 @@
 using FPS;
 using UnityEngine;
 using UnityEngine.AI;
+using Ennemies.Effect;
 
 namespace FPS
 {
@@ -120,12 +121,11 @@ namespace FPS
                 {
                     playerHealth.TakeDamage(attackDamage);
                     Debug.Log($"Enemy attacked player for {attackDamage} damage!");
+                    
+                    // Notifier l'indicateur de hit (seulement si dégâts infligés)
+                    var indicator = FindFirstObjectByType<EnemyScreenDetector>();
+                    indicator?.RegisterHit(transform, attackDamage);
                 }
-            }
-            var indicator = FindObjectOfType<EnemyScreenDetector>();
-            if (indicator != null)
-            {
-                indicator.RegisterHit(transform, attackDamage);
             }
         }
         

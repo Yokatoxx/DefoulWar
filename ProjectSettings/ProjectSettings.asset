@@ -834,24 +834,24 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Android: DOTWEEN
-    EmbeddedLinux: DOTWEEN
-    GameCoreScarlett: DOTWEEN
-    GameCoreXboxOne: DOTWEEN
-    Kepler: DOTWEEN
-    LinuxHeadlessSimulation: DOTWEEN
-    Nintendo Switch: DOTWEEN
-    Nintendo Switch 2: DOTWEEN
-    PS4: DOTWEEN
-    PS5: DOTWEEN
-    QNX: DOTWEEN
-    Standalone: DOTWEEN
-    VisionOS: DOTWEEN
-    WebGL: DOTWEEN
-    Windows Store Apps: DOTWEEN
-    XboxOne: DOTWEEN
-    iPhone: DOTWEEN
-    tvOS: DOTWEEN
+    Android: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    EmbeddedLinux: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    GameCoreScarlett: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    GameCoreXboxOne: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    Kepler: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    LinuxHeadlessSimulation: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    Nintendo Switch: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    Nintendo Switch 2: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    PS4: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    PS5: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    QNX: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    Standalone: DOTWEEN;HDRP_OUTLINE
+    VisionOS: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    WebGL: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    Windows Store Apps: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    XboxOne: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    iPhone: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
+    tvOS: DOTWEEN;EPO_DOTWEEN;HDRP_OUTLINE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

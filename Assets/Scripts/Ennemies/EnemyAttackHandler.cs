@@ -29,6 +29,10 @@ namespace Ennemies
         private EnemyBehaviorSettings settings;
         private Transform player;
         private float lastAttackTime = -999f;
+        
+        // Cache statique du détecteur pour éviter les FindFirstObjectByType répétés
+        private static EnemyScreenDetector cachedScreenDetector;
+        private static bool screenDetectorSearched;
 
         // Animator pour les animations futures
         // private Animator animator;
@@ -139,15 +143,14 @@ namespace Ennemies
                 {
                     playerHealth.TakeDamage(settings.attackDamage);
                     Debug.Log($"[EnemyAttack] Melee attack: {settings.attackDamage} damage!");
+                    
+                    // Appliquer le ralentissement électrique si l'ennemi est électrique
+                    ApplyElectricSlow();
                 }
             }
 
             // Notifier l'indicateur de hit
-            var indicator = FindFirstObjectByType<EnemyScreenDetector>();
-            if (indicator != null)
-            {
-                indicator.RegisterHit(transform, settings.attackDamage);
-            }
+            GetScreenDetector()?.RegisterHit(transform, settings.attackDamage);
         }
 
         private void PerformRangedAttack()
@@ -214,11 +217,10 @@ namespace Ennemies
                     hitPlayer = true;
                     
                     // Notifier l'indicateur de hit
-                    var indicator = FindFirstObjectByType<EnemyScreenDetector>();
-                    if (indicator != null)
-                    {
-                        indicator.RegisterHit(transform, settings.attackDamage);
-                    }
+                    GetScreenDetector()?.RegisterHit(transform, settings.attackDamage);
+                    
+                    // Appliquer le ralentissement électrique si l'ennemi est électrique
+                    ApplyElectricSlow();
                     break;
                 }
                 else
@@ -331,6 +333,33 @@ namespace Ennemies
                     Gizmos.DrawLine(shootPoint.position, shootPoint.position + shootPoint.forward * settings.attackRange);
                 }
             }
+        }
+
+        /// <summary>
+        /// Applique le ralentissement électrique au joueur si cet ennemi est électrique.
+        /// </summary>
+        private void ApplyElectricSlow()
+        {
+            if (player == null) return;
+            
+            var electricEnemy = GetComponent<ElectricEnnemis>();
+            if (electricEnemy != null && electricEnemy.ApplySlowOnAttack)
+            {
+                electricEnemy.ApplySlowToPlayer(player);
+            }
+        }
+
+        /// <summary>
+        /// Retourne le détecteur d'écran caché pour éviter les recherches répétées.
+        /// </summary>
+        private static EnemyScreenDetector GetScreenDetector()
+        {
+            if (!screenDetectorSearched)
+            {
+                cachedScreenDetector = FindFirstObjectByType<EnemyScreenDetector>();
+                screenDetectorSearched = true;
+            }
+            return cachedScreenDetector;
         }
     }
 }

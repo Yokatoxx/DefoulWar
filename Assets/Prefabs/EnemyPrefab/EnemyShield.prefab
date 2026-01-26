@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4701364012931773978}
   - component: {fileID: 3351474583499771530}
   - component: {fileID: 4793837826633410294}
+  - component: {fileID: 2010509462762145005}
   m_Layer: 7
   m_Name: Body
   m_TagString: Enemy
@@ -127,6 +128,18 @@ MonoBehaviour:
   baseDamageMultiplier: 1
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
+--- !u!114 &2010509462762145005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 254311255190136594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &525026324071530389
 GameObject:
   m_ObjectHideFlags: 0
@@ -140,6 +153,7 @@ GameObject:
   - component: {fileID: 7795808518942882505}
   - component: {fileID: 3074746511472831467}
   - component: {fileID: 4062171721609725400}
+  - component: {fileID: 7400452800433582792}
   m_Layer: 12
   m_Name: Head
   m_TagString: Enemy
@@ -252,6 +266,18 @@ MonoBehaviour:
   baseDamageMultiplier: 2
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
+--- !u!114 &7400452800433582792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525026324071530389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1807755940922956229
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,6 +295,7 @@ GameObject:
   - component: {fileID: 8939385370173567722}
   - component: {fileID: 7994179154030387157}
   - component: {fileID: 5914284153136345264}
+  - component: {fileID: 2851093302919115312}
   m_Layer: 7
   m_Name: EnemyShield
   m_TagString: Enemy
@@ -404,6 +431,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resistToKnockback: 1
+  canPushOtherEnemies: 1
+  dominoForceMultiplier: 0.6
+  dominoPushRadius: 1.2
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
   impactParticlePrefab: {fileID: 0}
   particleOffset: {x: 0, y: 0.5, z: 0}
   impactSound: {fileID: 0}
@@ -438,6 +471,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a6396c44267481183db83553bd89f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  defaultDilateShift: 1
 --- !u!114 &5914284153136345264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -454,6 +489,95 @@ MonoBehaviour:
   waypointPath: {fileID: 0}
   shootPoint: {fileID: 0}
   showDebugGizmos: 1
+--- !u!114 &2851093302919115312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807755940922956229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fe91dc294731a9428c0941ea7579110, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  complexMaskingMode: 0
+  drawingMode: 1
+  outlineLayer: 0
+  outlineTargets:
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 3351474583499771530}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 3074746511472831467}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 3263261782655520615}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  renderStyle: 1
+  outlineParameters:
+    enabled: 0
+    color: {r: 1, g: 0.015686274, b: 0.061687518, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  backParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  frontParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
 --- !u!1 &4779014995437992861
 GameObject:
   m_ObjectHideFlags: 0
@@ -469,6 +593,7 @@ GameObject:
   - component: {fileID: 6551056582859119117}
   - component: {fileID: 7072189409071410649}
   - component: {fileID: 3307348198493035423}
+  - component: {fileID: 8626065934590282740}
   m_Layer: 12
   m_Name: Shield
   m_TagString: Untagged
@@ -621,9 +746,26 @@ MonoBehaviour:
   vfxLifetime: 2
   impactSound: {fileID: 0}
   impactVolume: 0.7
+  useScreenShake: 1
+  shakeMaxDistance: 8
+  shakeDuration: 0.15
+  shakePositionMagnitude: 0.05
+  shakeRotationMagnitude: 1
   OnImpactHit:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8626065934590282740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4779014995437992861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7277404602049207658
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,132 +1,164 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EnemyScreenDetector : MonoBehaviour
+namespace Ennemies.Effect
 {
-    [Header("Références")]
-    [Tooltip("Caméra utilisée pour orienter les indicateurs (par défaut: Camera.main).")]
-    [SerializeField] private Camera targetCamera;
-    [Tooltip("Transform du joueur (par défaut: ce GameObject).")]
-    [SerializeField] private Transform player;
-
-    [Header("HUD")]
-    [SerializeField] private Image indicatorLeft;
-    [SerializeField] private Image indicatorRight;
-    [SerializeField] private Image indicatorBack;
-
-    [Header("Intensité en fonction de la distance")]
-    [Tooltip("Distance (m) à partir de laquelle l’alpha est maximum.")]
-    [SerializeField] private float minDistanceForMaxAlpha = 3f;
-    [Tooltip("Distance (m) au-delà de laquelle l’alpha tend vers 0.")]
-    [SerializeField] private float maxDistanceForMinAlpha = 30f;
-
-    [Header("Courbe de décroissance")]
-    [Tooltip("Vitesse de fade des indicateurs (unités d’alpha par seconde).")]
-    [SerializeField] private float fadeOutSpeed = 2.5f;
-    [Tooltip("Gain d’alpha en fonction des dégâts reçus (alpha += damage * factor).")]
-    [SerializeField] private float damageToAlphaFactor = 0.02f;
-    [Tooltip("Alpha max autorisé par pulse.")]
-    [SerializeField, Range(0f, 1f)] private float maxPulseAlpha = 1f;
-
-    private float leftAlpha;
-    private float rightAlpha;
-    private float backAlpha;
-
-    private void Awake()
+    /// <summary>
+    /// Affiche des indicateurs directionnels sur l'Ã©cran pour indiquer d'oÃ¹ viennent les attaques ennemies.
+    /// Supporte 4 directions: gauche, droite, derriÃ¨re et devant.
+    /// </summary>
+    public class EnemyScreenDetector : MonoBehaviour
     {
-        if (targetCamera == null) targetCamera = Camera.main;
-        if (player == null) player = transform;
+        [Header("RÃ©fÃ©rences")]
+        [Tooltip("CamÃ©ra utilisÃ©e pour orienter les indicateurs (par dÃ©faut: Camera.main)")]
+        [SerializeField] private Camera targetCamera;
 
-        SetImageAlpha(indicatorLeft, 0f);
-        SetImageAlpha(indicatorRight, 0f);
-        SetImageAlpha(indicatorBack, 0f);
-    }
+        [Header("Indicateurs UI")]
+        [SerializeField] private Image leftIndicator;
+        [SerializeField] private Image rightIndicator;
+        [SerializeField] private Image backIndicator;
+        [SerializeField] private Image frontIndicator;
 
-    private void Update()
-    {
-        // Fade vers 0
-        if (leftAlpha > 0f) leftAlpha = Mathf.Max(0f, leftAlpha - fadeOutSpeed * Time.deltaTime);
-        if (rightAlpha > 0f) rightAlpha = Mathf.Max(0f, rightAlpha - fadeOutSpeed * Time.deltaTime);
-        if (backAlpha > 0f) backAlpha = Mathf.Max(0f, backAlpha - fadeOutSpeed * Time.deltaTime);
+        [Header("Configuration")]
+        [Tooltip("Multiplicateur pour convertir les dÃ©gÃ¢ts en alpha")]
+        [SerializeField] private float damageToAlphaFactor = 0.05f;
+        [Tooltip("Alpha maximum pour l'effet pulse")]
+        [SerializeField] private float maxPulseAlpha = 0.8f;
+        [Tooltip("Vitesse de fade out des indicateurs")]
+        [SerializeField] private float fadeSpeed = 2f;
 
-        ApplyAlphas();
-    }
+        [Header("Seuils d'angle (degrÃ©s)")]
+        [Tooltip("Angle limite pour considÃ©rer une attaque comme venant de face/derriÃ¨re")]
+        [SerializeField] private float frontBackThreshold = 45f;
 
-    // À appeler depuis les scripts d’attaque ennemie (melee, projectiles, etc.)
-    public void RegisterHit(Transform attacker, float damage = 0f)
-    {
-        if (attacker == null) return;
-        RegisterHit(attacker.position, damage);
-    }
+        // Alpha actuel de chaque direction
+        private float leftAlpha;
+        private float rightAlpha;
+        private float backAlpha;
+        private float frontAlpha;
 
-    // Variante avec position directe
-    public void RegisterHit(Vector3 attackerWorldPosition, float damage = 0f)
-    {
-        if (targetCamera == null || player == null) return;
-
-        // Direction depuis la caméra (plus fiable pour gauche/droite/derrière)
-        Vector3 camPos = targetCamera.transform.position;
-        Vector3 camFwd = targetCamera.transform.forward;
-        Vector3 camRight = targetCamera.transform.right;
-        Vector3 dir = (attackerWorldPosition - camPos).normalized;
-
-        float forwardDot = Vector3.Dot(camFwd, dir);
-        float rightDot = Vector3.Dot(camRight, dir);
-
-        // Alpha basé sur distance + bonus dégâts
-        float dist = Vector3.Distance(player.position, attackerWorldPosition);
-        float distAlpha = 1f - Mathf.InverseLerp(minDistanceForMaxAlpha, maxDistanceForMinAlpha, dist);
-        float pulse = Mathf.Clamp01(distAlpha + damage * damageToAlphaFactor);
-        pulse = Mathf.Min(pulse, maxPulseAlpha);
-
-        if (forwardDot < 0f)
+        private void Awake()
         {
-            // Derrière
-            backAlpha = Mathf.Max(backAlpha, pulse);
+            if (targetCamera == null)
+            {
+                targetCamera = Camera.main;
+            }
+
+            SetIndicatorAlpha(leftIndicator, 0f);
+            SetIndicatorAlpha(rightIndicator, 0f);
+            SetIndicatorAlpha(backIndicator, 0f);
+            SetIndicatorAlpha(frontIndicator, 0f);
         }
-        else
+
+        private void Update()
         {
-            // Devant ou latéral: gauche/droite selon le signe de rightDot
-            if (rightDot < 0f)
-                leftAlpha = Mathf.Max(leftAlpha, pulse);
+            leftAlpha = FadeAlpha(leftAlpha);
+            rightAlpha = FadeAlpha(rightAlpha);
+            backAlpha = FadeAlpha(backAlpha);
+            frontAlpha = FadeAlpha(frontAlpha);
+
+            SetIndicatorAlpha(leftIndicator, leftAlpha);
+            SetIndicatorAlpha(rightIndicator, rightAlpha);
+            SetIndicatorAlpha(backIndicator, backAlpha);
+            SetIndicatorAlpha(frontIndicator, frontAlpha);
+        }
+
+        /// <summary>
+        /// Enregistre un hit venant d'une direction spÃ©cifique.
+        /// </summary>
+        public void RegisterHit(Transform enemyTransform, float damage)
+        {
+            if (targetCamera == null || enemyTransform == null) return;
+
+            // Direction de l'ennemi par rapport Ã  la camÃ©ra (plan horizontal)
+            Vector3 toEnemy = enemyTransform.position - targetCamera.transform.position;
+            toEnemy.y = 0f;
+            toEnemy.Normalize();
+
+            Vector3 forward = targetCamera.transform.forward;
+            forward.y = 0f;
+            forward.Normalize();
+
+            Vector3 right = targetCamera.transform.right;
+            right.y = 0f;
+            right.Normalize();
+
+            float forwardDot = Vector3.Dot(toEnemy, forward);
+            float rightDot = Vector3.Dot(toEnemy, right);
+
+            // Seuil en cos (radians)
+            float threshold = Mathf.Cos(frontBackThreshold * Mathf.Deg2Rad);
+            float pulse = Mathf.Min(damage * damageToAlphaFactor, maxPulseAlpha);
+
+            if (forwardDot > threshold)
+            {
+                frontAlpha = Mathf.Min(frontAlpha + pulse, maxPulseAlpha);
+            }
+            else if (forwardDot < -threshold)
+            {
+                backAlpha = Mathf.Min(backAlpha + pulse, maxPulseAlpha);
+            }
             else
-                rightAlpha = Mathf.Max(rightAlpha, pulse);
+            {
+                if (rightDot > 0f)
+                {
+                    rightAlpha = Mathf.Min(rightAlpha + pulse, maxPulseAlpha);
+                }
+                else
+                {
+                    leftAlpha = Mathf.Min(leftAlpha + pulse, maxPulseAlpha);
+                }
+            }
         }
 
-        ApplyAlphas();
-    }
+        private float FadeAlpha(float alpha)
+        {
+            if (alpha <= 0f) return 0f;
+            return Mathf.Max(0f, alpha - fadeSpeed * Time.deltaTime);
+        }
 
-    private void ApplyAlphas()
-    {
-        SetImageAlpha(indicatorLeft, leftAlpha);
-        SetImageAlpha(indicatorRight, rightAlpha);
-        SetImageAlpha(indicatorBack, backAlpha);
-    }
+        private void SetIndicatorAlpha(Image indicator, float alpha)
+        {
+            if (indicator == null) return;
+            Color c = indicator.color;
+            c.a = alpha;
+            indicator.color = c;
+        }
 
-    private static void SetImageAlpha(Image img, float a)
-    {
-        if (img == null) return;
-        var c = img.color;
-        c.a = Mathf.Clamp01(a);
-        img.color = c;
-        img.enabled = c.a > 0.01f;
-    }
+        [ContextMenu("Test Hit Gauche")]
+        private void TestLeft()
+        {
+            if (targetCamera == null) return;
+            RegisterHit(CreateTestTransform(-targetCamera.transform.right * 5f), 10f);
+        }
 
-    // Outils de test dans l’éditeur
-    [ContextMenu("Test Hit Gauche")]
-    private void TestLeft()
-    {
-        RegisterHit(targetCamera.transform.position - targetCamera.transform.right * 5f, 10f);
-    }
-    [ContextMenu("Test Hit Droite")]
-    private void TestRight()
-    {
-        RegisterHit(targetCamera.transform.position + targetCamera.transform.right * 5f, 10f);
-    }
-    [ContextMenu("Test Hit Derrière")]
-    private void TestBack()
-    {
-        RegisterHit(targetCamera.transform.position - targetCamera.transform.forward * 5f, 10f);
+        [ContextMenu("Test Hit Droite")]
+        private void TestRight()
+        {
+            if (targetCamera == null) return;
+            RegisterHit(CreateTestTransform(targetCamera.transform.right * 5f), 10f);
+        }
+
+        [ContextMenu("Test Hit DerriÃ¨re")]
+        private void TestBack()
+        {
+            if (targetCamera == null) return;
+            RegisterHit(CreateTestTransform(-targetCamera.transform.forward * 5f), 10f);
+        }
+
+        [ContextMenu("Test Hit Devant")]
+        private void TestFront()
+        {
+            if (targetCamera == null) return;
+            RegisterHit(CreateTestTransform(targetCamera.transform.forward * 5f), 10f);
+        }
+
+        private Transform CreateTestTransform(Vector3 offset)
+        {
+            GameObject temp = new GameObject("TestHitPoint");
+            temp.transform.position = targetCamera.transform.position + offset;
+            Destroy(temp, 0.1f);
+            return temp.transform;
+        }
     }
 }

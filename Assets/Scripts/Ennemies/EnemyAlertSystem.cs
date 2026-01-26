@@ -27,6 +27,9 @@ namespace Ennemies
         }
 
         private List<BaseEnemyBehavior> registeredEnemies = new List<BaseEnemyBehavior>();
+        
+        // Flag global pour le mode arène (appliqué aux nouveaux ennemis)
+        private bool isArenaMode = false;
 
         private void Awake()
         {
@@ -46,6 +49,12 @@ namespace Ennemies
             if (!registeredEnemies.Contains(enemy))
             {
                 registeredEnemies.Add(enemy);
+                
+                // Appliquer le mode arène actuel aux nouveaux ennemis
+                if (isArenaMode)
+                {
+                    enemy.SetArenaMode(true);
+                }
             }
         }
 
@@ -95,6 +104,25 @@ namespace Ennemies
                 if (enemy != null)
                 {
                     enemy.ReceiveAlert(playerPosition);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Active ou désactive le mode arène sur tous les ennemis enregistrés.
+        /// En mode arène, les ennemis connaissent toujours la position du joueur.
+        /// </summary>
+        public void SetAllEnemiesArenaMode(bool active)
+        {
+            isArenaMode = active;
+            
+            registeredEnemies.RemoveAll(e => e == null);
+
+            foreach (var enemy in registeredEnemies)
+            {
+                if (enemy != null)
+                {
+                    enemy.SetArenaMode(active);
                 }
             }
         }

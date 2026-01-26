@@ -32,7 +32,7 @@ Structure cible : **Rue → Intérieur → Toit** (finir sur belle vista)
 | **Arène 1** | V1: 6x Standard / V2: 4x Standard + 2x Shield | Bases + contournement |
 | **Arène 2** | V1: 4x Standard / V2: 3x Magique + 3x Standard / V3: 5x Magique + 2x Standard | Apprendre Magique |
 | **Arène 3** | V1: 5x Standard / V2: 2x Electric + 4x Standard / V3: 3x Electric + 3x Standard / V4: 2x Electric + 2x Shield + 3x Standard | Punition dash |
-| **Arène 4** | V1: 3x Standard + 2x Shield / V2: 1x Healer + 4x Standard / V3: 3x Magique + 3x Standard / V4: 1x Healer + 2x Shield + 3x Standard / V5: 2x Healer + 2x Electric + 4x Standard | Priorité Healer |
+| **Arène 4** | V1: 3x Standard + 2x Shield + 1x Magique / V2: 1x Healer + 4x Standard / V3: 3x Magique + 3x Standard / V4: 1x Healer + 2x Shield + 3x Standard / V5: 2x Healer + 2x Electric + 4x Standard | Priorité Healer |
 | **Arène Finale** | V1: 4x Standard + 2x Magique / V2: 4x Magique + 3x Standard / V3: 3x Electric + 2x Shield + 3x Standard / V4: 1x Healer + 3x Electric + 4x Standard / V5: 2x Healer + 4x Magique + 3x Standard / V6: 1x Healer + 3x Magique + 2x Electric + 2x Shield + 4x Standard | Tous les 5 types |
 
 > **Progression :** 2 → 3 → 4 → 5 → 6 vagues

@@ -27,6 +27,11 @@ namespace FPS
 
         private float defaultMoveSpeed;
 
+        // Variables pour le système de ralentissement
+        private float slowMultiplier = 1f;
+        private float slowEndTime;
+        private bool isSlowed;
+
         [Header("Air Control")]
         [SerializeField, Tooltip("Contrôle en l'air (0 = aucun, 1 = identique au sol)")]
         private float airControlFactor = 0.4f;
@@ -81,7 +86,8 @@ namespace FPS
         {
             externalMomentum = momentum;
             externalMomentumGroundTimer = externalMomentumGroundGrace;
-            moveSpeed = Mathf.Max(moveSpeed, momentum.magnitude);
+            // Limiter à speedLimit pour ne pas dépasser la vitesse max
+            moveSpeed = Mathf.Min(speedLimit, Mathf.Max(moveSpeed, momentum.magnitude));
         }
         
         // Désactiver le mouvement normal (pendant le dash)
@@ -136,6 +142,17 @@ namespace FPS
         {
             IncreaseSpeed();
             HandleGroundCheck();
+            UpdateSlowEffect();
+        }
+        
+        private void UpdateSlowEffect()
+        {
+            if (isSlowed && Time.time >= slowEndTime)
+            {
+                slowMultiplier = 1f;
+                isSlowed = false;
+                Debug.Log("[FPSMovement] Slow terminé");
+            }
         }
 
         private void FixedUpdate()
@@ -188,6 +205,10 @@ namespace FPS
             if (desiredMag > 1f) desired /= desiredMag;
             
             CurrentSpeed = inputSprint ? sprintSpeed : moveSpeed;
+            
+            // Appliquer le multiplicateur de ralentissement
+            CurrentSpeed *= slowMultiplier;
+            
             IsMoving = desired.sqrMagnitude > 0.01f;
 
             Vector3 horizontalVelocity = Vector3.zero;
@@ -372,5 +393,32 @@ namespace FPS
         /// Accès au Rigidbody pour les systèmes externes (Dash, etc.)
         /// </summary>
         public Rigidbody Rb => rb;
+        
+        /// <summary>
+        /// Indique si le joueur est actuellement ralenti.
+        /// </summary>
+        public bool IsSlowed => isSlowed;
+        
+        /// <summary>
+        /// Applique un effet de ralentissement au joueur.
+        /// </summary>
+        /// <param name="duration">Durée du ralentissement en secondes</param>
+        /// <param name="slowAmount">Multiplicateur de vitesse (0.5 = 50% de la vitesse normale)</param>
+        public void ApplySlow(float duration, float slowAmount)
+        {
+            slowMultiplier = Mathf.Clamp01(slowAmount);
+            slowEndTime = Time.time + duration;
+            isSlowed = true;
+            Debug.Log($"[FPSMovement] Slow appliqué: {slowAmount * 100}% pendant {duration}s");
+        }
+        
+        /// <summary>
+        /// Supprime l'effet de ralentissement immédiatement.
+        /// </summary>
+        public void ClearSlow()
+        {
+            slowMultiplier = 1f;
+            isSlowed = false;
+        }
     }
 }

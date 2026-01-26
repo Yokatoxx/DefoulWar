@@ -12,7 +12,7 @@ GameObject:
   m_Layer: 3
   m_Name: WeaponPoint
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2488908585195742037, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -72,6 +72,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8703966557384231457}
   - component: {fileID: 3469333960817140672}
+  - component: {fileID: 2920386777163252129}
   - component: {fileID: 1442011852720692160}
   - component: {fileID: 8291640835560598057}
   - component: {fileID: 4379777072623147912}
@@ -80,7 +81,6 @@ GameObject:
   - component: {fileID: 8826018477589334518}
   - component: {fileID: 6005410421240447297}
   - component: {fileID: 9097555686013398260}
-  - component: {fileID: 2920386777163252129}
   - component: {fileID: 4496668197879187442}
   - component: {fileID: 2359903377046822170}
   - component: {fileID: 1347673265557315538}
@@ -124,18 +124,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d614e6ab84d4eef44aecfc75d8424ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aimCamera: {fileID: 3725817409442096485}
-  dashDefinition: {fileID: 11400000, guid: a52eadeeb91d02e4f929b40420cb8892, type: 2}
-  groundBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
-  airBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
+  settings: {fileID: 11400000, guid: 2954bef560f17cb4eac4a5137c05c465, type: 2}
+  aimCamera: {fileID: 8530068263262953220}
   activationKey: 324
   steerMaxAngle: 30
   steerSamples: 4
   minAcceptableProgress: 0.25
   playerController: {fileID: 2084425902901004486}
-  rb: {fileID: 0}
+  rb: {fileID: 4496668197879187442}
   fpsMovement: {fileID: 4379777072623147912}
   isDashing: 0
+--- !u!114 &2920386777163252129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622188377374526642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad10986b331ce024f8de44517166fc57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponSettings: {fileID: 11400000, guid: d26f4c83c96e2874fabe3ce7dcca72d2, type: 2}
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  bulletSpawnPoint: {fileID: 0}
+  aimCamera: {fileID: 8530068263262953220}
+  crosshair: {fileID: 0}
+  soundPlayer: {fileID: 0}
+  textAmmo: {fileID: 0}
+  enemyTag: Enemy
+  animator: {fileID: 0}
+  weaponShake: {fileID: 0}
+  weaponReloadRotation: {fileID: 0}
+  zoneDamageMultipliers:
+  - zoneName: Body
+    multiplier: 1
+  - zoneName: Head
+    multiplier: 2
+  - zoneName: Shield
+    multiplier: 0
+  enableBloodBullets: 1
+  healthCostPerBullet: 20
+  minHealthToShoot: 1
+  playerHealth: {fileID: 7205156207043545737}
+  enableShootShake: 1
+  shootShakeDuration: 0.08
+  shootShakePositionMag: 0.3
+  shootShakeRotationMag: 0.3
+  OnMagazineChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReloadComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  OnBloodBulletModeChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1442011852720692160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,14 +230,14 @@ MonoBehaviour:
   OnSpeedChanged:
     m_PersistentCalls:
       m_Calls: []
-  moveSpeed: 7
-  sprintSpeed: 11
+  moveSpeed: 5
+  sprintSpeed: 9
   jumpHeight: 4
   gravity: -9.81
   gravityMultiplier: 2
   maxFallSpeed: -20
   increaseSpeedFactor: 0
-  speedLimit: 15
+  speedLimit: 9
   coyoteTime: 0.15
   airControlFactor: 1
   preserveJumpMomentum: 1
@@ -233,7 +280,7 @@ MonoBehaviour:
   enableRegen: 1
   regenDelay: 3
   regenRate: 5
-  dashCible: {fileID: 0}
+  dashCible: {fileID: 3469333960817140672}
   OnHealthChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -256,10 +303,13 @@ MonoBehaviour:
   dashSystem: {fileID: 3469333960817140672}
   dashEffectLensIntensity: -0.7
   dashEffectDuration: 0.5
-  dashBokehAperture: 0.4
-  dashBokehFocusDistance: 0.5
-  dashGaussianStart: 0.1
-  dashGaussianEnd: 0.5
+  dashFocusDistance: 0.5
+  dashNearFocusStart: 0
+  dashNearFocusEnd: 0.3
+  dashFarFocusStart: 0.5
+  dashFarFocusEnd: 2
+  dashVignetteIntensity: 0.4
+  dashVignetteDuration: 0.2
   dashParticleSystem: {fileID: 5996498839720484243}
   deactivateParticleGOOnStop: 1
 --- !u!114 &6005410421240447297
@@ -302,38 +352,6 @@ MonoBehaviour:
   shakeDuration: 0.08
   shakePositionMagnitude: 0.02
   shakeRotationMagnitude: 0.5
---- !u!114 &2920386777163252129
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4622188377374526642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad10986b331ce024f8de44517166fc57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponSettings: {fileID: 11400000, guid: d26f4c83c96e2874fabe3ce7dcca72d2, type: 2}
-  hitMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  bulletSpawnPoint: {fileID: 0}
-  aimCamera: {fileID: 3725817409442096485}
-  crosshair: {fileID: 0}
-  soundPlayer: {fileID: 0}
-  textAmmo: {fileID: 0}
-  enemyTag: Enemy
-  animator: {fileID: 0}
-  weaponShake: {fileID: 0}
-  weaponReloadRotation: {fileID: 0}
-  zoneDamageMultipliers:
-  - zoneName: Body
-    multiplier: 1
-  - zoneName: Head
-    multiplier: 2
-  - zoneName: Shield
-    multiplier: 0
 --- !u!54 &4496668197879187442
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -373,8 +391,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89ac13a1db8fee94295c02ebd01c1de6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slowMoScale: 0.2
-  slowMoDuration: 0.75
 --- !u!114 &1347673265557315538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -387,8 +403,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5a44fb276e3f244cbdabed44d058327, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
-  airBounce: {fileID: 11400000, guid: 84680873560672c4f9986f8f24189ea7, type: 2}
 --- !u!114 &2667271215102757460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -402,7 +416,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  outlineWidth: 2
+  outlineWidth: 5.13
   showDuringSlowMo: 1
 --- !u!114 &1508233293093554113
 MonoBehaviour:
@@ -461,11 +475,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1403591587188792743}
-  - component: {fileID: 3725817409442096485}
   - component: {fileID: 6090654977010750780}
-  - component: {fileID: 506691244335481993}
-  - component: {fileID: 7771429963434298130}
-  - component: {fileID: 4112391027481370878}
+  - component: {fileID: 8530068263262953220}
+  - component: {fileID: 1580189386796163951}
+  - component: {fileID: 8420992374081522002}
+  - component: {fileID: 6007708905211028212}
+  - component: {fileID: 6318839346854996181}
+  - component: {fileID: 7505063564153651774}
   m_Layer: 3
   m_Name: Camera
   m_TagString: MainCamera
@@ -481,16 +497,24 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4673607940017463061}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalRotation: {x: -0, y: -0.8660246, z: -0, w: 0.5000015}
+  m_LocalPosition: {x: 0, y: 1.5000002, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3741507381766461360}
   - {fileID: 3635843694372808814}
   m_Father: {fileID: 8703966557384231457}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &3725817409442096485
+  m_LocalEulerAnglesHint: {x: 0, y: -120, z: 0}
+--- !u!81 &6090654977010750780
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4673607940017463061}
+  m_Enabled: 1
+--- !u!20 &8530068263262953220
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -502,7 +526,7 @@ Camera:
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
-  m_GateFitMode: 2
+  m_GateFitMode: 1
   m_FOVAxisMode: 0
   m_Iso: 200
   m_ShutterSpeed: 0.005
@@ -529,27 +553,19 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 1983
+    m_Bits: 6079
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
+  m_HDR: 0
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
+  m_ForceIntoRT: 1
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &6090654977010750780
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4673607940017463061}
-  m_Enabled: 1
---- !u!114 &506691244335481993
+--- !u!114 &1580189386796163951
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -558,43 +574,137 @@ MonoBehaviour:
   m_GameObject: {fileID: 4673607940017463061}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 0
-  m_Cameras:
-  - {fileID: 8422785729160626329}
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
+  clearColorMode: 0
+  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
+  clearDepth: 1
+  volumeLayerMask:
     serializedVersion: 2
     m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 1
-  m_Antialiasing: 0
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 1
-  m_AllowXRRendering: 1
-  m_AllowHDROutput: 1
-  m_UseScreenCoordOverride: 0
-  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_Version: 2
-  m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
---- !u!114 &7771429963434298130
+  volumeAnchorOverride: {fileID: 0}
+  antialiasing: 0
+  SMAAQuality: 2
+  dithering: 0
+  stopNaNs: 0
+  taaSharpenStrength: 0.5
+  TAAQuality: 1
+  taaSharpenMode: 0
+  taaRingingReduction: 0
+  taaHistorySharpening: 0.35
+  taaAntiFlicker: 0.5
+  taaMotionVectorRejection: 0
+  taaAntiHistoryRinging: 0
+  taaBaseBlendFactor: 0.875
+  taaJitterScale: 1
+  physicalParameters:
+    m_Iso: 200
+    m_ShutterSpeed: 0.005
+    m_Aperture: 16
+    m_FocusDistance: 10
+    m_BladeCount: 5
+    m_Curvature: {x: 2, y: 11}
+    m_BarrelClipping: 0.25
+    m_Anamorphism: 0
+  flipYMode: 0
+  xrRendering: 1
+  fullscreenPassthrough: 0
+  allowDynamicResolution: 0
+  customRenderingSettings: 0
+  invertFaceCulling: 0
+  probeLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hasPersistentHistory: 0
+  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  allowDeepLearningSuperSampling: 1
+  deepLearningSuperSamplingUseCustomQualitySettings: 0
+  deepLearningSuperSamplingQuality: 0
+  deepLearningSuperSamplingUseCustomAttributes: 0
+  deepLearningSuperSamplingUseOptimalSettings: 1
+  deepLearningSuperSamplingSharpening: 0
+  allowFidelityFX2SuperResolution: 1
+  fidelityFX2SuperResolutionUseCustomQualitySettings: 0
+  fidelityFX2SuperResolutionQuality: 0
+  fidelityFX2SuperResolutionUseCustomAttributes: 0
+  fidelityFX2SuperResolutionUseOptimalSettings: 1
+  fidelityFX2SuperResolutionEnableSharpening: 0
+  fidelityFX2SuperResolutionSharpening: 0
+  fsrOverrideSharpness: 0
+  fsrSharpness: 0.92
+  exposureTarget: {fileID: 0}
+  materialMipBias: 0
+  m_RenderingPathCustomFrameSettings:
+    bitDatas:
+      data1: 5770166122053453
+      data2: 12934340311651418136
+    lodBias: 1
+    lodBiasMode: 0
+    lodBiasQualityLevel: 0
+    maximumLODLevel: 0
+    maximumLODLevelMode: 0
+    maximumLODLevelQualityLevel: 0
+    sssQualityMode: 0
+    sssQualityLevel: 0
+    sssCustomSampleBudget: 20
+    sssCustomDownsampleSteps: 0
+    msaaMode: 1
+    materialQuality: 0
+  renderingPathCustomFrameSettingsOverrideMask:
+    mask:
+      data1: 0
+      data2: 0
+  defaultFrameSettings: 0
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
+--- !u!114 &8420992374081522002
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -635,7 +745,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   showDebugInfo: 0
---- !u!114 &4112391027481370878
+--- !u!114 &6007708905211028212
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -644,18 +754,68 @@ MonoBehaviour:
   m_GameObject: {fileID: 4673607940017463061}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da70cac90980495fa13fde6d08f6eae9, type: 3}
+  m_Script: {fileID: 11500000, guid: 4b758c9229da4e64d93b22860b781d83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bobFrequency: 3
-  bobHorizontalAmplitude: 0.09
-  bobVerticalAmplitude: 0.15
-  bobSmoothing: 8
-  defaultFOV: 60
-  sprintFOV: 70
-  jumpFOV: 80
-  fovTransitionSpeed: 4
-  weaponCamera: {fileID: 8422785729160626329}
+  volume: {fileID: 0}
+  dashSystem: {fileID: 3469333960817140672}
+  dashEffectLensIntensity: -0.9
+  dashEffectDuration: 1.3
+  dashFocusDistance: 0.5
+  dashNearFocusStart: 0
+  dashNearFocusEnd: 0.3
+  dashFarFocusStart: 0.5
+  dashFarFocusEnd: 2
+  dashVignetteIntensity: 0.7
+  dashVignetteDuration: 1.3
+  dashParticleSystem: {fileID: 5996498839720484243}
+  deactivateParticleGOOnStop: 0
+--- !u!114 &6318839346854996181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4673607940017463061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8cf531fcf648344dbf94632bdbd70cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volume: {fileID: 0}
+  playerHealth: {fileID: 7205156207043545737}
+  targetCamera: {fileID: 8530068263262953220}
+  intensityAtFullHealth: 0
+  intensityAtZeroHealth: 0.8
+  vignetteColor: {r: 0.6, g: 0, b: 0, a: 1}
+  smoothSpeed: 10
+  hideThreshold: 0.01
+  volumePriority: 100
+--- !u!114 &7505063564153651774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4673607940017463061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bb42831ee5422f409e7f24f9e7488ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stage: 1
+  renderingStrategy: 0
+  renderingMode: 0
+  outlineLayerMask: -1
+  primaryBufferSizeMode: 0
+  primaryRendererScale: 0.75
+  primarySizeReference: 800
+  blurShift: 1
+  dilateShift: 1
+  dilateIterations: 6
+  dilateQuality: 0
+  blurIterations: 4
+  blurType: 1
 --- !u!1 &4948290940259812216
 GameObject:
   m_ObjectHideFlags: 0
@@ -665,15 +825,16 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3741507381766461360}
-  - component: {fileID: 8422785729160626329}
-  - component: {fileID: 8501921718750068588}
+  - component: {fileID: 1279808802453095102}
+  - component: {fileID: 7524153034599292048}
+  - component: {fileID: 8748251410890609327}
   m_Layer: 0
   m_Name: WeaponCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3741507381766461360
 Transform:
   m_ObjectHideFlags: 0
@@ -690,7 +851,7 @@ Transform:
   - {fileID: 3866508507772050354}
   m_Father: {fileID: 1403591587188792743}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &8422785729160626329
+--- !u!20 &1279808802453095102
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -699,10 +860,10 @@ Camera:
   m_GameObject: {fileID: 4948290940259812216}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 4
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
-  m_GateFitMode: 2
+  m_GateFitMode: 1
   m_FOVAxisMode: 0
   m_Iso: 200
   m_ShutterSpeed: 0.005
@@ -723,7 +884,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 90
+  field of view: 60
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -734,14 +895,14 @@ Camera:
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
+  m_HDR: 0
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
+  m_ForceIntoRT: 1
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &8501921718750068588
+--- !u!114 &7524153034599292048
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -750,41 +911,161 @@ MonoBehaviour:
   m_GameObject: {fileID: 4948290940259812216}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 1
-  m_Cameras: []
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
+  clearColorMode: 2
+  backgroundColorHDR: {r: 0.025, g: 0.07, b: 0.19, a: 0}
+  clearDepth: 1
+  volumeLayerMask:
     serializedVersion: 2
     m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
-  m_Antialiasing: 0
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 1
-  m_AllowXRRendering: 1
-  m_AllowHDROutput: 1
-  m_UseScreenCoordOverride: 0
-  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_Version: 2
-  m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
+  volumeAnchorOverride: {fileID: 0}
+  antialiasing: 0
+  SMAAQuality: 2
+  dithering: 0
+  stopNaNs: 0
+  taaSharpenStrength: 0.5
+  TAAQuality: 1
+  taaSharpenMode: 0
+  taaRingingReduction: 0
+  taaHistorySharpening: 0.35
+  taaAntiFlicker: 0.5
+  taaMotionVectorRejection: 0
+  taaAntiHistoryRinging: 0
+  taaBaseBlendFactor: 0.875
+  taaJitterScale: 1
+  physicalParameters:
+    m_Iso: 200
+    m_ShutterSpeed: 0.005
+    m_Aperture: 16
+    m_FocusDistance: 10
+    m_BladeCount: 5
+    m_Curvature: {x: 2, y: 11}
+    m_BarrelClipping: 0.25
+    m_Anamorphism: 0
+  flipYMode: 0
+  xrRendering: 1
+  fullscreenPassthrough: 0
+  allowDynamicResolution: 0
+  customRenderingSettings: 1
+  invertFaceCulling: 0
+  probeLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  hasPersistentHistory: 0
+  screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  allowDeepLearningSuperSampling: 1
+  deepLearningSuperSamplingUseCustomQualitySettings: 0
+  deepLearningSuperSamplingQuality: 0
+  deepLearningSuperSamplingUseCustomAttributes: 0
+  deepLearningSuperSamplingUseOptimalSettings: 1
+  deepLearningSuperSamplingSharpening: 0
+  allowFidelityFX2SuperResolution: 1
+  fidelityFX2SuperResolutionUseCustomQualitySettings: 0
+  fidelityFX2SuperResolutionQuality: 0
+  fidelityFX2SuperResolutionUseCustomAttributes: 0
+  fidelityFX2SuperResolutionUseOptimalSettings: 1
+  fidelityFX2SuperResolutionEnableSharpening: 0
+  fidelityFX2SuperResolutionSharpening: 0
+  fsrOverrideSharpness: 0
+  fsrSharpness: 0.92
+  exposureTarget: {fileID: 0}
+  materialMipBias: 0
+  m_RenderingPathCustomFrameSettings:
+    bitDatas:
+      data1: 5770166122053453
+      data2: 12934340311651418136
+    lodBias: 1
+    lodBiasMode: 0
+    lodBiasQualityLevel: 0
+    maximumLODLevel: 0
+    maximumLODLevelMode: 0
+    maximumLODLevelQualityLevel: 0
+    sssQualityMode: 0
+    sssQualityLevel: 0
+    sssCustomSampleBudget: 20
+    sssCustomDownsampleSteps: 0
+    msaaMode: 1
+    materialQuality: 0
+  renderingPathCustomFrameSettingsOverrideMask:
+    mask:
+      data1: 0
+      data2: 0
+  defaultFrameSettings: 0
+  m_Version: 9
+  m_ObsoleteRenderingPath: 0
+  m_ObsoleteFrameSettings:
+    overrides: 0
+    enableShadow: 0
+    enableContactShadows: 0
+    enableShadowMask: 0
+    enableSSR: 0
+    enableSSAO: 0
+    enableSubsurfaceScattering: 0
+    enableTransmission: 0
+    enableAtmosphericScattering: 0
+    enableVolumetrics: 0
+    enableReprojectionForVolumetrics: 0
+    enableLightLayers: 0
+    enableExposureControl: 1
+    diffuseGlobalDimmer: 0
+    specularGlobalDimmer: 0
+    shaderLitMode: 0
+    enableDepthPrepassWithDeferredRendering: 0
+    enableTransparentPrepass: 0
+    enableMotionVectors: 0
+    enableObjectMotionVectors: 0
+    enableDecals: 0
+    enableRoughRefraction: 0
+    enableTransparentPostpass: 0
+    enableDistortion: 0
+    enablePostprocess: 0
+    enableOpaqueObjects: 0
+    enableTransparentObjects: 0
+    enableRealtimePlanarReflection: 0
+    enableMSAA: 0
+    enableAsyncCompute: 0
+    runLightListAsync: 0
+    runSSRAsync: 0
+    runSSAOAsync: 0
+    runContactShadowsAsync: 0
+    runVolumeVoxelizationAsync: 0
+    lightLoopSettings:
+      overrides: 0
+      enableDeferredTileAndCluster: 0
+      enableComputeLightEvaluation: 0
+      enableComputeLightVariants: 0
+      enableComputeMaterialVariants: 0
+      enableFptlForForwardOpaque: 0
+      enableBigTilePrepass: 0
+      isFptlEnabled: 0
+--- !u!114 &8748251410890609327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4948290940259812216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bb42831ee5422f409e7f24f9e7488ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stage: 1
+  renderingStrategy: 0
+  renderingMode: 0
+  outlineLayerMask: -1
+  primaryBufferSizeMode: 0
+  primaryRendererScale: 0.75
+  primarySizeReference: 800
+  blurShift: 1
+  dilateShift: 1
+  dilateIterations: 6
+  dilateQuality: 0
+  blurIterations: 4
+  blurType: 1
 --- !u!1001 &3596921304298188440
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -128,5 +128,14 @@ namespace FPS
             get => targetFOV;
             set => targetFOV = value;
         }
+
+        /// <summary>
+        /// Réinitialise la position de référence du headbob à la position locale actuelle.
+        /// À appeler après une téléportation pour éviter les décalages.
+        /// </summary>
+        public void ResetDefaultPosition()
+        {
+            camDefaultLocalPos = transform.localPosition;
+        }
     }
 }

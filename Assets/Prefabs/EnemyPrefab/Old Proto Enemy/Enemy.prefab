@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2188955753850171073}
   - component: {fileID: 2689582501457834611}
   - component: {fileID: -3158992528684757622}
+  - component: {fileID: 4908996966987005605}
+  - component: {fileID: 7219059219276195263}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Minion
@@ -74,7 +76,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
+  bulletDamageMultiplier: 1
+  dashDamageMultiplier: 1
+  electricDamageMultiplier: 1
+  spawnInvulnerabilityDuration: 0
+  spawnInvulnerableAllDamage: 0
   OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &2689582501457834611
@@ -117,6 +127,93 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &4908996966987005605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fe91dc294731a9428c0941ea7579110, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  complexMaskingMode: 0
+  drawingMode: 1
+  outlineLayer: 0
+  outlineTargets:
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 1597362537128985916}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  - IsVisible: 0
+    CutoutMask: 8
+    edgeDilateAmount: 5
+    frontEdgeDilateAmount: 5
+    backEdgeDilateAmount: 5
+    renderer: {fileID: 2797102046993378888}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    DilateRenderingMode: 0
+    cutoutTextureIndex: 0
+  renderStyle: 1
+  outlineParameters:
+    enabled: 0
+    color: {r: 1, g: 0.015686274, b: 0.061687518, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  backParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  frontParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+--- !u!114 &7219059219276195263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160580225223210161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a6396c44267481183db83553bd89f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  defaultDilateShift: 1
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
@@ -130,6 +227,7 @@ GameObject:
   - component: {fileID: 5333951548045206057}
   - component: {fileID: 2797102046993378888}
   - component: {fileID: 1006435175190009992}
+  - component: {fileID: 1344822688615563371}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -240,14 +338,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zoneName: Head
   baseDamageMultiplier: 1
-  hasArmor: 0
-  armorLevel: 0
-  armorDamageReduction: 0.5
-  level1Color: {r: 0, g: 0, b: 1, a: 1}
-  level2Color: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-  level3Color: {r: 1, g: 0.5, b: 0, a: 1}
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
+--- !u!114 &1344822688615563371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463622794186511725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4242204456841231454
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,6 +415,7 @@ GameObject:
   - component: {fileID: 4590870555706604448}
   - component: {fileID: 1597362537128985916}
   - component: {fileID: 2651874369235720882}
+  - component: {fileID: 6882865480677739315}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -423,11 +528,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   zoneName: Body
   baseDamageMultiplier: 1
-  hasArmor: 0
-  armorLevel: 0
-  armorDamageReduction: 0.5
-  level1Color: {r: 0, g: 0, b: 1, a: 1}
-  level2Color: {r: 0.6, g: 0.2, b: 0.8, a: 1}
-  level3Color: {r: 1, g: 0.5, b: 0, a: 1}
   hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
   hitFlashDuration: 0.08
+--- !u!114 &6882865480677739315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7108478021694863082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

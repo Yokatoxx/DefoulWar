@@ -3,9 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class WeaponSystem : MonoBehaviour
 {
+    // Delegate pour l'event d'esquive avec possibilité d'annuler les dégâts
+    public delegate void PlayerAimAtEnemyHandler(GameObject target, ref bool cancelDamage);
+    public static event PlayerAimAtEnemyHandler OnPlayerAimAtEnemy;
     [Header("Settings")]
     [SerializeField] private WeaponSettings weaponSettings;
     [SerializeField] private LayerMask hitMask = ~0;
@@ -37,6 +41,26 @@ public class WeaponSystem : MonoBehaviour
     [Tooltip("Vie minimum requise pour pouvoir tirer (ne peut pas se suicider)")]
     [SerializeField] private float minHealthToShoot = 1f;
     [SerializeField] private PlayerHealth playerHealth;
+    
+    [Header("Camera Shake - Tir")]
+    [Tooltip("Activer le screenshake quand on tire")]
+    [SerializeField] private bool enableShootShake = true;
+    [Tooltip("Durée du shake par tir")]
+    [SerializeField] private float shootShakeDuration = 0.08f;
+    [Tooltip("Intensité du déplacement")]
+    [SerializeField] private float shootShakePositionMag = 0.02f;
+    [Tooltip("Intensité de la rotation")]
+    [SerializeField] private float shootShakeRotationMag = 0.5f;
+
+    [Header("Events")]
+    [Tooltip("Déclenché après chaque tir (paramètre: munitions restantes dans le chargeur)")]
+    public UnityEvent<int> OnMagazineChanged;
+    
+    [Tooltip("Déclenché quand le reload est terminé")]
+    public UnityEvent OnReloadComplete;
+    
+    [Tooltip("Déclenché quand on entre/sort du mode blood bullet (true = actif)")]
+    public UnityEvent<bool> OnBloodBulletModeChanged;
 
     // Runtime
     private int currentMagazine;
@@ -49,8 +73,10 @@ public class WeaponSystem : MonoBehaviour
     // Nouveau: contrôle de la possibilité de tirer
     private bool canShoot = true;
     private Coroutine disableShootingRoutine;
+    private bool hasShootingParam; // Vérifie si le param isShooting existe
 
     public bool IsReloading => isReloading;
+    public bool IsUsingBloodBullets => isUsingBloodBullets;
 
     private void Awake()
     {
@@ -74,6 +100,20 @@ public class WeaponSystem : MonoBehaviour
         
         if (playerHealth == null)
             playerHealth = GetComponentInParent<PlayerHealth>();
+        
+        // Vérifier si le paramètre isShooting existe
+        hasShootingParam = false;
+        if (animator != null)
+        {
+            foreach (var param in animator.parameters)
+            {
+                if (param.name == "isShooting" && param.type == AnimatorControllerParameterType.Bool)
+                {
+                    hasShootingParam = true;
+                    break;
+                }
+            }
+        }
     }
 
     private void OnDisable()
@@ -174,20 +214,18 @@ public class WeaponSystem : MonoBehaviour
                 return;
             }
             
-            // Plus de munitions du tout - tenter le tir avec la vie
-            if (CanUseBloodBullets())
+            // Plus de munitions - on doit être en mode blood bullet pour tirer
+            if (!isUsingBloodBullets || !CanUseBloodBullets())
             {
-                isUsingBloodBullets = true;
-            }
-            else
-            {
-                isUsingBloodBullets = false;
                 return;
             }
-        }
-        else
-        {
-            isUsingBloodBullets = false;
+            
+            // Empêcher les blood bullets quand le joueur est stunné (ne pas consommer sa vie contre son gré)
+            var stunComp = GetComponentInParent<FPS.PlayerStunAutoFire>();
+            if (stunComp != null && stunComp.IsStunned)
+            {
+                return;
+            }
         }
 
         lastShootTime = Time.time;
@@ -200,6 +238,29 @@ public class WeaponSystem : MonoBehaviour
         if (playerHealth == null) return false;
         if (playerHealth.IsDead) return false;
         return playerHealth.CurrentHealth > minHealthToShoot;
+    }
+    
+    /// <summary>
+    /// Vérifie et active/désactive le mode Blood Bullet selon l'état des munitions.
+    /// Le mode s'active quand on est à court de munitions et qu'on peut utiliser les blood bullets.
+    /// Le mode se désactive uniquement quand on récupère des munitions.
+    /// </summary>
+    private void CheckBloodBulletMode()
+    {
+        // Activer le mode si on est à court de munitions et qu'on peut l'utiliser
+        if (IsOutOfAmmo && CanUseBloodBullets() && !isUsingBloodBullets)
+        {
+            isUsingBloodBullets = true;
+            OnBloodBulletModeChanged?.Invoke(true);
+            UpdateAmmoUI();
+        }
+        // Désactiver le mode uniquement si on a récupéré des munitions
+        else if (!IsOutOfAmmo && isUsingBloodBullets)
+        {
+            isUsingBloodBullets = false;
+            OnBloodBulletModeChanged?.Invoke(false);
+            UpdateAmmoUI();
+        }
     }
 
     private void PerformShotBurst()
@@ -216,11 +277,17 @@ public class WeaponSystem : MonoBehaviour
             shots = Mathf.Min(weaponSettings.bulletsPerShot, currentMagazine);
         }
 
-        if (animator != null) animator.SetBool("isShooting", true);
+        if (hasShootingParam) animator.SetBool("isShooting", true);
         if (crosshair != null) crosshair.PlayShoot();
         if (weaponShake != null) weaponShake.Shake();
         if (soundPlayer != null && weaponSettings.shootSound != null)
             soundPlayer.PlayOneShot(weaponSettings.shootSound, 1f, Random.Range(0.95f, 1.05f));
+        
+        // Camera shake pour sentir la puissance du tir
+        if (enableShootShake && CameraShake.Instance != null)
+        {
+            CameraShake.Instance.ShakeWithRotation(shootShakeDuration, shootShakePositionMag, shootShakeRotationMag);
+        }
 
         for (int i = 0; i < shots; i++)
         {
@@ -243,6 +310,10 @@ public class WeaponSystem : MonoBehaviour
         }
 
         UpdateAmmoUI();
+        OnMagazineChanged?.Invoke(currentMagazine);
+        
+        // Vérifier si on doit activer le mode Blood Bullet après avoir tiré
+        CheckBloodBulletMode();
     }
     
     private void ConsumeHealthForBullet()
@@ -296,7 +367,21 @@ public class WeaponSystem : MonoBehaviour
             SpawnTrail(endPoint, normal, hit ? hitInfo.collider : null);
 
         if (hit)
-            ApplyDamage(hitInfo.collider);
+        {
+            // Notifier l'ennemi ciblé AVANT d'appliquer les dégâts (permet l'esquive)
+            bool cancelDamage = false;
+            var enemyHealth = hitInfo.collider.GetComponentInParent<EnemyHealth>();
+            if (enemyHealth != null)
+            {
+                OnPlayerAimAtEnemy?.Invoke(enemyHealth.gameObject, ref cancelDamage);
+            }
+            
+            // Si l'ennemi a esquivé, ne pas appliquer de dégâts
+            if (!cancelDamage)
+            {
+                ApplyDamage(hitInfo.collider);
+            }
+        }
     }
 
     private Vector3 ApplyRadialAngularSpread(Vector3 baseDir)
@@ -360,7 +445,7 @@ public class WeaponSystem : MonoBehaviour
             Instantiate(weaponSettings.ImpactParticleSystem, endPoint, Quaternion.LookRotation(normal));
         }
 
-        if (animator != null) animator.SetBool("isShooting", false);
+        if (hasShootingParam) animator.SetBool("isShooting", false);
         Destroy(trail.gameObject, trail.time);
     }
 
@@ -428,6 +513,7 @@ public class WeaponSystem : MonoBehaviour
         isReloading = false;
         if (animator != null) animator.SetBool("isReloading", false);
         UpdateAmmoUI();
+        OnReloadComplete?.Invoke();
     }
 
     private void UpdateAmmoUI()
@@ -447,7 +533,6 @@ public class WeaponSystem : MonoBehaviour
     
     // Propriétés publiques pour l'état des munitions
     public bool IsOutOfAmmo => currentMagazine <= 0 && currentReserve <= 0;
-    public bool IsUsingBloodBullets => isUsingBloodBullets && IsOutOfAmmo;
     public int CurrentMagazine => currentMagazine;
     public int CurrentReserve => currentReserve;
 
@@ -457,7 +542,12 @@ public class WeaponSystem : MonoBehaviour
     public void AddAmmo(int amount)
     {
         if (weaponSettings == null) return;
+        
         currentReserve = Mathf.Min(currentReserve + amount, weaponSettings.maxAmmo);
+        
+        // Vérifier et mettre à jour le mode Blood Bullet
+        CheckBloodBulletMode();
+        
         UpdateAmmoUI();
     }
 

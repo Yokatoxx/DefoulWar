@@ -9,6 +9,9 @@ namespace FPS
         [SerializeField] private bool isPaused = false;
         [SerializeField] private bool isGameOver = false;
         
+        [Header("Death Settings")]
+        [SerializeField] private float restartDelay = 1.5f;
+        
         private PlayerHealth playerHealth;
         
         private void Awake()
@@ -50,7 +53,16 @@ namespace FPS
         {
             isGameOver = true;
             UIManager.Instance?.ShowGameOverMenu();
-            Debug.Log("Game Over!");
+            Debug.Log("Game Over! Restarting...");
+            
+            // Restart automatique après un court délai
+            StartCoroutine(RestartAfterDelay(restartDelay));
+        }
+        
+        private System.Collections.IEnumerator RestartAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            RestartGame();
         }
         
         public void RestartGame()

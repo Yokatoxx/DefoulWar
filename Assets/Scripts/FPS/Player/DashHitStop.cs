@@ -5,22 +5,44 @@ namespace FPS
 {
     /// <summary>
     /// Gère le hitstop (pause brève) lors d'un impact de dash.
-    /// Extrait de DashCible pour simplifier la logique.
+    /// Utilise HitStopSettings pour la configuration via DashSettings.
     /// </summary>
     public class DashHitStop : MonoBehaviour
     {
+        private HitStopSettings config;
+        
         private bool isActive;
         private float savedTimeScale = 1f;
         private float savedFixedDeltaTime = 0.02f;
         
         public bool IsActive => isActive;
+        public bool IsEnabled => config?.enabled ?? false;
+        
+        /// <summary>
+        /// Configure le module avec les paramètres HitStop depuis DashSettings.
+        /// </summary>
+        public void Configure(HitStopSettings settings)
+        {
+            config = settings;
+        }
         
         /// <summary>
         /// Applique un hitstop en temps réel.
         /// </summary>
-        /// <param name="duration">Durée en temps réel (non affecté par timeScale)</param>
-        /// <param name="freezeTime">Si true, timeScale = 0, sinon 0.01</param>
-        /// <param name="onComplete">Callback appelé à la fin du hitstop</param>
+        public Coroutine Apply(System.Action onComplete = null)
+        {
+            if (!IsEnabled || config == null || config.duration <= 0f)
+            {
+                onComplete?.Invoke();
+                return null;
+            }
+            
+            return StartCoroutine(HitStopCoroutine(config.duration, config.freezeTime, onComplete));
+        }
+        
+        /// <summary>
+        /// Applique un hitstop avec paramètres personnalisés (override).
+        /// </summary>
         public Coroutine Apply(float duration, bool freezeTime, System.Action onComplete = null)
         {
             if (duration <= 0f)
@@ -36,20 +58,15 @@ namespace FPS
         {
             isActive = true;
             
-            // Sauvegarder l'état actuel du temps
             savedTimeScale = (Time.timeScale <= 0.01f) ? 1f : Time.timeScale;
             savedFixedDeltaTime = Time.fixedDeltaTime;
             
-            // Appliquer le freeze
             Time.timeScale = freezeTime ? 0f : 0.01f;
             Time.fixedDeltaTime = 0.02f * Time.timeScale;
             
-            // Attendre en temps réel
             yield return new WaitForSecondsRealtime(duration);
             
-            // Restaurer le temps
             Restore();
-            
             onComplete?.Invoke();
         }
         
@@ -66,7 +83,7 @@ namespace FPS
         }
         
         /// <summary>
-        /// Restaure vers un timeScale spécifique (utilisé quand slow-mo est actif).
+        /// Restaure vers un timeScale spécifique.
         /// </summary>
         public void RestoreTo(float targetTimeScale)
         {

@@ -5,7 +5,7 @@ namespace FPS
 {
     /// <summary>
     /// Système de dash ciblé vers les ennemis.
-    /// Version refactorisée utilisant des modules séparés pour SlowMo, Bounce, Highlight et HitStop.
+    /// Utilise DashSettings pour centraliser toute la configuration.
     /// </summary>
     [RequireComponent(typeof(DashSlowMo))]
     [RequireComponent(typeof(DashBounce))]
@@ -15,13 +15,11 @@ namespace FPS
     {
         #region Serialized Fields
         
+        [Header("Configuration")]
+        [SerializeField] private DashSettings settings;
+
         [Header("Ciblage")]
         [SerializeField] private Camera aimCamera;
-
-        [Header("Définition du Dash")]
-        [SerializeField] private DashDefinition dashDefinition;
-        [SerializeField] private BounceDefinition groundBounce;
-        [SerializeField] private BounceDefinition airBounce;
 
         [Header("Input")]
         [SerializeField] private KeyCode activationKey = KeyCode.Q;
@@ -57,6 +55,8 @@ namespace FPS
         private float nextAvailableTime;
         private bool pathElectricStunned;
         private float dashStartTime;
+        private Vector3 lastDashDirection;
+        private bool waitingForLandingCooldown;
 
         private static readonly Collider[] OverlapBuffer = new Collider[16];
         
@@ -64,7 +64,7 @@ namespace FPS
 
         #region Properties - Configuration
         
-        private DashDefinition Config => dashDefinition;
+        private DashSettings Config => settings;
         private LayerMask EnemyMask => Config?.enemyMask ?? ~0;
         private LayerMask ObstacleMask => Config?.obstacleMask ?? ~0;
         private float MaxAimAngle => Mathf.Max(0f, Config?.maxAimAngle ?? 30f);
@@ -75,8 +75,6 @@ namespace FPS
         private float ConfigDashTravelTime => Mathf.Max(0.01f, Config?.dashTravelTime ?? 0.08f);
         private float ConfigCapsuleRadius => Mathf.Max(0f, Config?.capsuleRadius ?? 0.4f);
         private float ConfigStopOffset => Mathf.Max(0f, Config?.stopOffset ?? 1f);
-        private float ConfigHitStopDuration => Mathf.Max(0f, Config?.hitStopUnscaledDuration ?? 0f);
-        private bool ConfigHitStopFreezeTime => Config?.hitStopFreezeTime ?? true;
         
         #endregion
 
@@ -90,8 +88,10 @@ namespace FPS
         public int RemainingChains => chainActive ? Mathf.Clamp(remainingChains, 0, ConfigCountDash) : ConfigCountDash;
         public bool IsSlowMoActive => slowMo?.IsActive ?? false;
         public bool slowMoApplied => IsSlowMoActive;
-        public bool IsCooldownActive => !chainActive && Time.time < nextAvailableTime;
-        public float CooldownProgress => IsCooldownActive ? 1f - ((nextAvailableTime - Time.time) / ConfigCooldown) : 1f;
+        public bool IsWaitingForLanding => waitingForLandingCooldown;
+        public bool IsCooldownActive => !chainActive && (waitingForLandingCooldown || Time.time < nextAvailableTime);
+        public float CooldownProgress => waitingForLandingCooldown ? 0f : (IsCooldownActive ? 1f - ((nextAvailableTime - Time.time) / ConfigCooldown) : 1f);
+        public bool IsDashReady => !chainActive && !waitingForLandingCooldown && Time.time >= nextAvailableTime;
         
         #endregion
 
@@ -113,7 +113,6 @@ namespace FPS
             highlight = GetComponent<DashHighlight>();
             hitStop = GetComponent<DashHitStop>();
             
-            // Configurer les modules depuis DashDefinition
             ConfigureModules();
         }
         
@@ -121,32 +120,44 @@ namespace FPS
         {
             if (Config == null) return;
             
-            slowMo?.Configure(Config.slowMoScale, Config.slowMoTime);
-            bounce?.Configure(groundBounce, airBounce);
+            slowMo?.Configure(Config.slowMo);
+            bounce?.Configure(Config.groundBounce, Config.airBounce);
+            hitStop?.Configure(Config.hitStop);
         }
 
         private void Update()
         {
             // Sécurité: détecter si le dash est bloqué
-            if (isDashing && Time.unscaledTime - dashStartTime > 2f)
+            if (isDashing && Time.unscaledTime - dashStartTime > 0.5f)
             {
-                Debug.LogWarning("[DashCible] Dash bloqué depuis plus de 2s! Réinitialisation forcée.");
+                Debug.LogWarning("[DashCible] Dash bloqué depuis plus de 0.5s! Réinitialisation forcée.");
                 FinalizeDash();
                 if (chainActive) EndChain();
             }
             
-            // Sécurité: fin du slow-mo
-            if (slowMo != null && !slowMo.IsActive && chainActive && !isDashing)
+            // Sécurité: fin du slow-mo (mais pas si on bounce encore)
+            bool isBouncing = bounce != null && bounce.IsBouncing;
+            if (slowMo != null && !slowMo.IsActive && chainActive && !isDashing && !isBouncing)
             {
                 EndChain();
             }
             
-            // Sécurité: timeScale anormal
-            if (slowMo != null && !slowMo.IsActive && !hitStop.IsActive && !isDashing && Time.timeScale < 0.5f)
+            // Sécurité: timeScale anormal (seulement si rien n'est actif)
+            bool anyEffectActive = (slowMo != null && slowMo.IsActive) || 
+                                   (hitStop != null && hitStop.IsActive) || 
+                                   isDashing || isBouncing;
+            if (!anyEffectActive && Time.timeScale < 0.5f && Time.timeScale > 0f)
             {
                 Debug.LogWarning($"[DashCible] TimeScale anormal ({Time.timeScale})! Restauration à 1.");
                 Time.timeScale = 1f;
                 Time.fixedDeltaTime = 0.02f;
+            }
+
+            // Démarrer le cooldown à l'atterrissage
+            if (waitingForLandingCooldown && fpsMovement != null && fpsMovement.IsGrounded)
+            {
+                waitingForLandingCooldown = false;
+                nextAvailableTime = Time.time + ConfigCooldown;
             }
 
             if (Input.GetKeyDown(activationKey))
@@ -154,7 +165,6 @@ namespace FPS
                 TryTriggerOrChain();
             }
             
-            // Mettre à jour l'outline
             UpdateHighlight();
         }
         
@@ -194,7 +204,6 @@ namespace FPS
 
             Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             
-            // Raycast direct
             if (Physics.Raycast(ray, out RaycastHit hit, ConfigDistanceDash, EnemyMask, QueryTriggerInteraction.Ignore))
             {
                 var eh = hit.collider.GetComponentInParent<EnemyHealth>() ?? hit.collider.GetComponent<EnemyHealth>();
@@ -202,13 +211,11 @@ namespace FPS
                     return eh;
             }
 
-            // Recherche dans le cône de visée
             return FindBestTargetInCone();
         }
         
         private EnemyHealth FindBestTargetInCone()
         {
-            // Utiliser le registry au lieu de FindObjectsByType (plus performant)
             var aliveEnemies = EnemyRegistry.Instance.GetAliveEnemies();
             EnemyHealth best = null;
             float bestScore = float.MaxValue;
@@ -254,7 +261,6 @@ namespace FPS
         
         private void TryTriggerOrChain()
         {
-            // Vérifier si le mouvement est bloqué
             if (fpsMovement != null && fpsMovement.IsMovementDisabled && !isDashing)
             {
                 fpsMovement.EnableMovement();
@@ -262,7 +268,6 @@ namespace FPS
             
             if (isDashing) return;
 
-            // Reset de chaîne expirée
             if (chainActive && !slowMo.IsActive && Time.time >= nextAvailableTime)
             {
                 chainActive = false;
@@ -272,7 +277,8 @@ namespace FPS
 
             if (!chainActive)
             {
-                if (Time.time < nextAvailableTime) return;
+                // Bloquer si cooldown actif OU si on attend l'atterrissage
+                if (waitingForLandingCooldown || Time.time < nextAvailableTime) return;
                 remainingChains = ConfigCountDash;
                 chainActive = true;
             }
@@ -301,16 +307,11 @@ namespace FPS
             Vector3 start = transform.position;
             Vector3 targetPos = target.transform.position;
             Vector3 dirToTarget = (targetPos - start).normalized;
-
-            // Position d'arrêt devant l'ennemi
-            float distToTarget = Vector3.Distance(start, targetPos);
-            float stopDist = Mathf.Clamp(ConfigStopOffset, 0f, Mathf.Max(0f, distToTarget - 0.1f));
-            Vector3 end = targetPos - dirToTarget * stopDist;
+            lastDashDirection = dirToTarget;
 
             fpsMovement?.SetSpeedToMax();
             fpsMovement?.DisableMovement();
 
-            // Mouvement du dash
             yield return StartCoroutine(MoveToDashTarget(start, target));
 
             if (target == null)
@@ -319,7 +320,6 @@ namespace FPS
                 yield break;
             }
 
-            // Vérifier la distance finale
             float finalDistance = Vector3.Distance(transform.position, target.transform.position);
             bool reachedTarget = finalDistance <= ConfigStopOffset + 3f;
 
@@ -337,10 +337,10 @@ namespace FPS
                 }
             }
 
-            // Appliquer les dégâts
+            // Appliquer dégâts et effets
             if (reachedTarget && target != null)
             {
-                yield return ApplyDashDamage(target, dirToTarget);
+                ApplyDashDamage(target, dirToTarget);
             }
 
             FinalizeDash();
@@ -401,27 +401,23 @@ namespace FPS
                 transform.position = safePos;
         }
         
-        private IEnumerator ApplyDashDamage(EnemyHealth target, Vector3 dirToTarget)
+        private void ApplyDashDamage(EnemyHealth target, Vector3 dirToTarget)
         {
-            // Chercher le shield si présent
             var shield = target.GetComponentInChildren<Ennemies.Effect.EnemyShield>();
             Collider hitCol = null;
 
             if (shield != null && shield.ShieldActive)
             {
-                // Vérifier si on attaque de face (le shield doit intercepter)
                 Vector3 enemyForward = target.transform.forward;
-                Vector3 attackerDir = -dirToTarget; // Direction vers l'attaquant
+                Vector3 attackerDir = -dirToTarget;
                 float angle = Vector3.Angle(enemyForward, attackerDir);
 
-                // Si on est dans le cône frontal, cibler le shield
-                if (angle <= 45f) // Moitié de 90° (cône frontal)
+                if (angle <= 45f)
                 {
                     hitCol = shield.GetComponent<Collider>();
                 }
             }
 
-            // Fallback sur n'importe quel collider
             if (hitCol == null)
             {
                 hitCol = target.GetComponentInChildren<Collider>();
@@ -441,19 +437,51 @@ namespace FPS
 
             if (applied)
             {
-                // HitStop
-                if (ConfigHitStopDuration > 0f)
+                // Bounce joueur - IMMÉDIAT à l'impact
+                bounce?.StartBounce(dirToTarget);
+                
+                // ScreenShake à l'impact
+                ApplyScreenShake();
+                
+                // Knockback ennemi - IMMÉDIAT à l'impact
+                ApplyEnemyKnockback(target, dirToTarget);
+                
+                // HitStop (non-bloquant, s'exécute en parallèle)
+                if (hitStop != null && hitStop.IsEnabled)
                 {
-                    bool hitStopDone = false;
-                    hitStop?.Apply(ConfigHitStopDuration, ConfigHitStopFreezeTime, () => hitStopDone = true);
-                    while (!hitStopDone && ConfigHitStopDuration > 0f)
-                        yield return null;
+                    hitStop.Apply(null); // Pas de callback, on n'attend pas
                 }
                 
-                //SlowMo et Bounce
+                // SlowMo
                 slowMo?.ApplyOrRefresh();
-                bounce?.StartBounce(dirToTarget);
             }
+        }
+        
+        private void ApplyEnemyKnockback(EnemyHealth target, Vector3 direction)
+        {
+            if (Config?.knockback == null || !Config.knockback.enabled) return;
+            
+            var knockback = target.GetComponent<EnemyKnockback>();
+            if (knockback == null || knockback.ResistToKnockback) return;
+            
+            knockback.ApplyKnockback(
+                direction,
+                Config.knockback.force,
+                Config.knockback.duration,
+                Config.knockback.affectsYAxis
+            );
+        }
+        
+        private void ApplyScreenShake()
+        {
+            if (Config?.screenShake == null || !Config.screenShake.enabled) return;
+            if (CameraShake.Instance == null) return;
+            
+            CameraShake.Instance.ShakeWithRotation(
+                Config.screenShake.duration,
+                Config.screenShake.positionMagnitude,
+                Config.screenShake.rotationMagnitude
+            );
         }
         
         private void ApplyElectricStun(Ennemies.Effect.ElectricEnnemis electric)
@@ -480,20 +508,17 @@ namespace FPS
             float radius = ConfigCapsuleRadius > 0 ? ConfigCapsuleRadius : 0.4f;
             LayerMask collisionMask = ObstacleMask & ~EnemyMask;
             
-            // Pas d'obstacle ?
             if (!Physics.SphereCast(fromPos + Vector3.up * 0.5f, radius, moveDir, out RaycastHit hit, moveLen, collisionMask, QueryTriggerInteraction.Ignore))
             {
                 return fromPos + delta;
             }
             
-            // Tenter le sliding
             Vector3 slideResult = SlideMove(fromPos, delta, collisionMask);
             float slideProgress = slideResult.magnitude / moveLen;
             
             if (slideProgress >= minAcceptableProgress)
                 return fromPos + slideResult;
             
-            // Échantillonnage latéral
             Vector3 bestMove = slideResult;
             float bestScore = slideProgress;
             
@@ -526,7 +551,6 @@ namespace FPS
             if (bestScore >= minAcceptableProgress)
                 return fromPos + bestMove;
             
-            // Fallback
             return fromPos + moveDir * Mathf.Max(0f, hit.distance - 0.1f);
         }
 
@@ -574,7 +598,6 @@ namespace FPS
             isDashing = false;
             fpsMovement?.EnableMovement();
 
-            // Bloquer le tir temporairement
             if (Config != null && Config.postDashNoFireDuration > 0f)
             {
                 var ws = GetComponentInChildren<WeaponSystem>();
@@ -586,7 +609,17 @@ namespace FPS
         {
             chainActive = false;
             remainingChains = 0;
-            nextAvailableTime = Time.time + ConfigCooldown;
+            
+            // Le cooldown ne démarre qu'à l'atterrissage
+            if (fpsMovement != null && fpsMovement.IsGrounded)
+            {
+                nextAvailableTime = Time.time + ConfigCooldown;
+            }
+            else
+            {
+                waitingForLandingCooldown = true;
+            }
+            
             fpsMovement?.EnableMovement();
         }
         
