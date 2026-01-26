@@ -33,6 +33,12 @@ namespace Ennemies.Effect
         [Tooltip("LayerMask pour ajuster la position sur le sol via raycast (optionnel).")]
         [SerializeField] private LayerMask groundMask = ~0;
 
+        [Header("Effet de destruction")]
+        [Tooltip("Effet/particule à jouer quand l'IA est détruite faute de compagnon.")]
+        [SerializeField] private GameObject destroyEffectPrefab;
+        [Tooltip("Durée de vie automatique de l'effet (0 = ne pas auto-détruire).")]
+        [SerializeField] private float destroyEffectLifetime = 2f;
+
         private EnemyBehaviour controller;
         private FollowCompanionBehavior followBehavior;
         private Transform currentCompanion;
@@ -165,6 +171,16 @@ namespace Ennemies.Effect
 
             // Spawn des ennemis autour
             SpawnEnemiesAroundSelf();
+
+            // Effet de destruction (optionnel)
+            if (destroyEffectPrefab != null)
+            {
+                var effect = Instantiate(destroyEffectPrefab, owner.position, Quaternion.identity);
+                if (destroyEffectLifetime > 0f)
+                {
+                    Destroy(effect, destroyEffectLifetime);
+                }
+            }
 
             // Détruire le healer
             Destroy(gameObject);
