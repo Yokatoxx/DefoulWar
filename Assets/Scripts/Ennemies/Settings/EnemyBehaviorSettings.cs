@@ -158,6 +158,8 @@ namespace Ennemies.Settings
         [Header("Companion Follower Settings")]
         [Tooltip("Tags d’ennemis à prioriser pour le suivi (ordre de priorité).")]
         public string[] preferredCompanionTags = new[] { "ShieldEnemy" };
+        [Tooltip("Limiter le nombre d'IA par compagnon (0 = illimité).")]
+        [Min(0)] public int maxFollowersPerCompanion = 1;
         [Tooltip("Si true, ne suit que les ennemis dont le tag est dans la liste. Sinon, fallback sur n’importe quel ennemi éligible.")]
         public bool restrictToPreferredTagsOnly = false;
     }

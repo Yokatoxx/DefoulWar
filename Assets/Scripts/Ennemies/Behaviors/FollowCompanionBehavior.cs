@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.AI;
 using Ennemies.Settings;
 
@@ -15,6 +16,22 @@ namespace Ennemies.Behaviors
 
         private bool isFollowing;
         private bool canAttack;
+
+        // Comptage global des followers par compagnon
+        private static readonly Dictionary<Transform, int> FollowersPerCompanion = new Dictionary<Transform, int>();
+        private static int GetFollowersCount(Transform t) => (t != null && FollowersPerCompanion.TryGetValue(t, out var c)) ? c : 0;
+        private static void IncFollower(Transform t)
+        {
+            if (t == null) return;
+            FollowersPerCompanion[t] = GetFollowersCount(t) + 1;
+        }
+        private static void DecFollower(Transform t)
+        {
+            if (t == null) return;
+            var c = GetFollowersCount(t) - 1;
+            if (c <= 0) FollowersPerCompanion.Remove(t);
+            else FollowersPerCompanion[t] = c;
+        }
 
         // Ce behavior ne poursuit pas le joueur, donc pas de turn-before-move
         protected override bool RequiresTurnBeforeMove => false;
@@ -40,7 +57,6 @@ namespace Ennemies.Behaviors
         {
             if (agent == null || owner == null) return;
 
-            // Acquisition si pas de cible
             if (companionTarget == null)
             {
                 isFollowing = false;
@@ -48,12 +64,31 @@ namespace Ennemies.Behaviors
                 if (Time.time >= nextSearchTime)
                 {
                     nextSearchTime = Time.time + SEARCH_INTERVAL;
-                    companionTarget = FindClosestEligibleCompanion();
-                    isFollowing = companionTarget != null;
 
-                    agent.isStopped = !isFollowing;
-                    if (isFollowing)
+                    // Recherche qui évite les compagnons déjà suivis, si possible
+                    companionTarget = FindBestCompanionAvoidingStack();
+
+                    if (companionTarget != null)
+                    {
+                        // Vérifier la limite
+                        if (settings.maxFollowersPerCompanion > 0 &&
+                            GetFollowersCount(companionTarget) >= settings.maxFollowersPerCompanion)
+                        {
+                            companionTarget = null; // sur-capacité
+                        }
+                    }
+
+                    if (companionTarget != null)
+                    {
+                        IncFollower(companionTarget);
+                        isFollowing = true;
+                        agent.isStopped = false;
                         agent.speed = Mathf.Max(agent.speed, settings.patrolSpeed);
+                    }
+                    else
+                    {
+                        agent.isStopped = true;
+                    }
                 }
                 return;
             }
@@ -103,70 +138,81 @@ namespace Ennemies.Behaviors
             canAttack = false;
         }
 
-// Remplacez FindClosestEligibleCompanion() par cette version orientée tags
-private Transform FindClosestEligibleCompanion()
-{
-    float maxRange = Mathf.Max(0.01f, settings.detectionRange);
-
-    // Essai par tags prioritaires (dans l'ordre)
-    if (settings.preferredCompanionTags != null && settings.preferredCompanionTags.Length > 0)
-    {
-        foreach (var tag in settings.preferredCompanionTags)
+        private Transform FindBestCompanionAvoidingStack()
         {
-            var t = FindClosestByPredicate(maxRange, eb =>
+            float maxRange = Mathf.Max(0.01f, settings.detectionRange);
+
+            // 1) Essayer par tags prioritaires, en choisissant celui avec le moins de followers (et le plus proche)
+            if (settings.preferredCompanionTags != null && settings.preferredCompanionTags.Length > 0)
             {
-                if (eb == null || eb.transform == owner) return false;
-                if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
-                return eb.gameObject.CompareTag(tag);
-            });
-            if (t != null) return t;
-        }
+                foreach (var tag in settings.preferredCompanionTags)
+                {
+                    var best = FindClosestByPredicateMinFollowers(maxRange, eb =>
+                    {
+                        if (eb == null || eb.transform == owner) return false;
+                        if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+                        return eb.gameObject.CompareTag(tag);
+                    });
+                    if (best != null) return best;
+                }
+                // 2) Fallback: si autorisé, n’importe quel éligible (en minimisant les followers)
+                if (!settings.restrictToPreferredTagsOnly)
+                {
+                    var any = FindClosestByPredicateMinFollowers(maxRange, eb =>
+                    {
+                        if (eb == null || eb.transform == owner) return false;
+                        if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+                        return true;
+                    });
+                    if (any != null) return any;
+                }
+                return null;
+            }
 
-        // Fallback si pas strict: prendre n’importe quel éligible
-        if (!settings.restrictToPreferredTagsOnly)
-        {
-            var any = FindClosestByPredicate(maxRange, eb =>
+            // 3) Pas de liste: choisir éligible avec le moins de followers puis le plus proche
+            return FindClosestByPredicateMinFollowers(maxRange, eb =>
             {
                 if (eb == null || eb.transform == owner) return false;
                 if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
                 return true;
             });
-            if (any != null) return any;
         }
-        return null;
-    }
 
-    // Pas de liste: comportement existant
-    return FindClosestByPredicate(maxRange, eb =>
-    {
-        if (eb == null || eb.transform == owner) return false;
-        if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
-        return true;
-    });
-}
-
-private Transform FindClosestByPredicate(float maxRange, System.Func<Ennemies.EnemyBehaviour, bool> predicate)
-{
-    float bestDist = float.PositiveInfinity;
-    Transform best = null;
-
-    var enemies = Object.FindObjectsByType<Ennemies.EnemyBehaviour>(FindObjectsSortMode.None);
-    foreach (var eb in enemies)
-    {
-        if (!predicate(eb)) continue;
-        float dist = Vector3.Distance(owner.position, eb.transform.position);
-        if (dist > maxRange) continue;
-        if (dist < bestDist)
+        private Transform FindClosestByPredicateMinFollowers(float maxRange, System.Func<Ennemies.EnemyBehaviour, bool> predicate)
         {
-            bestDist = dist;
-            best = eb.transform;
+            float bestDist = float.PositiveInfinity;
+            int bestFollowers = int.MaxValue;
+            Transform best = null;
+
+            var enemies = Object.FindObjectsByType<Ennemies.EnemyBehaviour>(FindObjectsSortMode.None);
+            foreach (var eb in enemies)
+            {
+                if (!predicate(eb)) continue;
+
+                // Respecter la limite si définie
+                int count = GetFollowersCount(eb.transform);
+                if (settings.maxFollowersPerCompanion > 0 && count >= settings.maxFollowersPerCompanion)
+                    continue;
+
+                float dist = Vector3.Distance(owner.position, eb.transform.position);
+                if (dist > maxRange) continue;
+
+                // Prioriser le moins de followers, puis la distance
+                if (count < bestFollowers || (count == bestFollowers && dist < bestDist))
+                {
+                    bestFollowers = count;
+                    bestDist = dist;
+                    best = eb.transform;
+                }
+            }
+            return best;
         }
-    }
-    return best;
-}
 
         private void ClearCompanion()
         {
+            if (companionTarget != null)
+                DecFollower(companionTarget);
+
             companionTarget = null;
             isFollowing = false;
             agent.isStopped = true;
