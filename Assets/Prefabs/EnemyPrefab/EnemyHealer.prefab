@@ -262,7 +262,7 @@ MonoBehaviour:
   searchInterval: 1
   blinkEffectScript: {fileID: 6625965002628555201}
   blinkDuration: 5
-  noCompanionTimeout: 2
+  noCompanionTimeout: 1.5
   enemyPrefabs:
   - {fileID: 1807755940922956229, guid: 2e6eaa2ed41754940abcf48f590752b8, type: 3}
   spawnCount: 3
@@ -286,10 +286,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blinkVisualPrefab: {fileID: 0}
   minScale: 0.8
-  maxScale: 1.3
+  maxScale: 1.5
   pulseFrequency: 3
   visualOffset: {x: 0, y: 1, z: 0}
-  visualColor: {r: 1, g: 1, b: 1, a: 0.35}
+  visualColor: {r: 0.7905661, g: 1, b: 0.9359378, a: 0.72156864}
 --- !u!1 &463622794186511725
 GameObject:
   m_ObjectHideFlags: 0
