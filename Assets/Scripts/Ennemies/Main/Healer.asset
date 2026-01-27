@@ -23,6 +23,11 @@ MonoBehaviour:
   patrolSpeed: 10
   keepDistance: 4
   distanceTolerance: 1
+  trajectoryType: 0
+  trajectoryAmplitude: 3
+  trajectoryFrequency: 1
+  trajectoryChangeInterval: 0.5
+  trajectoryMinDistance: 3
   patrolRadius: 20
   waypointWaitTime: 1
   attackType: 0
@@ -51,6 +56,15 @@ MonoBehaviour:
   sniperChargeDuration: 1
   sniperLockDuration: 0.5
   highGroundSearchRadius: 20
+  canDodge: 0
+  dodgeChance: 0.1
+  dodgeForce: 8
+  dodgeDuration: 0.3
+  dodgeCooldown: 2
   preferredCompanionTags:
   - EnemyShield
+  maxFollowersPerCompanion: 1
   restrictToPreferredTagsOnly: 0
+  avoidedCompanionTags:
+  - EnemyElectric
+  avoidTagsStrict: 1

@@ -138,45 +138,91 @@ namespace Ennemies.Behaviors
             canAttack = false;
         }
 
-        private Transform FindBestCompanionAvoidingStack()
+// Remplacez FindBestCompanionAvoidingStack() par une version qui évite des tags si possible
+private Transform FindBestCompanionAvoidingStack()
+{
+    float maxRange = Mathf.Max(0.01f, settings.detectionRange);
+
+    // Helper: test si un eb a un tag à éviter
+    bool IsAvoided(Ennemies.EnemyBehaviour eb)
+    {
+        if (settings.avoidedCompanionTags == null || settings.avoidedCompanionTags.Length == 0) return false;
+        foreach (var tag in settings.avoidedCompanionTags)
         {
-            float maxRange = Mathf.Max(0.01f, settings.detectionRange);
+            if (!string.IsNullOrEmpty(tag) && eb.gameObject.CompareTag(tag))
+                return true;
+        }
+        return false;
+    }
 
-            // 1) Essayer par tags prioritaires, en choisissant celui avec le moins de followers (et le plus proche)
-            if (settings.preferredCompanionTags != null && settings.preferredCompanionTags.Length > 0)
-            {
-                foreach (var tag in settings.preferredCompanionTags)
-                {
-                    var best = FindClosestByPredicateMinFollowers(maxRange, eb =>
-                    {
-                        if (eb == null || eb.transform == owner) return false;
-                        if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
-                        return eb.gameObject.CompareTag(tag);
-                    });
-                    if (best != null) return best;
-                }
-                // 2) Fallback: si autorisé, n’importe quel éligible (en minimisant les followers)
-                if (!settings.restrictToPreferredTagsOnly)
-                {
-                    var any = FindClosestByPredicateMinFollowers(maxRange, eb =>
-                    {
-                        if (eb == null || eb.transform == owner) return false;
-                        if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
-                        return true;
-                    });
-                    if (any != null) return any;
-                }
-                return null;
-            }
-
-            // 3) Pas de liste: choisir éligible avec le moins de followers puis le plus proche
-            return FindClosestByPredicateMinFollowers(maxRange, eb =>
+    // 1) Essais par tags préférés, en minimisant les followers et en excluant les 'évités' si possible
+    if (settings.preferredCompanionTags != null && settings.preferredCompanionTags.Length > 0)
+    {
+        foreach (var tag in settings.preferredCompanionTags)
+        {
+            var best = FindClosestByPredicateMinFollowers(maxRange, eb =>
             {
                 if (eb == null || eb.transform == owner) return false;
                 if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+                if (!eb.gameObject.CompareTag(tag)) return false;
+                // Éviter les tags si d’autres existent: le filtre d’abord les non-évités
+                if (IsAvoided(eb)) return false;
                 return true;
             });
+            if (best != null) return best;
         }
+
+        // Fallback: si autorisé, prendre n’importe quel éligible non-évité
+        if (!settings.restrictToPreferredTagsOnly)
+        {
+            var anyNonAvoided = FindClosestByPredicateMinFollowers(maxRange, eb =>
+            {
+                if (eb == null || eb.transform == owner) return false;
+                if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+                if (IsAvoided(eb)) return false;
+                return true;
+            });
+            if (anyNonAvoided != null) return anyNonAvoided;
+
+            // Dernier recours: accepter un 'évité' uniquement si strictement rien d’autre
+            if (!settings.avoidTagsStrict)
+            {
+                var anyAvoided = FindClosestByPredicateMinFollowers(maxRange, eb =>
+                {
+                    if (eb == null || eb.transform == owner) return false;
+                    if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+                    return IsAvoided(eb);
+                });
+                if (anyAvoided != null) return anyAvoided;
+            }
+        }
+        return null;
+    }
+
+    // 2) Pas de tags préférés: d’abord non-évités
+    var bestNonAvoided = FindClosestByPredicateMinFollowers(maxRange, eb =>
+    {
+        if (eb == null || eb.transform == owner) return false;
+        if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+        if (IsAvoided(eb)) return false;
+        return true;
+    });
+    if (bestNonAvoided != null) return bestNonAvoided;
+
+    // 3) Dernier recours: accepter un 'évité' seulement si rien d’autre
+    if (!settings.avoidTagsStrict)
+    {
+        var bestAvoided = FindClosestByPredicateMinFollowers(maxRange, eb =>
+        {
+            if (eb == null || eb.transform == owner) return false;
+            if (eb.Settings != null && eb.Settings.behaviorType == EnemyBehaviorType.CompanionFollower) return false;
+            return IsAvoided(eb);
+        });
+        if (bestAvoided != null) return bestAvoided;
+    }
+
+    return null;
+}
 
         private Transform FindClosestByPredicateMinFollowers(float maxRange, System.Func<Ennemies.EnemyBehaviour, bool> predicate)
         {
