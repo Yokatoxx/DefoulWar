@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: 2535758025684249478}
   m_Layer: 7
   m_Name: Enemy Electrique
-  m_TagString: Enemy
+  m_TagString: EnemyElectric
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -130,6 +130,12 @@ MonoBehaviour:
   electricEffectPrefab: {fileID: 0}
   effectDuration: 0.5
   dischargeCooldown: 0.2
+  targetEnemyTag: BasicEnemy
+  detectionRadius: 10
+  maxEnemiesForBonus: 5
+  speedBonusPerEnemy: 0.5
+  damageBonusPerEnemy: 0.2
+  detectionInterval: 0.5
   resistToDash: 1
   slowDuration: 1
   slowAmount: 0.801
