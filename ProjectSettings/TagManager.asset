@@ -8,6 +8,7 @@ TagManager:
   - Minion
   - HighGroundPoint
   - EnemyShield
+  - BasicEnemy
   layers:
   - Default
   - TransparentFX

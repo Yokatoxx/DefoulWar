@@ -26,6 +26,20 @@ namespace Ennemies.Effect
         [Tooltip("Temps minimum entre deux décharges (en secondes).")]
         [SerializeField] private float dischargeCooldown = 0.2f;
         
+        [Header("Power Scaling (basé sur les ennemis proches)")]
+        [Tooltip("Tag des ennemis à compter pour le bonus de puissance")]
+        [SerializeField] private string targetEnemyTag = "BasicEnemy";
+        [Tooltip("Rayon de détection des ennemis pour le bonus")]
+        [SerializeField] private float detectionRadius = 10f;
+        [Tooltip("Nombre maximum d'ennemis pris en compte pour le bonus")]
+        [SerializeField, Min(1)] private int maxEnemiesForBonus = 5;
+        [Tooltip("Bonus de vitesse par ennemi détecté")]
+        [SerializeField] private float speedBonusPerEnemy = 0.5f;
+        [Tooltip("Multiplicateur de dégâts par ennemi (0.2 = +20% par ennemi)")]
+        [SerializeField, Range(0f, 1f)] private float damageBonusPerEnemy = 0.2f;
+        [Tooltip("Intervalle de mise à jour de la détection (en secondes)")]
+        [SerializeField] private float detectionInterval = 0.5f;
+        
         [Header("Protection contre le dash")]
         [Tooltip("Les ennemis électriques résistent au dash et ne meurent pas")]
         [SerializeField] private bool resistToDash = true;
@@ -41,6 +55,13 @@ namespace Ennemies.Effect
         private EnemyHealth health;
         private static readonly Collider[] DischargeBuffer = new Collider[32];
         private float lastDischargeTime = -999f;
+        
+        // Power scaling system
+        private UnityEngine.AI.NavMeshAgent navAgent;
+        private float baseSpeed = -1f;
+        private int currentNearbyEnemyCount = 0;
+        private float nextDetectionTime = 0f;
+        private static readonly Collider[] DetectionBuffer = new Collider[32];
 
         private void Awake()
         {
@@ -48,6 +69,12 @@ namespace Ennemies.Effect
             if (health != null)
             {
                 health.OnDeath.AddListener(OnDeath);
+            }
+            
+            navAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+            if (navAgent != null)
+            {
+                baseSpeed = navAgent.speed;
             }
         }
 
@@ -57,6 +84,58 @@ namespace Ennemies.Effect
             {
                 health.OnDeath.RemoveListener(OnDeath);
             }
+        }
+        
+        private void Update()
+        {
+            if (health != null && health.IsDead) return;
+            
+            if (Time.time >= nextDetectionTime)
+            {
+                UpdateNearbyEnemyCount();
+                UpdateSpeedBonus();
+                nextDetectionTime = Time.time + detectionInterval;
+            }
+        }
+        
+        private void UpdateNearbyEnemyCount()
+        {
+            if (detectionRadius <= 0f) 
+            {
+                currentNearbyEnemyCount = 0;
+                return;
+            }
+            
+            int count = 0;
+            int detected = Physics.OverlapSphereNonAlloc(transform.position, detectionRadius, DetectionBuffer);
+            
+            for (int i = 0; i < detected && count < maxEnemiesForBonus; i++)
+            {
+                var col = DetectionBuffer[i];
+                if (col == null) continue;
+                
+                // Vérifier le tag
+                if (!col.CompareTag(targetEnemyTag)) continue;
+                
+                // Vérifier que c'est un ennemi vivant
+                var enemyHealth = col.GetComponent<EnemyHealth>();
+                if (enemyHealth == null) enemyHealth = col.GetComponentInParent<EnemyHealth>();
+                
+                if (enemyHealth != null && enemyHealth != this.health && !enemyHealth.IsDead)
+                {
+                    count++;
+                }
+            }
+            
+            currentNearbyEnemyCount = count;
+        }
+        
+        private void UpdateSpeedBonus()
+        {
+            if (navAgent == null || baseSpeed < 0f) return;
+            
+            float newSpeed = baseSpeed + (currentNearbyEnemyCount * speedBonusPerEnemy);
+            navAgent.speed = newSpeed;
         }
 
         private void OnDeath()
@@ -73,6 +152,10 @@ namespace Ennemies.Effect
                 return;
             }
             lastDischargeTime = Time.time;
+            
+            // Calculer les dégâts avec le bonus
+            float damageMultiplier = 1f + (currentNearbyEnemyCount * damageBonusPerEnemy);
+            float scaledDamage = electricDamage * damageMultiplier;
 
             int count = Physics.OverlapSphereNonAlloc(transform.position, electricDischargeRadius, DischargeBuffer);
             for (int i = 0; i < count; i++)
@@ -83,7 +166,7 @@ namespace Ennemies.Effect
                 if (enemyHealth == null) enemyHealth = col.GetComponentInParent<EnemyHealth>();
                 if (enemyHealth != null && enemyHealth != this.health && !enemyHealth.IsDead)
                 {
-                    enemyHealth.TakeDamage(new DamageInfo(electricDamage, "Electric", DamageType.Electric));
+                    enemyHealth.TakeDamage(new DamageInfo(scaledDamage, "Electric", DamageType.Electric));
                     if (electricEffectPrefab != null)
                     {
                         CreateElectricArc(enemyHealth.transform.position);
@@ -134,6 +217,20 @@ namespace Ennemies.Effect
             {
                 movement.ApplySlow(slowDuration, slowAmount);
                 Debug.Log($"[ElectricEnnemis] Ralentissement électrique appliqué au joueur: {slowAmount * 100}% pendant {slowDuration}s");
+            }
+        }
+        
+        // Propriétés publiques pour debug/inspection
+        public int CurrentNearbyEnemyCount => currentNearbyEnemyCount;
+        public float CurrentSpeed => navAgent != null ? navAgent.speed : baseSpeed;
+        public float CurrentDamageMultiplier => 1f + (currentNearbyEnemyCount * damageBonusPerEnemy);
+        
+        private void OnDrawGizmosSelected()
+        {
+            if (detectionRadius > 0f)
+            {
+                Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+                Gizmos.DrawWireSphere(transform.position, detectionRadius);
             }
         }
     }
