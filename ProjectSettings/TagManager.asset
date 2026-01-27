@@ -9,6 +9,7 @@ TagManager:
   - HighGroundPoint
   - EnemyShield
   - BasicEnemy
+  - EnemyElectric
   layers:
   - Default
   - TransparentFX
