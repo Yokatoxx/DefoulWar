@@ -50924,6 +50924,10 @@ PrefabInstance:
       propertyPath: dashPlayer
       value: 
       objectReference: {fileID: 1224475214}
+    - target: {fileID: 1918107123851469354, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
+      propertyPath: positionSmoothSpeed
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 2871269150694286956, guid: 5abacc5a8f5c4af47a96d68153d8a3b0, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
