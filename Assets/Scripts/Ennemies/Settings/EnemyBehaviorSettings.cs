@@ -211,5 +211,10 @@ namespace Ennemies.Settings
         [Min(0)] public int maxFollowersPerCompanion = 1;
         [Tooltip("Si true, ne suit que les ennemis dont le tag est dans la liste. Sinon, fallback sur n’importe quel ennemi éligible.")]
         public bool restrictToPreferredTagsOnly = false;
+
+        [Tooltip("Tags d’ennemis à éviter (ne pas suivre si d’autres cibles existent).")]
+        public string[] avoidedCompanionTags;
+        [Tooltip("Si true, n’acceptera un ennemi 'évité' que s’il n’existe strictement aucune autre cible possible.")]
+        public bool avoidTagsStrict = true;
     }
 }
