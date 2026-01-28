@@ -23,11 +23,16 @@ MonoBehaviour:
   patrolSpeed: 2
   keepDistance: 1
   distanceTolerance: 1
+  trajectoryType: 0
+  trajectoryAmplitude: 3
+  trajectoryFrequency: 1
+  trajectoryChangeInterval: 0.5
+  trajectoryMinDistance: 3
   patrolRadius: 20
   waypointWaitTime: 1
   attackType: 0
   attackDamage: 10
-  attackCooldown: 1.5
+  attackCooldown: 2.5
   attackRange: 2
   isHitscan: 0
   bulletPrefab: {fileID: 0}
@@ -47,3 +52,18 @@ MonoBehaviour:
   slamLifetime: 0.6
   slamYOffset: 0.05
   slamTriggerRadius: 10
+  fleeToHighGroundDistance: 8
+  sniperChargeDuration: 1
+  sniperLockDuration: 0.5
+  highGroundSearchRadius: 20
+  canDodge: 0
+  dodgeChance: 0.1
+  dodgeForce: 8
+  dodgeDuration: 0.3
+  dodgeCooldown: 2
+  preferredCompanionTags:
+  - ShieldEnemy
+  maxFollowersPerCompanion: 1
+  restrictToPreferredTagsOnly: 0
+  avoidedCompanionTags: []
+  avoidTagsStrict: 1
