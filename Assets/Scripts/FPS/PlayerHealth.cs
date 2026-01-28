@@ -15,6 +15,9 @@ namespace FPS
         [SerializeField] private float regenDelay = 3f;
         [SerializeField] private float regenRate = 5f;
         
+        // Limite maximale de régénération (en pourcentage, 1 = 100%)
+        private float regenCapPercentage = 1f;
+        
         [Header("References")]
         [Tooltip("Référence au DashCible pour vérifier l'état du dash. Auto-détecté si non assigné.")]
         [SerializeField] private DashCible dashCible;
@@ -41,13 +44,21 @@ namespace FPS
         
         private void Update()
         {
-            if (enableRegen && !isDead && currentHealth < maxHealth)
+            float regenCap = maxHealth * regenCapPercentage;
+            if (enableRegen && !isDead && currentHealth < regenCap)
             {
                 timeSinceLastDamage += Time.deltaTime;
                 
                 if (timeSinceLastDamage >= regenDelay)
                 {
-                    Heal(regenRate * Time.deltaTime);
+                    // Ne pas dépasser le plafond de regen
+                    float healAmount = regenRate * Time.deltaTime;
+                    float newHealth = Mathf.Min(regenCap, currentHealth + healAmount);
+                    if (newHealth > currentHealth)
+                    {
+                        currentHealth = newHealth;
+                        OnHealthChanged?.Invoke(currentHealth / maxHealth);
+                    }
                 }
             }
         }
@@ -107,5 +118,24 @@ namespace FPS
         {
             isInvulnerable = invulnerable;
         }
+        
+        /// <summary>
+        /// Définit le plafond de régénération en pourcentage (0 à 1).
+        /// Par exemple, 0.5f = la regen s'arrête à 50% de la vie max.
+        /// </summary>
+        public void SetRegenCap(float percentage)
+        {
+            regenCapPercentage = Mathf.Clamp01(percentage);
+        }
+        
+        /// <summary>
+        /// Réinitialise le plafond de régénération à 100%.
+        /// </summary>
+        public void ResetRegenCap()
+        {
+            regenCapPercentage = 1f;
+        }
+        
+        public float RegenCapPercentage => regenCapPercentage;
     }
 }

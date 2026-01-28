@@ -9,6 +9,14 @@ public class WaveSpawner : MonoBehaviour
     [SerializeField] public Wave[] waves;
     [SerializeField] public Transform[] spawnpoints;
     [SerializeField] public DoorArena[] doors;
+    
+    [Header("Regen Control")]
+    [Tooltip("Plafond de régénération pendant l'arène (0.5 = 50% de la vie max)")]
+    [SerializeField, Range(0f, 1f)] private float arenaRegenCap = 0.5f;
+    [Tooltip("Plafond de régénération après l'arène (1 = 100% de la vie max)")]
+    [SerializeField, Range(0f, 1f)] private float postArenaRegenCap = 1f;
+    
+    private PlayerHealth playerHealth;
 
     private int waveIndex = 0;
     private Wave currentWave;
@@ -38,6 +46,14 @@ public class WaveSpawner : MonoBehaviour
         
         // Active le mode arène : tous les ennemis connaissent la position du joueur
         EnemyAlertSystem.Instance.SetAllEnemiesArenaMode(true);
+        
+        // Limite la régénération du joueur pendant l'arène
+        playerHealth = FindFirstObjectByType<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.SetRegenCap(arenaRegenCap);
+            Debug.Log($"[WaveSpawner] Player regen capped at {arenaRegenCap * 100}%");
+        }
 
         StartCoroutine(StartWaveAfterDelay(currentWave.TimeBeforeThisWave));
     }
@@ -203,6 +219,13 @@ public class WaveSpawner : MonoBehaviour
         
         // Désactive le mode arène : les ennemis retrouvent leur comportement normal
         EnemyAlertSystem.Instance.SetAllEnemiesArenaMode(false);
+        
+        // Restaure le plafond de régénération après l'arène
+        if (playerHealth != null)
+        {
+            playerHealth.SetRegenCap(postArenaRegenCap);
+            Debug.Log($"[WaveSpawner] Player regen cap restored to {postArenaRegenCap * 100}%");
+        }
         
         Debug.Log("[WaveSpawner] All doors opened, arena mode disabled");
     }
