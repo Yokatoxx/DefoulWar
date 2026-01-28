@@ -206,6 +206,8 @@ MonoBehaviour:
   doors:
   - {fileID: 1609119379}
   - {fileID: 582905257}
+  arenaRegenCap: 0.5
+  postArenaRegenCap: 1
 --- !u!4 &1656869
 Transform:
   m_ObjectHideFlags: 0
@@ -70626,6 +70628,8 @@ MonoBehaviour:
   - {fileID: 1325708850}
   doors:
   - {fileID: 1831891692}
+  arenaRegenCap: 0.5
+  postArenaRegenCap: 1
 --- !u!4 &1082221589
 Transform:
   m_ObjectHideFlags: 0
@@ -85010,6 +85014,8 @@ MonoBehaviour:
   - {fileID: 266265989}
   doors:
   - {fileID: 1674942858}
+  arenaRegenCap: 0.5
+  postArenaRegenCap: 1
 --- !u!4 &1374721759
 Transform:
   m_ObjectHideFlags: 0
@@ -104257,6 +104263,8 @@ MonoBehaviour:
   doors:
   - {fileID: 1973872362}
   - {fileID: 447996639}
+  arenaRegenCap: 0.2
+  postArenaRegenCap: 1
 --- !u!1 &1884815702
 GameObject:
   m_ObjectHideFlags: 0
