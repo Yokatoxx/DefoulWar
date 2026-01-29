@@ -8,18 +8,16 @@ public class CustomSSAOPass : CustomPass
     public enum DebugMode
     {
         Off = 0,
-        ShowDepth = 1,
-        ShowNormals = 2,
         ShowAO = 3,
         TestWhite = 4,
         DepthColors = 5
     }
     
-    [Header("SSAO Settings")]
-    public float intensity = 5f;
-    public float radius = 2f;
-    public float bias = 0.5f;
-    public float falloffDistance = 2f;
+    [Header("SSAO Quality")]
+    public float intensity = 3f;
+    public float radius = 0.8f;
+    public float bias = 0.2f;
+    public float falloffDistance = 3f;
     
     [Header("Debug")]
     public DebugMode debugMode = DebugMode.Off;
@@ -45,20 +43,18 @@ public class CustomSSAOPass : CustomPass
         ssaoMat.SetFloat("_Bias", bias);
         ssaoMat.SetFloat("_FalloffDistance", falloffDistance);
         
-        if (debugMode == DebugMode.Off)
+        // Debug modes et ShowAO: rendu direct
+        if (debugMode != DebugMode.Off)
         {
-            // Mode normal: utilise le pass multiplicatif (pass 1)
-            ssaoMat.SetInt("_DebugMode", 0);
-            CoreUtils.DrawFullScreen(ctx.cmd, ssaoMat, ctx.cameraColorBuffer, shaderPassId: 1);
-        }
-        else
-        {
-            // Modes debug: utilise le pass normal (pass 0)
             if (debugMode == DebugMode.ShowAO)
                 ssaoMat.SetInt("_DebugMode", 0);
-                
             CoreUtils.DrawFullScreen(ctx.cmd, ssaoMat, ctx.cameraColorBuffer, shaderPassId: 0);
+            return;
         }
+        
+        // Mode Off: composite multiplicatif direct (pass 2)
+        ssaoMat.SetInt("_DebugMode", 0);
+        CoreUtils.DrawFullScreen(ctx.cmd, ssaoMat, ctx.cameraColorBuffer, shaderPassId: 2);
     }
 
     protected override void Cleanup()

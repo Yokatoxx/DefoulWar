@@ -37,107 +37,90 @@ Shader "Hidden/CustomSSAO"
         return output;
     }
     
-    float Hash(float2 p)
+    float InterleavedGradientNoise(float2 position)
     {
-        float3 p3 = frac(float3(p.xyx) * 0.1031);
-        p3 += dot(p3, p3.yzx + 33.33);
-        return frac((p3.x + p3.y) * p3.z);
+        float3 magic = float3(0.06711056, 0.00583715, 52.9829189);
+        return frac(magic.z * frac(dot(position, magic.xy)));
     }
     
-    // Reconstruit la position view space depuis UV et depth
     float3 GetViewPos(float2 uv, float rawDepth)
     {
         float linearDepth = LinearEyeDepth(rawDepth, _ZBufferParams);
-        
-        // UV vers NDC
         float2 ndc = uv * 2.0 - 1.0;
         #if UNITY_UV_STARTS_AT_TOP
             ndc.y = -ndc.y;
         #endif
-        
-        // Position en view space
         float3 viewPos;
         viewPos.xy = ndc * linearDepth / float2(UNITY_MATRIX_P[0][0], UNITY_MATRIX_P[1][1]);
         viewPos.z = -linearDepth;
-        
         return viewPos;
     }
     
-    float4 FragMain(Varyings input) : SV_Target
+    float MultiBounce(float ao)
+    {
+        // Approximation multi-bounce simple
+        float a = 2.0404 * 0.5 - 0.3324;
+        float b = -4.7951 * 0.5 + 0.6417;
+        float c = 2.7552 * 0.5 + 0.6903;
+        return max(ao, ((ao * a + b) * ao + c) * ao);
+    }
+    
+    float4 FragSSAO(Varyings input) : SV_Target
     {
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
         
         if (_DebugMode == 4) return float4(1, 1, 1, 1);
-        if (_DebugMode == 8) return float4(1, 0, 0, 1);
         
         float2 uv = input.texcoord;
         uint2 positionSS = uint2(uv * _ScreenSize.xy);
         
         float rawDepth = LoadCameraDepth(positionSS);
         
-        // Debug modes
-        if (_DebugMode == 1)
-            return float4(rawDepth, rawDepth, rawDepth, 1.0);
-        
         if (_DebugMode == 5)
         {
-            if (rawDepth > 0.9) return float4(1, 0, 0, 1);
-            if (rawDepth > 0.5) return float4(1, 0.5, 0, 1);
+            if (rawDepth > 0.5) return float4(1, 0, 0, 1);
             if (rawDepth > 0.1) return float4(1, 1, 0, 1);
             if (rawDepth > 0.01) return float4(0, 1, 0, 1);
             if (rawDepth > 0.0) return float4(0, 0, 1, 1);
             return float4(1, 0, 1, 1);
         }
         
-        if (_DebugMode == 2)
-        {
-            NormalData normalData;
-            DecodeFromNormalBuffer(positionSS, normalData);
-            return float4(normalData.normalWS * 0.5 + 0.5, 1.0);
-        }
-        
-        // === HBAO-style SSAO ===
-        
+        // Skip sky
         if (rawDepth < 0.0001 || rawDepth > 0.9999)
             return 1.0;
         
-        // Position du pixel central en view space
         float3 viewPos = GetViewPos(uv, rawDepth);
         float linearDepth = -viewPos.z;
         
-        // Normale en view space
         NormalData normalData;
         DecodeFromNormalBuffer(positionSS, normalData);
-        float3 normalVS = mul((float3x3)UNITY_MATRIX_V, normalData.normalWS);
+        float3 normalVS = normalize(mul((float3x3)UNITY_MATRIX_V, normalData.normalWS));
         
-        // Rayon en world units, converti en pixels
         float radiusWorld = _Radius;
-        float radiusPixels = (radiusWorld * _ScreenSize.y * 0.5) / linearDepth;
-        radiusPixels = clamp(radiusPixels, 4.0, 128.0);
+        float radiusPixels = (radiusWorld * _ScreenSize.y) / linearDepth;
+        radiusPixels = clamp(radiusPixels, 3.0, 200.0);
         
-        // Rotation aléatoire
-        float randomAngle = Hash(uv * 1000.0 + _Time.y * 0.01) * 6.28318;
+        float noise = InterleavedGradientNoise(positionSS) * 6.28318;
         
         float occlusion = 0.0;
         
-        // 8 directions, 2 steps par direction (HBAO-style)
-        const int NUM_DIRECTIONS = 8;
-        const int STEPS_PER_DIR = 3;
+        const int NUM_DIRECTIONS = 12;
+        const int STEPS_PER_DIR = 4;
         
         for (int dir = 0; dir < NUM_DIRECTIONS; dir++)
         {
-            float angle = (float(dir) / float(NUM_DIRECTIONS)) * 6.28318 + randomAngle;
+            float angle = (float(dir) + 0.5) / float(NUM_DIRECTIONS) * 6.28318 + noise;
             float2 direction = float2(cos(angle), sin(angle));
             
-            float horizonAngle = -1.0; // Angle d'horizon le plus bas trouvé
+            float maxHorizon = -1.0;
             
             for (int step = 1; step <= STEPS_PER_DIR; step++)
             {
-                float stepRadius = radiusPixels * (float(step) / float(STEPS_PER_DIR));
+                float t = float(step) / float(STEPS_PER_DIR);
+                float stepRadius = radiusPixels * t * t; // Distribution quadratique
                 float2 sampleUV = uv + direction * stepRadius * _ScreenSize.zw;
                 
-                // Bounds check
-                if (sampleUV.x < 0.01 || sampleUV.x > 0.99 || sampleUV.y < 0.01 || sampleUV.y > 0.99)
+                if (any(sampleUV < 0.005) || any(sampleUV > 0.995))
                     continue;
                 
                 uint2 samplePos = uint2(sampleUV * _ScreenSize.xy);
@@ -146,63 +129,36 @@ Shader "Hidden/CustomSSAO"
                 if (sampleRawDepth < 0.0001 || sampleRawDepth > 0.9999)
                     continue;
                 
-                // Position du sample en view space
                 float3 sampleViewPos = GetViewPos(sampleUV, sampleRawDepth);
-                
-                // Vecteur du pixel central vers le sample
                 float3 deltaVec = sampleViewPos - viewPos;
                 float deltaLen = length(deltaVec);
                 
-                // Skip si trop loin
-                if (deltaLen > _FalloffDistance || deltaLen < 0.001)
+                if (deltaLen < 0.01 || deltaLen > _FalloffDistance)
                     continue;
                 
                 float3 deltaDir = deltaVec / deltaLen;
+                float horizonCos = dot(normalVS, deltaDir);
                 
-                // Angle entre la direction du sample et la normale
-                // cos(theta) = dot(normal, sampleDir)
-                float cosAngle = dot(normalVS, deltaDir);
+                // Falloff smooth
+                float falloff = 1.0 - smoothstep(0.0, _FalloffDistance, deltaLen);
                 
-                // L'horizon est la tangente de la surface
-                // On cherche des samples qui sont "au-dessus" de notre horizon actuel
-                // mais "en-dessous" de la normale (dans l'hémisphère)
+                // Bias
+                float biasedHorizon = horizonCos - _Bias * 0.1;
                 
-                // Mise à jour de l'angle d'horizon
-                if (cosAngle > horizonAngle)
+                if (biasedHorizon > maxHorizon)
                 {
-                    // Ce sample définit un nouvel horizon
-                    // L'occlusion est proportionnelle à la différence
-                    float angleDiff = cosAngle - horizonAngle;
-                    
-                    // Falloff par distance
-                    float distFalloff = 1.0 - (deltaLen / _FalloffDistance);
-                    distFalloff = distFalloff * distFalloff;
-                    
-                    // Contribution
-                    float contrib = angleDiff * distFalloff;
-                    
-                    // Bias: ignore les petites variations
-                    if (cosAngle > _Bias * 0.1)
-                    {
-                        occlusion += max(0, contrib);
-                    }
-                    
-                    horizonAngle = cosAngle;
+                    float contrib = (biasedHorizon - maxHorizon) * falloff;
+                    occlusion += max(0, contrib);
+                    maxHorizon = biasedHorizon;
                 }
             }
         }
         
-        // Normalise par le nombre de directions
         occlusion = occlusion / float(NUM_DIRECTIONS);
+        occlusion = pow(saturate(occlusion), 0.6) * _Intensity;
         
-        // Applique l'intensité
-        occlusion = saturate(occlusion * _Intensity);
-        
-        // AO final
-        float ao = 1.0 - occlusion;
-        
-        // Courbe pour contraste
-        ao = pow(ao, 1.5);
+        float ao = saturate(1.0 - occlusion);
+        ao = MultiBounce(ao);
         
         return ao;
     }
@@ -213,23 +169,36 @@ Shader "Hidden/CustomSSAO"
     {
         Tags { "RenderPipeline" = "HDRenderPipeline" }
         
+        // Pass 0: SSAO (remplace les couleurs)
         Pass
         {
             Name "SSAO"
             ZWrite Off ZTest Always Blend Off Cull Off
             HLSLPROGRAM
             #pragma vertex Vert
-            #pragma fragment FragMain
+            #pragma fragment FragSSAO
             ENDHLSL
         }
         
+        // Pass 1: unused
         Pass
         {
-            Name "SSAO Multiply"
+            Name "Unused"
+            ZWrite Off ZTest Always Blend Off Cull Off
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment FragSSAO
+            ENDHLSL
+        }
+        
+        // Pass 2: Composite (multiply)
+        Pass
+        {
+            Name "Composite"
             ZWrite Off ZTest Always Blend DstColor Zero Cull Off
             HLSLPROGRAM
             #pragma vertex Vert
-            #pragma fragment FragMain
+            #pragma fragment FragSSAO
             ENDHLSL
         }
     }
