@@ -22,6 +22,14 @@ public class DebugTeleporter : MonoBehaviour
         public KeyCode key = KeyCode.Alpha1;
     }
 
+    [System.Serializable]
+    public class GameObjectToggle
+    {
+        public string name = "Object";
+        public KeyCode key = KeyCode.G;
+        public GameObject target;
+    }
+
     [Header("Teleport Points")]
     [SerializeField] private TeleportPoint[] teleportPoints;
 
@@ -29,6 +37,11 @@ public class DebugTeleporter : MonoBehaviour
     [SerializeField] private SceneEntry[] scenes;
     [SerializeField] private KeyCode sceneMenuKey = KeyCode.F10;
     private bool showSceneMenu = false;
+
+    [Header("GameObject Toggles")]
+    [SerializeField] private GameObjectToggle[] gameObjectToggles;
+    [SerializeField] private KeyCode toggleMenuKey = KeyCode.F11;
+    private bool showToggleMenu = false;
 
     [Header("Settings")]
     [SerializeField] private bool showDebugUI = true;
@@ -102,6 +115,12 @@ public class DebugTeleporter : MonoBehaviour
             showSceneMenu = !showSceneMenu;
         }
 
+        // Toggle du menu de GameObjects
+        if (Input.GetKeyDown(toggleMenuKey))
+        {
+            showToggleMenu = !showToggleMenu;
+        }
+
         // Téléportation
         if (teleportPoints != null)
         {
@@ -127,6 +146,18 @@ public class DebugTeleporter : MonoBehaviour
                 }
             }
         }
+
+        // Toggle des GameObjects par touche
+        if (gameObjectToggles != null)
+        {
+            foreach (var toggle in gameObjectToggles)
+            {
+                if (toggle.target != null && Input.GetKeyDown(toggle.key))
+                {
+                    ToggleGameObject(toggle);
+                }
+            }
+        }
     }
 
     private void LoadScene(string sceneName)
@@ -147,6 +178,13 @@ public class DebugTeleporter : MonoBehaviour
         
         // Recharger la scène actuelle
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void ToggleGameObject(GameObjectToggle toggle)
+    {
+        bool newState = !toggle.target.activeSelf;
+        toggle.target.SetActive(newState);
+        Debug.Log($"[DebugTeleporter] {toggle.name} -> {(newState ? "ON" : "OFF")}");
     }
 
     private void OnGUI()
@@ -199,6 +237,34 @@ public class DebugTeleporter : MonoBehaviour
                 if (GUI.Button(new Rect(x + 10, y, w - 10, h), label))
                 {
                     LoadScene(scene.sceneName);
+                }
+                y += h + 2;
+            }
+        }
+
+        // Menu de toggle GameObject
+        y += 10;
+        if (GUI.Button(new Rect(x, y, w, h), $"[{toggleMenuKey}] Toggles {(showToggleMenu ? "▼" : "▶")}"))
+        {
+            showToggleMenu = !showToggleMenu;
+        }
+        y += h + 2;
+
+        if (showToggleMenu && gameObjectToggles != null)
+        {
+            foreach (var toggle in gameObjectToggles)
+            {
+                if (toggle.target == null)
+                {
+                    GUI.Label(new Rect(x + 10, y, w - 10, h), $"[{toggle.key}] {toggle.name} (MISSING)");
+                }
+                else
+                {
+                    string state = toggle.target.activeSelf ? "ON" : "OFF";
+                    if (GUI.Button(new Rect(x + 10, y, w - 10, h), $"[{toggle.key}] {toggle.name} [{state}]"))
+                    {
+                        ToggleGameObject(toggle);
+                    }
                 }
                 y += h + 2;
             }
