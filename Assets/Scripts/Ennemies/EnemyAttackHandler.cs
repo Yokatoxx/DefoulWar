@@ -139,18 +139,22 @@ namespace Ennemies
             if (distance <= settings.attackRange)
             {
                 PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
-                if (playerHealth != null)
+                if (playerHealth != null && !playerHealth.IsInvulnerable)
                 {
+                    // Vérifier si le joueur est en train de dasher
+                    DashCible dashCible = player.GetComponent<DashCible>();
+                    if (dashCible != null && dashCible.isDashing) return;
+
                     playerHealth.TakeDamage(settings.attackDamage);
                     Debug.Log($"[EnemyAttack] Melee attack: {settings.attackDamage} damage!");
+                    
+                    // Notifier l'indicateur de hit seulement si les dégâts ont été infligés
+                    GetScreenDetector()?.RegisterHit(transform, settings.attackDamage);
                     
                     // Appliquer le ralentissement électrique si l'ennemi est électrique
                     ApplyElectricSlow();
                 }
             }
-
-            // Notifier l'indicateur de hit
-            GetScreenDetector()?.RegisterHit(transform, settings.attackDamage);
         }
 
         private void PerformRangedAttack()
@@ -213,10 +217,15 @@ namespace Ennemies
 
                 if (playerHealth != null)
                 {
+                    // Vérifier l'invincibilité et le dash
+                    if (playerHealth.IsInvulnerable) break;
+                    DashCible dashCible = playerHealth.GetComponent<DashCible>();
+                    if (dashCible != null && dashCible.isDashing) break;
+
                     playerHealth.TakeDamage(settings.attackDamage);
                     hitPlayer = true;
                     
-                    // Notifier l'indicateur de hit
+                    // Notifier l'indicateur de hit seulement si les dégâts ont été infligés
                     GetScreenDetector()?.RegisterHit(transform, settings.attackDamage);
                     
                     // Appliquer le ralentissement électrique si l'ennemi est électrique
