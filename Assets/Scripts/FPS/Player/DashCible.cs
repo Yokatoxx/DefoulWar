@@ -358,15 +358,43 @@ namespace FPS
             float dur = ConfigDashTravelTime;
             Vector3 prev = transform.position;
 
+            // Vérifier si l'ennemi a un bouclier actif face au joueur
+            var shield = target.GetComponentInChildren<Ennemies.Effect.EnemyShield>();
+            bool shieldBlocking = false;
+            Vector3 shieldPos = Vector3.zero;
+            
+            if (shield != null && shield.ShieldActive)
+            {
+                Vector3 dirFromEnemy = (start - target.transform.position).normalized;
+                float angle = Vector3.Angle(target.transform.forward, dirFromEnemy);
+                // Si on vient de devant (dans le cône de blocage du shield)
+                if (angle <= 45f)
+                {
+                    shieldBlocking = true;
+                    // Utiliser la position du bouclier comme point d'arrêt
+                    shieldPos = shield.transform.position;
+                }
+            }
+
             while (Time.unscaledTime - t0 < dur)
             {
                 if (target == null) break;
                 
                 Vector3 targetPos = target.transform.position;
                 Vector3 dirToTarget = (targetPos - start).normalized;
-                float currentDistToTarget = Vector3.Distance(start, targetPos);
+                
+                // Si le bouclier bloque, s'arrêter au bouclier au lieu du centre de l'ennemi
+                Vector3 effectiveTargetPos = shieldBlocking ? shieldPos : targetPos;
+                float currentDistToTarget = Vector3.Distance(start, effectiveTargetPos);
                 float stopDist = Mathf.Clamp(ConfigStopOffset, 0f, Mathf.Max(0f, currentDistToTarget - 0.1f));
-                Vector3 end = targetPos - dirToTarget * stopDist;
+                
+                // Pour le bouclier, s'arrêter plus loin pour ne pas rentrer dedans
+                if (shieldBlocking)
+                {
+                    stopDist = Mathf.Max(stopDist, 1.0f);
+                }
+                
+                Vector3 end = effectiveTargetPos - dirToTarget * stopDist;
 
                 float u = (Time.unscaledTime - t0) / dur;
                 Vector3 desiredPos = Vector3.Lerp(start, end, u);

@@ -127,29 +127,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   mode:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   color:
-    m_OverrideState: 0
-    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0.81621504, b: 1, a: 1}
   center:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {x: 0.5, y: 0.5}
   intensity:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   smoothness:
     m_OverrideState: 0
     m_Value: 0.2
   roundness:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   rounded:
     m_OverrideState: 0
     m_Value: 0
   mask:
     m_OverrideState: 0
-    m_Value: {fileID: 0}
+    m_Value: {fileID: 2800000, guid: b463c455a9285e34ba84b9b10f81ce9f, type: 3}
   opacity:
     m_OverrideState: 0
     m_Value: 1
