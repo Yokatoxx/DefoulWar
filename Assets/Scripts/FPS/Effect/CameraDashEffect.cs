@@ -127,7 +127,7 @@ namespace FPS.Effect
             // Lerp depuis la valeur "dash" vers les valeurs neutres sur la durée
             while (elapsed < dashEffectDuration)
             {
-                elapsed += Time.deltaTime;
+                elapsed += Time.unscaledDeltaTime;
                 float t = Mathf.Clamp01(elapsed / dashEffectDuration);
 
                 if (lensDistortion != null)

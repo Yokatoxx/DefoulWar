@@ -10,6 +10,7 @@ namespace FPS
     public class DashHitStop : MonoBehaviour
     {
         private HitStopSettings config;
+        private DashSlowMo dashSlowMo;
         
         private bool isActive;
         private float savedTimeScale = 1f;
@@ -17,6 +18,11 @@ namespace FPS
         
         public bool IsActive => isActive;
         public bool IsEnabled => config?.enabled ?? false;
+        
+        private void Awake()
+        {
+            dashSlowMo = GetComponent<DashSlowMo>();
+        }
         
         /// <summary>
         /// Configure le module avec les paramètres HitStop depuis DashSettings.
@@ -71,14 +77,24 @@ namespace FPS
         }
         
         /// <summary>
-        /// Restaure le temps normal.
+        /// Restaure le temps - coordonne avec SlowMo si actif.
         /// </summary>
         public void Restore()
         {
             if (!isActive) return;
             
-            Time.timeScale = savedTimeScale;
-            Time.fixedDeltaTime = 0.02f * savedTimeScale;
+            // Si SlowMo est actif, restaurer vers son échelle pour éviter les conflits
+            if (dashSlowMo != null && dashSlowMo.IsActive)
+            {
+                Time.timeScale = dashSlowMo.SlowMoScale;
+                Time.fixedDeltaTime = 0.02f * dashSlowMo.SlowMoScale;
+            }
+            else
+            {
+                // Restaurer à l'échelle normale (1.0) pour éviter les stales
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = 0.02f;
+            }
             isActive = false;
         }
         

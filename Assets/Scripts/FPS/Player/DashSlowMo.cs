@@ -23,6 +23,8 @@ namespace FPS
         private bool rampInDone;
 
         public bool IsActive => isActive;
+        public bool IsPending => delayedApplyRoutine != null;
+        public bool IsActiveOrPending => isActive || delayedApplyRoutine != null;
         public float SlowMoScale => config?.scale ?? 0.2f;
         public float SlowMoDuration => config?.duration ?? 0.75f;
         public bool IsEnabled => config?.enabled ?? true;
@@ -78,23 +80,32 @@ namespace FPS
         {
             if (!IsEnabled) return;
             
+            // Arrêter le ramp-out en cours si présent
             if (rampOutRoutine != null)
             {
                 StopCoroutine(rampOutRoutine);
                 rampOutRoutine = null;
             }
             
+            // RESET COMPLET: Chaque dash doit avoir le même flow (knockback à vitesse normale → délai → slow-mo)
+            // Donc on arrête tout et on recommence le cycle
             if (isActive)
             {
-                slowMoEndUnscaled = Time.unscaledTime + SlowMoDuration;
-                return;
+                isActive = false;
+                rampInDone = false;
+                // Restaurer le temps normal pour le knockback
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = 0.02f;
             }
 
+            // Arrêter le délai en cours si présent
             if (delayedApplyRoutine != null)
             {
                 StopCoroutine(delayedApplyRoutine);
                 delayedApplyRoutine = null;
             }
+            
+            // Démarrer un nouveau cycle complet avec délai
             delayedApplyRoutine = StartCoroutine(DelayedApplySlowMo());
         }
 

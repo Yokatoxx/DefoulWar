@@ -129,3 +129,8 @@ MonoBehaviour:
     force: 10
     duration: 0.5
     affectsYAxis: 0
+  screenShake:
+    enabled: 1
+    duration: 0.15
+    positionMagnitude: 0.1
+    rotationMagnitude: 2

@@ -16595,6 +16595,8 @@ MonoBehaviour:
   - sceneName: LDToyVista
     key: 284
   sceneMenuKey: 291
+  gameObjectToggles: []
+  toggleMenuKey: 292
   showDebugUI: 1
 --- !u!4 &379262230
 Transform:
@@ -24334,10 +24336,30 @@ PrefabInstance:
       propertyPath: volume
       value: 
       objectReference: {fileID: 1517002196}
+    - target: {fileID: 6007708905211028212, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: dashSystem
+      value: 
+      objectReference: {fileID: 598452232}
+    - target: {fileID: 6007708905211028212, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: dashParticleSystem
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6007708905211028212, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: dashVignetteIntensity
+      value: 0.72
+      objectReference: {fileID: 0}
+    - target: {fileID: 6007708905211028212, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: deactivateParticleGOOnStop
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6318839346854996181, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: volume
       value: 
       objectReference: {fileID: 1714021711}
+    - target: {fileID: 6318839346854996181, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7205156207043545737, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
       propertyPath: soundPlayer
       value: 
@@ -24386,6 +24408,10 @@ PrefabInstance:
       propertyPath: volume
       value: 
       objectReference: {fileID: 1517002196}
+    - target: {fileID: 8826018477589334518, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -102489,6 +102515,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!20 &1853091476 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 8530068263262953220, guid: 7bceab56da18d6c4c9afefa779d51a77, type: 3}
+  m_PrefabInstance: {fileID: 598452226}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1870420480
 GameObject:
   m_ObjectHideFlags: 0
@@ -109419,6 +109450,10 @@ PrefabInstance:
       propertyPath: playerHealth
       value: 
       objectReference: {fileID: 598452231}
+    - target: {fileID: 5013624234891264410, guid: 90929b39cb833cd46a55847d75de16e0, type: 3}
+      propertyPath: targetCamera
+      value: 
+      objectReference: {fileID: 1853091476}
     - target: {fileID: 7984727888628449398, guid: 90929b39cb833cd46a55847d75de16e0, type: 3}
       propertyPath: playerHealth
       value: 

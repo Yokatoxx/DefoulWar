@@ -33,9 +33,9 @@ namespace FPS
             float vertical = Input.GetAxisRaw("Vertical");
             MoveInput = new Vector2(horizontal, vertical);
             
-            // Regard
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
+            // Regard - utiliser GetAxisRaw pour éviter le ralentissement pendant le slow-mo
+            float mouseX = Input.GetAxisRaw("Mouse X");
+            float mouseY = Input.GetAxisRaw("Mouse Y");
             LookInput = new Vector2(mouseX, mouseY);
             
             // Actions

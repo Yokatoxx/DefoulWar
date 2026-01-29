@@ -284,6 +284,7 @@ namespace FPS
             }
             else
             {
+                // On peut re-dasher SEULEMENT quand le slow-mo est actif (pas avant)
                 if (!slowMo.IsActive || remainingChains <= 0) return;
             }
 
