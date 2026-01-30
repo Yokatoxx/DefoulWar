@@ -13,6 +13,10 @@ public class CustomSSAOPass : CustomPass
         DepthColors = 5
     }
     
+    [Header("Shader (REQUIRED)")]
+    [Tooltip("Glisse le shader 'CustomSSAO' ici depuis le dossier Shaders")]
+    public Shader ssaoShader;
+    
     [Header("SSAO Quality")]
     public float intensity = 3f;
     public float radius = 0.8f;
@@ -28,9 +32,20 @@ public class CustomSSAOPass : CustomPass
 
     protected override void Setup(ScriptableRenderContext ctx, CommandBuffer cmd)
     {
-        var shader = Shader.Find("Hidden/CustomSSAO");
-        if (shader != null)
-            ssaoMat = CoreUtils.CreateEngineMaterial(shader);
+        // Utilise le shader assigné, ou tente de le trouver en fallback (editor only)
+        Shader shader = ssaoShader;
+        
+        if (shader == null)
+        {
+            shader = Shader.Find("Hidden/CustomSSAO");
+            if (shader == null)
+            {
+                Debug.LogError("[CustomSSAO] Shader non assigné ! Glisse le shader dans le champ 'Ssao Shader' du Custom Pass.");
+                return;
+            }
+        }
+        
+        ssaoMat = CoreUtils.CreateEngineMaterial(shader);
     }
 
     protected override void Execute(CustomPassContext ctx)
@@ -43,7 +58,6 @@ public class CustomSSAOPass : CustomPass
         ssaoMat.SetFloat("_Bias", bias);
         ssaoMat.SetFloat("_FalloffDistance", falloffDistance);
         
-        // Debug modes et ShowAO: rendu direct
         if (debugMode != DebugMode.Off)
         {
             if (debugMode == DebugMode.ShowAO)
@@ -52,7 +66,7 @@ public class CustomSSAOPass : CustomPass
             return;
         }
         
-        // Mode Off: composite multiplicatif direct (pass 2)
+        // Mode Off: composite multiplicatif
         ssaoMat.SetInt("_DebugMode", 0);
         CoreUtils.DrawFullScreen(ctx.cmd, ssaoMat, ctx.cameraColorBuffer, shaderPassId: 2);
     }
