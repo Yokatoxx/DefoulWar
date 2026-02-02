@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -13,6 +14,9 @@ namespace FPS
     [RequireComponent(typeof(DashHitStop))]
     public class DashCible : MonoBehaviour
     {
+        // Événement déclenché quand le dash touche un ennemi (position de l'impact)
+        public static event Action<Vector3> OnDashImpact;
+        
         #region Serialized Fields
         
         [Header("Configuration")]
@@ -483,6 +487,9 @@ namespace FPS
                 
                 // SlowMo
                 slowMo?.ApplyOrRefresh();
+                
+                // Notifier les listeners de l'impact
+                OnDashImpact?.Invoke(target.transform.position);
             }
         }
         
