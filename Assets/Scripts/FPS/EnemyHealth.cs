@@ -183,6 +183,10 @@ namespace FPS
             TryApplyDamage(info);
         }
 
+        [Header("Death Settings")]
+        [Tooltip("Délai avant destruction quand tué par un dash (permet les effets visuels).")]
+        [SerializeField] private float dashKillDestructionDelay = 0.2f;
+
         private void Die()
         {
             if (isDead) return;
@@ -190,7 +194,40 @@ namespace FPS
             isDead = true;
             OnDeath?.Invoke();
 
-            Destroy(gameObject);
+            // Si tué par un dash, attendre un peu pour laisser les effets visuels s'afficher
+            if (lastKillType == DamageType.Dash && dashKillDestructionDelay > 0f)
+            {
+                // Désactiver les comportements mais garder le visuel
+                DisableEnemyBehaviors();
+                Destroy(gameObject, dashKillDestructionDelay);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void DisableEnemyBehaviors()
+        {
+            // Désactiver l'IA et les collisions pour éviter les interactions post-mortem
+            var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+            if (agent != null) agent.enabled = false;
+            
+            var colliders = GetComponentsInChildren<Collider>();
+            foreach (var col in colliders)
+            {
+                col.enabled = false;
+            }
+            
+            // Désactiver les scripts de comportement
+            var behaviours = GetComponents<MonoBehaviour>();
+            foreach (var b in behaviours)
+            {
+                if (b != this && b is not EnemyVisualFeedback)
+                {
+                    b.enabled = false;
+                }
+            }
         }
 
         private static string NormalizeZoneKey(string zone)

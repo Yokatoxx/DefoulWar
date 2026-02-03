@@ -30,6 +30,15 @@ namespace FPS.Effect
         [SerializeField] private float dashVignetteIntensity = 0.4f;
         [SerializeField] private float dashVignetteDuration = 0.2f;
 
+        [Header("Chromatic Aberration - Impact")]
+        [Tooltip("Activer l'aberration chromatique à l'impact du dash.")]
+        [SerializeField] private bool enableImpactChromaticAberration = true;
+        [Tooltip("Intensité de l'aberration chromatique à l'impact (0-1).")]
+        [Range(0f, 1f)]
+        [SerializeField] private float impactChromaticIntensity = 0.8f;
+        [Tooltip("Durée du flash d'aberration chromatique.")]
+        [SerializeField] private float impactChromaticDuration = 0.08f;
+
         [Header("Dash Particles")]
         [Tooltip("Particle System à jouer au début du dash.")]
         [SerializeField] private ParticleSystem dashParticleSystem;
@@ -39,16 +48,19 @@ namespace FPS.Effect
         private LensDistortion lensDistortion;
         private DepthOfField depthOfField;
         private Vignette vignette;
+        private ChromaticAberration chromaticAberration;
 
-        // Sauvegarde des valeurs d'origine DoF
+        // Sauvegarde des valeurs d'origine
         private float initialFocusDistance;
         private float initialNearFocusStart;
         private float initialNearFocusEnd;
         private float initialFarFocusStart;
         private float initialFarFocusEnd;
+        private float initialChromaticIntensity;
 
         private bool wasDashing;
         private Coroutine currentRoutine;
+        private Coroutine chromaticRoutine;
 
         private void Start()
         {
@@ -72,7 +84,6 @@ namespace FPS.Effect
 
             if (volume.profile.TryGet(out depthOfField))
             {
-                // Stocker les valeurs initiales pour HDRP
                 initialFocusDistance = depthOfField.focusDistance.value;
                 initialNearFocusStart = depthOfField.nearFocusStart.value;
                 initialNearFocusEnd = depthOfField.nearFocusEnd.value;
@@ -93,15 +104,33 @@ namespace FPS.Effect
                 Debug.LogWarning("Vignette non trouvé dans le Volume profile (la vignette ne sera pas appliquée).");
             }
 
-            // S'assurer que le particle system est à l'arrêt au départ
+            if (volume.profile.TryGet(out chromaticAberration))
+            {
+                initialChromaticIntensity = chromaticAberration.intensity.value;
+            }
+            else
+            {
+                Debug.LogWarning("ChromaticAberration non trouvé dans le Volume profile.");
+            }
+
             StopParticles(forceClear: true);
+        }
+
+        private void OnEnable()
+        {
+            DashCible.OnDashImpact += HandleDashImpact;
+        }
+
+        private void OnDisable()
+        {
+            DashCible.OnDashImpact -= HandleDashImpact;
+            ResetAllEffects();
         }
 
         private void Update()
         {
             bool nowDashing = dashSystem != null && (dashSystem.isDashing || dashSystem.slowMoApplied);
 
-            // Front montant: démarrage des effets
             if (nowDashing && !wasDashing)
             {
                 if (currentRoutine != null)
@@ -111,7 +140,6 @@ namespace FPS.Effect
                 currentRoutine = StartCoroutine(PlayDashEffect());
             }
 
-            // Front descendant: arrêt des particules
             if (!nowDashing && wasDashing)
             {
                 StopParticles(forceClear: false);
@@ -120,11 +148,51 @@ namespace FPS.Effect
             wasDashing = nowDashing;
         }
 
+        private void HandleDashImpact(Vector3 impactPosition)
+        {
+            Debug.Log($"[CameraDashEffect] Impact reçu à {impactPosition}");
+            
+            if (!enableImpactChromaticAberration)
+            {
+                Debug.Log("[CameraDashEffect] Chromatic Aberration désactivée dans l'inspector");
+                return;
+            }
+            
+            if (chromaticAberration == null)
+            {
+                Debug.LogWarning("[CameraDashEffect] ChromaticAberration est null! Ajoute 'Chromatic Aberration' dans ton Volume Profile HDRP.");
+                return;
+            }
+
+            if (chromaticRoutine != null)
+                StopCoroutine(chromaticRoutine);
+
+            chromaticRoutine = StartCoroutine(PlayChromaticFlash());
+        }
+
+        private System.Collections.IEnumerator PlayChromaticFlash()
+        {
+            float elapsed = 0f;
+
+            while (elapsed < impactChromaticDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / impactChromaticDuration;
+                
+                // Flash rapide puis retour à la normale
+                chromaticAberration.intensity.value = Mathf.Lerp(impactChromaticIntensity, initialChromaticIntensity, t);
+
+                yield return null;
+            }
+
+            chromaticAberration.intensity.value = initialChromaticIntensity;
+            chromaticRoutine = null;
+        }
+
         private System.Collections.IEnumerator PlayDashEffect()
         {
             float elapsed = 0f;
 
-            // Lerp depuis la valeur "dash" vers les valeurs neutres sur la durée
             while (elapsed < dashEffectDuration)
             {
                 elapsed += Time.unscaledDeltaTime;
@@ -135,7 +203,6 @@ namespace FPS.Effect
 
                 if (depthOfField != null)
                 {
-                    // HDRP utilise focusDistance + nearFocus/farFocus ranges
                     depthOfField.focusDistance.value = Mathf.Lerp(dashFocusDistance, initialFocusDistance, t);
                     depthOfField.nearFocusStart.value = Mathf.Lerp(dashNearFocusStart, initialNearFocusStart, t);
                     depthOfField.nearFocusEnd.value = Mathf.Lerp(dashNearFocusEnd, initialNearFocusEnd, t);
@@ -168,9 +235,8 @@ namespace FPS.Effect
             currentRoutine = null;
         }
 
-        private void OnDisable()
+        private void ResetAllEffects()
         {
-            // Sécurité: remettre les valeurs d'origine si le script est désactivé
             if (lensDistortion != null)
                 lensDistortion.intensity.value = 0f;
 
@@ -185,6 +251,9 @@ namespace FPS.Effect
 
             if (vignette != null)
                 vignette.intensity.value = 0f;
+
+            if (chromaticAberration != null)
+                chromaticAberration.intensity.value = initialChromaticIntensity;
 
             StopParticles(forceClear: true);
         }

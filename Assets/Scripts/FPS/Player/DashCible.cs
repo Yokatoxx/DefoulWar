@@ -466,6 +466,10 @@ namespace FPS
                 hitCollider: hitCol
             );
             
+            // Notifier les listeners de l'impact AVANT d'appliquer les dégâts
+            // pour que les effets visuels se déclenchent avant la destruction potentielle de l'ennemi
+            OnDashImpact?.Invoke(target.transform.position);
+            
             bool applied = target.TryApplyDamage(dmg);
 
             if (applied)
@@ -479,6 +483,9 @@ namespace FPS
                 // Knockback ennemi - IMMÉDIAT à l'impact
                 ApplyEnemyKnockback(target, dirToTarget);
                 
+                // Repousse les ennemis autour de la cible
+                ApplyAreaKnockback(target.transform.position);
+                
                 // HitStop (non-bloquant, s'exécute en parallèle)
                 if (hitStop != null && hitStop.IsEnabled)
                 {
@@ -487,9 +494,6 @@ namespace FPS
                 
                 // SlowMo
                 slowMo?.ApplyOrRefresh();
-                
-                // Notifier les listeners de l'impact
-                OnDashImpact?.Invoke(target.transform.position);
             }
         }
         
@@ -518,6 +522,48 @@ namespace FPS
                 Config.screenShake.positionMagnitude,
                 Config.screenShake.rotationMagnitude
             );
+        }
+        
+        /// <summary>
+        /// Repousse les ennemis dans un cercle autour du point d'impact du dash
+        /// </summary>
+        private void ApplyAreaKnockback(Vector3 impactPosition)
+        {
+            if (Config?.areaKnockback == null || !Config.areaKnockback.enabled) return;
+            
+            float radius = Config.areaKnockback.radius;
+            int count = Physics.OverlapSphereNonAlloc(
+                impactPosition, 
+                radius, 
+                OverlapBuffer, 
+                EnemyMask, 
+                QueryTriggerInteraction.Ignore
+            );
+            
+            for (int i = 0; i < count; i++)
+            {
+                var col = OverlapBuffer[i];
+                if (col == null) continue;
+                
+                // Récupérer le knockback de l'ennemi
+                var knockback = col.GetComponentInParent<EnemyKnockback>();
+                if (knockback == null) knockback = col.GetComponent<EnemyKnockback>();
+                if (knockback == null || knockback.ResistToKnockback) continue;
+                
+                // Ne pas repousser l'ennemi qu'on vient de toucher directement (déjà knockback)
+                if (knockback.IsKnockbackActive) continue;
+                
+                // Direction depuis le point d'impact vers l'ennemi (repousse vers l'extérieur)
+                Vector3 pushDir = (col.transform.position - impactPosition).normalized;
+                if (pushDir.sqrMagnitude < 1e-4f) pushDir = Vector3.up;
+                
+                knockback.ApplyKnockback(
+                    pushDir,
+                    Config.areaKnockback.force,
+                    Config.areaKnockback.duration,
+                    Config.areaKnockback.affectsYAxis
+                );
+            }
         }
         
         private void ApplyElectricStun(Ennemies.Effect.ElectricEnnemis electric)

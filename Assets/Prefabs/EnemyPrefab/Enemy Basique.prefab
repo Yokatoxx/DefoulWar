@@ -372,6 +372,7 @@ GameObject:
   - component: {fileID: 4479012537968092976}
   - component: {fileID: -3646622553901817136}
   - component: {fileID: 4914846723171063}
+  - component: {fileID: 1842546751200952064}
   m_Layer: 7
   m_Name: Enemy Basique
   m_TagString: BasicEnemy
@@ -444,6 +445,7 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
+  dashKillDestructionDelay: 0.2
 --- !u!114 &4807056319870603770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -651,6 +653,28 @@ MonoBehaviour:
     fillPass:
       shader: {fileID: 0}
       serializedProperties: []
+--- !u!114 &1842546751200952064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807755940922956229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 934a532ffd8242ac93fe06316b2b6ea9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitColor: {r: 1, g: 0, b: 0, a: 1}
+  hitFlashDuration: 0.1
+  dashHitColor: {r: 1, g: 0, b: 0.11808586, a: 1}
+  dashFlashDuration: 0.15
+  dashScalePunchIntensity: 0.2
+  dashScalePunchDuration: 0.1
+  dashImpactParticles: {fileID: 0}
+  armorMaterial: {fileID: 0}
+  helmetPrefab: {fileID: 0}
+  vestPrefab: {fileID: 0}
 --- !u!1 &3126611085991315919
 GameObject:
   m_ObjectHideFlags: 0

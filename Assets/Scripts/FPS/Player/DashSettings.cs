@@ -34,6 +34,9 @@ namespace FPS
         [Header("Knockback Ennemi")]
         public KnockbackSettings knockback = new KnockbackSettings();
 
+        [Header("Repousse AOE (ennemis autour de la cible)")]
+        public AreaKnockbackSettings areaKnockback = new AreaKnockbackSettings();
+
         [Header("ScreenShake Impact")]
         public ScreenShakeSettings screenShake = new ScreenShakeSettings();
     }
@@ -125,6 +128,28 @@ namespace FPS
         public float duration = 0.5f;
         
         [Tooltip("Le knockback affecte aussi l'axe Y")]
+        public bool affectsYAxis = false;
+    }
+
+    [System.Serializable]
+    public class AreaKnockbackSettings
+    {
+        [Tooltip("Active la repousse des ennemis autour de la cible du dash")]
+        public bool enabled = true;
+        
+        [Min(0f)]
+        [Tooltip("Rayon de détection des ennemis autour de la cible")]
+        public float radius = 4f;
+        
+        [Min(0f)]
+        [Tooltip("Force de repousse appliquée aux ennemis alentour")]
+        public float force = 10f;
+        
+        [Min(0.1f)]
+        [Tooltip("Durée du knockback sur les ennemis alentour")]
+        public float duration = 0.4f;
+        
+        [Tooltip("Le knockback AOE affecte aussi l'axe Y")]
         public bool affectsYAxis = false;
     }
 
