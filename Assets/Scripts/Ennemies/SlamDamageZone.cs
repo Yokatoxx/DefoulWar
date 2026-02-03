@@ -45,7 +45,7 @@ namespace Ennemies.Effect
             var player = other.GetComponentInParent<PlayerHealth>() ?? other.GetComponent<PlayerHealth>();
             if (player != null && !player.IsDead)
             {
-                player.TakeDamage(damagePerSecond * tickInterval);
+                player.TakeDamage(damagePerSecond * tickInterval, transform.position);
             }
         }
     }

@@ -119,7 +119,7 @@ namespace FPS
                 PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
                 if (playerHealth != null)
                 {
-                    playerHealth.TakeDamage(attackDamage);
+                    playerHealth.TakeDamage(attackDamage, transform.position);
                     Debug.Log($"Enemy attacked player for {attackDamage} damage!");
                     
                     // Notifier l'indicateur de hit (seulement si dégâts infligés)

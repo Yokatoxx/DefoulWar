@@ -145,7 +145,7 @@ namespace Ennemies
                     DashCible dashCible = player.GetComponent<DashCible>();
                     if (dashCible != null && dashCible.isDashing) return;
 
-                    playerHealth.TakeDamage(settings.attackDamage);
+                    playerHealth.TakeDamage(settings.attackDamage, transform.position);
                     Debug.Log($"[EnemyAttack] Melee attack: {settings.attackDamage} damage!");
                     
                     // Notifier l'indicateur de hit seulement si les dégâts ont été infligés
@@ -222,7 +222,7 @@ namespace Ennemies
                     DashCible dashCible = playerHealth.GetComponent<DashCible>();
                     if (dashCible != null && dashCible.isDashing) break;
 
-                    playerHealth.TakeDamage(settings.attackDamage);
+                    playerHealth.TakeDamage(settings.attackDamage, shootPoint.position);
                     hitPlayer = true;
                     
                     // Notifier l'indicateur de hit seulement si les dégâts ont été infligés

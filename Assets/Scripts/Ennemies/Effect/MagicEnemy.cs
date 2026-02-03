@@ -212,7 +212,7 @@ namespace Ennemies.Effect
         // Renvoie un tir hitscan instantané vers le joueur
         private void ReflectHitscan(PlayerHealth player)
         {
-            player.TakeDamage(reflectedDamage);
+            player.TakeDamage(reflectedDamage, transform.position);
 
             if (hitScanFx != null)
             {
@@ -235,7 +235,7 @@ namespace Ennemies.Effect
             
             if (distanceToTarget <= hitRadius)
             {
-                player.TakeDamage(reflectedDamage);
+                player.TakeDamage(reflectedDamage, transform.position);
                 Debug.Log("[MagicEnemy] Hitscan prédit touche le joueur !");
             }
             else

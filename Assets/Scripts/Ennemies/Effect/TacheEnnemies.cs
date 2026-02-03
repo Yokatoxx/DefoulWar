@@ -123,7 +123,7 @@ namespace Ennemies.Effect
                 var playerHealth = col.GetComponent<PlayerHealth>();
                 if (playerHealth != null)
                 {
-                    playerHealth.TakeDamage(explosionDamage);
+                    playerHealth.TakeDamage(explosionDamage, transform.position);
                 }
             }
 

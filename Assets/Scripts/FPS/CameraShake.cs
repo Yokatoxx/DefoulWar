@@ -179,6 +179,94 @@ namespace FPS
         }
 
         /// <summary>
+        /// Déclenche un screenshake directionnel (le shake part de la direction de l'impact)
+        /// </summary>
+        /// <param name="attackerWorldPosition">Position mondiale de l'attaquant</param>
+        /// <param name="duration">Durée du shake en secondes</param>
+        /// <param name="positionMagnitude">Intensité du déplacement</param>
+        /// <param name="rotationMagnitude">Intensité de la rotation (optionnel)</param>
+        public void DirectionalShake(Vector3 attackerWorldPosition, float duration, float positionMagnitude, float rotationMagnitude = 0f)
+        {
+            StopAllCoroutines();
+            StartCoroutine(DirectionalShakeCoroutine(attackerWorldPosition, duration, positionMagnitude, rotationMagnitude));
+        }
+
+        private IEnumerator DirectionalShakeCoroutine(Vector3 attackerWorldPosition, float duration, float positionMagnitude, float rotationMagnitude)
+        {
+            isShaking = true;
+            float elapsed = 0f;
+            originalPosition = cameraTransform.localPosition;
+            originalRotation = cameraTransform.localRotation;
+            
+            duration = Mathf.Min(duration, maxShakeDuration);
+            positionMagnitude = Mathf.Min(positionMagnitude * globalIntensityMultiplier, maxPositionMagnitude);
+            rotationMagnitude = Mathf.Min(rotationMagnitude * globalIntensityMultiplier, maxRotationMagnitude);
+            
+            // Calculer la direction de l'impact en espace local caméra
+            Vector3 toAttacker = (attackerWorldPosition - cameraTransform.position).normalized;
+            Vector3 localDir = cameraTransform.InverseTransformDirection(toAttacker);
+            Vector2 impactDir = new Vector2(localDir.x, localDir.y).normalized;
+            
+            if (showDebugInfo)
+            {
+                Debug.Log($"CameraShake: Directional shake - Direction: {impactDir}, Durée: {duration}s, Magnitude: {positionMagnitude}");
+            }
+
+            while (elapsed < duration)
+            {
+                float percentComplete = elapsed / duration;
+                float damper = dampingCurve.Evaluate(percentComplete);
+                
+                // Premier quart: fort push dans la direction de l'impact
+                // Reste: oscillation décroissante
+                float phaseProgress = percentComplete * 4f;
+                float directionalWeight;
+                float randomWeight;
+                
+                if (phaseProgress < 1f)
+                {
+                    directionalWeight = 1f - phaseProgress;
+                    randomWeight = phaseProgress * 0.5f;
+                }
+                else
+                {
+                    directionalWeight = 0f;
+                    randomWeight = 1f;
+                }
+                
+                // Offset directionnel (vers l'impact)
+                Vector2 directionalOffset = impactDir * positionMagnitude * directionalWeight * damper;
+                
+                // Offset aléatoire (oscillation)
+                float randomX = Random.Range(-1f, 1f) * positionMagnitude * randomWeight * damper;
+                float randomY = Random.Range(-1f, 1f) * positionMagnitude * randomWeight * damper;
+                
+                Vector3 totalOffset = new Vector3(directionalOffset.x + randomX, directionalOffset.y + randomY, 0);
+                cameraTransform.localPosition = originalPosition + totalOffset;
+                
+                // Rotation directionnelle (penche vers l'impact)
+                if (rotationMagnitude > 0f)
+                {
+                    float tiltAngle = -impactDir.x * rotationMagnitude * damper;
+                    float randomRoll = Random.Range(-1f, 1f) * rotationMagnitude * 0.3f * randomWeight * damper;
+                    cameraTransform.localRotation = originalRotation * Quaternion.Euler(0, 0, tiltAngle + randomRoll);
+                }
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            cameraTransform.localPosition = originalPosition;
+            cameraTransform.localRotation = originalRotation;
+            isShaking = false;
+            
+            if (showDebugInfo)
+            {
+                Debug.Log("CameraShake: Directional shake terminé");
+            }
+        }
+
+        /// <summary>
         /// Arrête immédiatement le screenshake
         /// </summary>
         public void StopShake()

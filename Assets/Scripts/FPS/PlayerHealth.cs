@@ -22,6 +22,16 @@ namespace FPS
         [Tooltip("Référence au DashCible pour vérifier l'état du dash. Auto-détecté si non assigné.")]
         [SerializeField] private DashCible dashCible;
         
+        [Header("Camera Shake - Dégâts")]
+        [Tooltip("Activer le screenshake quand le joueur prend des dégâts")]
+        [SerializeField] private bool enableDamageShake = true;
+        [Tooltip("Durée du shake")]
+        [SerializeField] private float damageShakeDuration = 0.25f;
+        [Tooltip("Intensité du déplacement de la caméra")]
+        [SerializeField] private float damageShakePositionMag = 0.08f;
+        [Tooltip("Intensité de la rotation de la caméra")]
+        [SerializeField] private float damageShakeRotationMag = 2f;
+        
         [Header("Events")]
         public UnityEvent<float> OnHealthChanged;
         public UnityEvent OnDeath;
@@ -65,7 +75,16 @@ namespace FPS
         
         public void TakeDamage(float damage)
         {
-            // Ignorer les dégâts si mort, invulnérable, ou en train de dasher
+            TakeDamageInternal(damage, null);
+        }
+        
+        public void TakeDamage(float damage, Vector3 attackerPosition)
+        {
+            TakeDamageInternal(damage, attackerPosition);
+        }
+
+        private void TakeDamageInternal(float damage, Vector3? attackerPosition)
+        {
             if (isDead || isInvulnerable) return;
             if (dashCible != null && dashCible.isDashing) return;
 
@@ -76,6 +95,26 @@ namespace FPS
 
             currentHealth = Mathf.Max(0, currentHealth - damage);
             timeSinceLastDamage = 0f;
+
+            // Screenshake directionnel ou classique selon si on a la position de l'attaquant
+            if (enableDamageShake && CameraShake.Instance != null)
+            {
+                if (attackerPosition.HasValue)
+                {
+                    CameraShake.Instance.DirectionalShake(
+                        attackerPosition.Value, 
+                        damageShakeDuration, 
+                        damageShakePositionMag, 
+                        damageShakeRotationMag);
+                }
+                else
+                {
+                    CameraShake.Instance.ShakeWithRotation(
+                        damageShakeDuration, 
+                        damageShakePositionMag, 
+                        damageShakeRotationMag);
+                }
+            }
 
             OnHealthChanged?.Invoke(currentHealth / maxHealth);
 
