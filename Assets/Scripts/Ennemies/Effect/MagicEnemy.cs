@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using FPS;
 
 namespace Ennemies.Effect
@@ -20,6 +21,10 @@ namespace Ennemies.Effect
         
         [Tooltip("Temps minimum entre deux réflexions (en secondes)")]
         [SerializeField] private float reflectCooldown = 0.15f;
+        
+        [Header("Délai de réflexion")]
+        [Tooltip("Délai avant le renvoi de la balle (avec ligne de prédiction verte)")]
+        [SerializeField] private float reflectDelay = 0.5f;
         
         [Tooltip("Prefab du projectile magique renvoyé (si null, utilise Bullet.CreateBulletPrefab())")]
         [SerializeField] private GameObject magicBulletPrefab;
@@ -44,6 +49,10 @@ namespace Ennemies.Effect
         private float lastReflectTime = -999f;
         private GameObject cachedBulletPrefab;
         
+        private LineRenderer laserLine;
+        private Coroutine pendingReflectCoroutine;
+        private bool isReflecting = false;
+        
         private void Awake()
         {
             health = GetComponent<EnemyHealth>();
@@ -62,6 +71,22 @@ namespace Ennemies.Effect
             }
             
             cachedBulletPrefab = magicBulletPrefab;
+            
+            CreateLaserLine();
+        }
+        
+        private void CreateLaserLine()
+        {
+            GameObject laserObj = new GameObject("MagicReflectLaser");
+            laserObj.transform.SetParent(transform);
+            laserLine = laserObj.AddComponent<LineRenderer>();
+            laserLine.startWidth = 0.05f;
+            laserLine.endWidth = 0.05f;
+            laserLine.positionCount = 2;
+            laserLine.material = new Material(Shader.Find("Sprites/Default"));
+            laserLine.startColor = Color.green;
+            laserLine.endColor = Color.green;
+            laserLine.enabled = false;
         }
         
         private void OnDestroy()
@@ -97,11 +122,11 @@ namespace Ennemies.Effect
                 return true; // appliquer
             }
             
-            // Bloquer les dégâts de balle et renvoyer vers le joueur
+            // Bloquer les dégâts de balle et renvoyer vers le joueur avec délai
             if (damage.type == DamageType.Bullet)
             {
-                // Cooldown
-                if (Time.time - lastReflectTime < reflectCooldown)
+                // Cooldown et vérifier si pas déjà en train de réfléchir
+                if (Time.time - lastReflectTime < reflectCooldown || isReflecting)
                 {
                     return false; // bloqué, pas de dégâts
                 }
@@ -110,19 +135,7 @@ namespace Ennemies.Effect
                 var player = FindFirstObjectByType<PlayerHealth>();
                 if (player != null)
                 {
-                    if (useHitscanReflect)
-                    {
-                        ReflectHitscan(player);
-                    }
-                    else
-                    {
-                        CreateMagicBullet(player.transform.position);
-                    }
-                    // Effet visuel à l'impact si fourni
-                    if (reflectEffectPrefab != null)
-                    {
-                        CreateReflectEffect(transform.position + Vector3.up * 1.5f);
-                    }
+                    pendingReflectCoroutine = StartCoroutine(ReflectWithDelay(player));
                 }
                 
                 return false; // on bloque le dégât d'origine
@@ -130,6 +143,70 @@ namespace Ennemies.Effect
             
             // Par défaut, laisser passer
             return true;
+        }
+        
+        // Coroutine de réflexion avec délai et ligne de prédiction verte
+        private IEnumerator ReflectWithDelay(PlayerHealth player)
+        {
+            isReflecting = true;
+            Vector3 shootOrigin = transform.position + Vector3.up * 1.5f;
+            
+            // Calculer la position prédite (verrouillée au moment du tir)
+            Vector3 lockedTargetPosition;
+            Rigidbody playerRb = player.GetComponent<Rigidbody>();
+            if (playerRb != null)
+            {
+                // Prédiction basée sur la vélocité du joueur
+                lockedTargetPosition = player.transform.position + playerRb.linearVelocity * reflectDelay + Vector3.up;
+            }
+            else
+            {
+                lockedTargetPosition = player.transform.position + Vector3.up;
+            }
+            
+            // Afficher la ligne verte vers la position prédite
+            if (laserLine != null)
+            {
+                laserLine.enabled = true;
+            }
+            
+            float timer = reflectDelay;
+            while (timer > 0f)
+            {
+                shootOrigin = transform.position + Vector3.up * 1.5f;
+                
+                // Ligne fixe vers la position verrouillée (ne suit PAS le joueur)
+                if (laserLine != null)
+                {
+                    laserLine.SetPosition(0, shootOrigin);
+                    laserLine.SetPosition(1, lockedTargetPosition);
+                }
+                
+                timer -= Time.deltaTime;
+                yield return null;
+            }
+            
+            // Désactiver la ligne et tirer vers la position prédite
+            if (laserLine != null) laserLine.enabled = false;
+            
+            if (player != null)
+            {
+                if (useHitscanReflect)
+                {
+                    ReflectHitscanToPosition(lockedTargetPosition, player);
+                }
+                else
+                {
+                    CreateMagicBullet(lockedTargetPosition);
+                }
+                
+                if (reflectEffectPrefab != null)
+                {
+                    CreateReflectEffect(transform.position + Vector3.up * 1.5f);
+                }
+            }
+            
+            isReflecting = false;
         }
         
         // Renvoie un tir hitscan instantané vers le joueur
@@ -147,6 +224,37 @@ namespace Ennemies.Effect
                 new Color(0.8f, 0.2f, 1f), 0.1f);
             
             Debug.Log("[MagicEnemy] Tir hitscan instantané renvoyé vers le joueur !");
+        }
+        
+        // Hitscan vers une position prédite (le joueur peut esquiver)
+        private void ReflectHitscanToPosition(Vector3 targetPosition, PlayerHealth player)
+        {
+            // Vérifier si le joueur est proche de la position prédite
+            float hitRadius = 1.5f;
+            float distanceToTarget = Vector3.Distance(player.transform.position + Vector3.up, targetPosition);
+            
+            if (distanceToTarget <= hitRadius)
+            {
+                player.TakeDamage(reflectedDamage);
+                Debug.Log("[MagicEnemy] Hitscan prédit touche le joueur !");
+            }
+            else
+            {
+                Debug.Log($"[MagicEnemy] Hitscan prédit manqué ! Distance: {distanceToTarget:F2}m");
+            }
+
+            // Effet visuel vers la position prédite (pas le joueur actuel)
+            if (hitScanFx != null)
+            {
+                // Créer un point temporaire pour l'effet
+                GameObject tempTarget = new GameObject("TempHitscanTarget");
+                tempTarget.transform.position = targetPosition;
+                hitScanFx.FireTo(tempTarget.transform);
+                Destroy(tempTarget, 0.5f);
+            }
+
+            Debug.DrawLine(transform.position + Vector3.up * 1.5f, targetPosition, 
+                new Color(0.8f, 0.2f, 1f), 0.5f);
         }
         
         // Crée un projectile magique
