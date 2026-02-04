@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientMode: 4
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
@@ -46092,6 +46092,71 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1001 &1334702929
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 160580225223210161, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_Name
+      value: EnemyMagique
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.4877543
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 14.130651
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2657800489959688396, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128198403746774918, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: outlineTargets.Array.data[0].IsVisible
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128198403746774918, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
+      propertyPath: outlineTargets.Array.data[1].IsVisible
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a7ec9ced8b367964193f2469fd8a7a92, type: 3}
 --- !u!43 &1338883432
 Mesh:
   m_ObjectHideFlags: 0
@@ -62832,3 +62897,4 @@ SceneRoots:
   - {fileID: 8616131597921640758}
   - {fileID: 560043952}
   - {fileID: 665781359}
+  - {fileID: 1334702929}

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shield
+  m_Name: Shield 1
   m_Shader: {fileID: -6465566751694194690, guid: 9e3b13dd327e0fd43ac54adee55ee553, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -167,7 +167,7 @@ Material:
     - _DoubleSidedNormalMode: 1
     - _DstBlend: 1
     - _DstBlend2: 10
-    - _EmissionPower: 1.2
+    - _EmissionPower: 2.13
     - _EmissionScale: 5
     - _EmissiveColorMode: 1
     - _EmissiveExposureWeight: 1
