@@ -167,8 +167,8 @@ Material:
     - _DoubleSidedNormalMode: 1
     - _DstBlend: 1
     - _DstBlend2: 10
-    - _EmissionPower: 1.2
-    - _EmissionScale: 5
+    - _EmissionPower: 1.88
+    - _EmissionScale: 50
     - _EmissiveColorMode: 1
     - _EmissiveExposureWeight: 1
     - _EmissiveIntensity: 1
@@ -196,8 +196,8 @@ Material:
     - _Metallic: 0
     - _MetallicRemapMax: 1
     - _MetallicRemapMin: 0
-    - _NoiseScale: 80
-    - _NoiseSpeed: 0.15
+    - _NoiseScale: 189.69
+    - _NoiseSpeed: 0.1
     - _NormalMapSpace: 0
     - _NormalScale: 1
     - _ObjectSpaceUVMapping: 0
@@ -209,7 +209,7 @@ Material:
     - _PPDPrimitiveLength: 1
     - _PPDPrimitiveWidth: 1
     - _PerPixelSorting: 0
-    - _PulseSpeed: 2
+    - _PulseSpeed: 1.5
     - _RayTracing: 0
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
