@@ -212,9 +212,6 @@ MonoBehaviour:
   mouseSensitivity: 2
   minVerticalAngle: -80
   maxVerticalAngle: 80
-  leanAngle: -0.5
-  leanInputAngle: 20
-  leanSpeed: 8
 --- !u!114 &4379777072623147912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -475,13 +472,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1403591587188792743}
-  - component: {fileID: 6090654977010750780}
   - component: {fileID: 8530068263262953220}
   - component: {fileID: 1580189386796163951}
   - component: {fileID: 8420992374081522002}
   - component: {fileID: 6007708905211028212}
   - component: {fileID: 6318839346854996181}
   - component: {fileID: 7505063564153651774}
+  - component: {fileID: 822352646558680129}
   m_Layer: 3
   m_Name: Camera
   m_TagString: MainCamera
@@ -506,14 +503,6 @@ Transform:
   - {fileID: 3635843694372808814}
   m_Father: {fileID: 8703966557384231457}
   m_LocalEulerAnglesHint: {x: 0, y: -120, z: 0}
---- !u!81 &6090654977010750780
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4673607940017463061}
-  m_Enabled: 1
 --- !u!20 &8530068263262953220
 Camera:
   m_ObjectHideFlags: 0
@@ -816,6 +805,20 @@ MonoBehaviour:
   dilateQuality: 0
   blurIterations: 4
   blurType: 1
+--- !u!114 &822352646558680129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4673607940017463061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1 &4948290940259812216
 GameObject:
   m_ObjectHideFlags: 0
